@@ -55,6 +55,7 @@ The project should help the user:
 - Track important deliverables in `docs/artifact_index.md`.
 - Track risks and blockers in `docs/risk_register.md`.
 - Before professor handoff or staged delivery, check `docs/submission_checklist.md`.
+- Use `python3 scripts/check_project_status.py` for a quick setup and placeholder check.
 
 ## Code Standards
 

@@ -37,6 +37,7 @@
 - 新增風險與阻塞追蹤 `docs/risk_register.md`。
 - 新增專案儀表板 `docs/dashboard.md`。
 - 新增給教授的更新與詢問模板 `docs/professor_update_template.md`。
+- 新增專案狀態檢查腳本 `scripts/check_project_status.py`。
 
 ### 已知資訊
 
@@ -73,5 +74,6 @@
 - 決定正式程式碼要使用的語言、框架與執行方式。
 - 確認學校或教授要求的引用格式。
 - 每週使用 `docs/weekly_review.md` 檢查進度與風險。
+- 可執行 `python3 scripts/check_project_status.py` 快速檢查關鍵文件與待補標記。
 - 交付教授或階段成果前使用 `docs/submission_checklist.md`。
 - 重要 AI 協助需記錄到 `docs/ai_usage_log.md`，是否正式揭露需向教授確認。

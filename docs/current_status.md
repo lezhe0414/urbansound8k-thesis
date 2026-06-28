@@ -45,6 +45,7 @@
 
 ### 程式與實驗
 
+- `scripts/check_project_status.py`：專案狀態檢查腳本。
 - `src/README.md`：正式程式碼放置規則。
 - `notebooks/README.md`：探索性 notebook 規則。
 - `docs/environment.md`：程式環境與執行方式。
@@ -110,6 +111,7 @@
 11. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
 12. 若 AI 協助產生重要內容、程式或整理，更新 `docs/ai_usage_log.md`。
 13. 若出現會影響進度、資料、程式或交付的問題，更新 `docs/risk_register.md`。
+14. 可執行 `python3 scripts/check_project_status.py` 檢查關鍵文件與待補標記。
 
 ## 目前完成度判斷
 

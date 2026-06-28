@@ -71,6 +71,13 @@
 | 定義程式任務 | `docs/code_task_spec.md` |
 | 管理文獻引用 | `references/` |
 | 交付前檢查 | `docs/submission_checklist.md` |
+| 自動檢查狀態 | `scripts/check_project_status.py` |
+
+## 快速檢查命令
+
+```text
+python3 scripts/check_project_status.py
+```
 
 ## 最近提交
 

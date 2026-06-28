@@ -50,15 +50,16 @@
 14. 重要 AI 協助記錄到 `docs/ai_usage_log.md`。
 15. 寫作時依 `docs/writing_style_guide.md` 與 `docs/glossary.md` 統一語氣和術語。
 16. 每週用 `docs/weekly_review.md` 檢查進度與風險。
-17. 章節正式草稿放在 `docs/chapters/`。
-18. 寫程式前先用 `docs/code_task_spec.md` 定義任務規格。
-19. 程式原型可先放 `notebooks/`，確定要重複執行後整理到 `src/`。
-20. 程式環境與執行方式記在 `docs/environment.md`。
-21. 每次實驗前後參考 `docs/experiment_template.md` 紀錄目的、命令、參數與結果。
-22. 用 `docs/reproducibility_checklist.md` 檢查程式、資料與實驗是否能支撐論文。
-23. 交給教授或階段交付前，用 `docs/submission_checklist.md` 檢查。
-24. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
-25. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
+17. 可執行 `python3 scripts/check_project_status.py` 快速檢查專案狀態。
+18. 章節正式草稿放在 `docs/chapters/`。
+19. 寫程式前先用 `docs/code_task_spec.md` 定義任務規格。
+20. 程式原型可先放 `notebooks/`，確定要重複執行後整理到 `src/`。
+21. 程式環境與執行方式記在 `docs/environment.md`。
+22. 每次實驗前後參考 `docs/experiment_template.md` 紀錄目的、命令、參數與結果。
+23. 用 `docs/reproducibility_checklist.md` 檢查程式、資料與實驗是否能支撐論文。
+24. 交給教授或階段交付前，用 `docs/submission_checklist.md` 檢查。
+25. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
+26. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
 
 ## 重要文件入口
 
@@ -89,6 +90,7 @@
 - `docs/experiment_template.md`：每次實驗或跑程式後的紀錄格式。
 - `docs/reproducibility_checklist.md`：交付前檢查研究是否可追蹤、可重現。
 - `docs/submission_checklist.md`：交付教授、階段成果或初稿前的檢查清單。
+- `scripts/check_project_status.py`：快速檢查關鍵文件與待補標記。
 - `.env.example`：環境變數樣板，實際 `.env` 不提交。
 - `references/README.md`：文獻與引用管理流程。
 - `references/literature_notes.md`：文獻閱讀與引用重點。
