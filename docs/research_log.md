@@ -1,0 +1,51 @@
+# 研究日誌
+
+每次討論、實驗、寫作或重要決策都可以記在這裡，避免之後忘記脈絡。
+
+## 2026-06-28
+
+### 事件
+
+- 建立論文專案骨架。
+- 設定 AI Agent 協作規範。
+- 新增論文需求訪談表 `docs/intake_questions.md`。
+- 新增里程碑與任務追蹤文件 `docs/milestones.md`。
+- 新增程式碼目錄說明 `src/README.md`。
+- 新增 notebook 使用說明 `notebooks/README.md`。
+- 新增實驗紀錄模板 `docs/experiment_template.md`。
+- 新增可重複研究檢查清單 `docs/reproducibility_checklist.md`。
+- 新增論文章節大綱 `docs/thesis_outline.md`。
+- 新增教授會議紀錄 `docs/meeting_notes.md`。
+- 新增資料、結果與圖表資料夾說明。
+- 新增決策紀錄 `docs/decision_log.md`。
+- 新增任務 Inbox `docs/task_inbox.md`。
+- 新增程式環境設定 `docs/environment.md` 與 `.env.example`。
+- 新增逐章論文草稿資料夾 `docs/chapters/`。
+- 新增引用管理入口 `references/README.md`、`references/citation_tracker.md`、`references/references.bib`。
+- 新增目前狀態摘要 `docs/current_status.md`。
+
+### 已知資訊
+
+- 專案目標是協助完成論文寫作與程式碼開發。
+- 指導教授已同意使用 AI Agent。
+
+### 待補資訊
+
+- 論文題目或暫定方向。
+- 程式碼要解決的問題。
+- 資料來源與研究方法。
+- 教授對論文格式、進度和實驗的要求。
+
+### 下一步
+
+- 補完 `docs/thesis_plan.md` 的基本資訊。
+- 先查看 `docs/current_status.md`，確認仍缺哪些資訊。
+- 依 `docs/thesis_outline.md` 建立第一版正式章節架構。
+- 開始在 `docs/chapters/` 補第一章緒論或第二章文獻探討。
+- 把教授既有要求補到 `docs/meeting_notes.md`。
+- 把未分類任務先放到 `docs/task_inbox.md`。
+- 把重要研究或技術選擇補到 `docs/decision_log.md`。
+- 先回答 `docs/intake_questions.md` 最後三題，以便 AI Agent 整理研究計畫。
+- 確定第一個可執行的研究或程式任務。
+- 決定正式程式碼要使用的語言、框架與執行方式。
+- 確認學校或教授要求的引用格式。

@@ -1,0 +1,94 @@
+# 論文專案
+
+這個專案用來協助完成論文寫作、程式碼開發、實驗紀錄、資料整理與結果產出。
+
+教授已同意使用 AI Agent，因此本專案會把 AI 協作流程納入正式工作方式：每次修改都盡量留下可追蹤的文件、程式、實驗紀錄或結果。
+
+## 專案結構
+
+```text
+.
+├── AGENTS.md
+├── README.md
+├── docs/
+├── src/
+├── notebooks/
+├── data/
+│   ├── raw/
+│   └── processed/
+├── results/
+├── figures/
+└── references/
+```
+
+## 主要資料夾
+
+- `docs/`：論文計畫、章節大綱、章節草稿、研究日誌、會議紀錄。
+- `src/`：正式可重複執行的程式碼。
+- `notebooks/`：探索性分析或實驗筆記。
+- `data/raw/`：原始資料，原則上不覆蓋、不直接修改。
+- `data/processed/`：清理後或轉換後的資料。
+- `results/`：實驗輸出、指標、表格與紀錄。
+- `figures/`：論文用圖、流程圖、結果圖。
+- `references/`：文獻、BibTeX、閱讀筆記。
+
+## 建議工作流程
+
+1. 先看 `docs/current_status.md`，確認目前完成度與資訊缺口。
+2. 在 `docs/thesis_plan.md` 補上題目、研究問題、方法與目前限制。
+3. 如果還不確定怎麼描述需求，先填 `docs/intake_questions.md`。
+4. 不確定要放哪裡的事項，先放進 `docs/task_inbox.md`。
+5. 重要方向、技術選型或教授要求改變時，記到 `docs/decision_log.md`。
+6. 用 `docs/milestones.md` 追蹤論文、程式、實驗與教授回饋。
+7. 每次與教授討論後，把結論寫進 `docs/research_log.md` 與 `docs/meeting_notes.md`。
+8. 章節正式草稿放在 `docs/chapters/`。
+9. 程式原型可先放 `notebooks/`，確定要重複執行後整理到 `src/`。
+10. 程式環境與執行方式記在 `docs/environment.md`。
+11. 每次實驗前後參考 `docs/experiment_template.md` 紀錄目的、命令、參數與結果。
+12. 用 `docs/reproducibility_checklist.md` 檢查程式、資料與實驗是否能支撐論文。
+13. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
+14. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
+
+## 重要文件入口
+
+- `docs/intake_questions.md`：還不知道怎麼開始時，先回答這份訪談表。
+- `docs/current_status.md`：目前完成度、資訊缺口與下一步。
+- `docs/thesis_plan.md`：整理論文題目、研究問題、方法與預期成果。
+- `docs/thesis_outline.md`：建立論文章節架構與各章待補內容。
+- `docs/chapters/`：逐章撰寫正式草稿。
+- `docs/task_inbox.md`：暫存尚未分類的論文、程式、資料、文獻任務。
+- `docs/decision_log.md`：記錄重要研究與技術決策，以及決策理由。
+- `docs/milestones.md`：追蹤論文、程式、實驗、教授回饋與期限。
+- `docs/meeting_notes.md`：記錄教授會議、修改要求與下次會議前任務。
+- `docs/ai_workflow.md`：說明如何讓 AI Agent 協助寫作、文獻與程式。
+- `docs/environment.md`：記錄程式語言、工具、安裝命令與重現步驟。
+- `docs/experiment_template.md`：每次實驗或跑程式後的紀錄格式。
+- `docs/reproducibility_checklist.md`：交付前檢查研究是否可追蹤、可重現。
+- `.env.example`：環境變數樣板，實際 `.env` 不提交。
+- `references/README.md`：文獻與引用管理流程。
+- `references/literature_notes.md`：文獻閱讀與引用重點。
+- `references/citation_tracker.md`：追蹤各章節需要補哪些引用。
+- `references/references.bib`：BibTeX 參考文獻檔。
+- `src/README.md`：正式程式碼的放置與整理原則。
+- `notebooks/README.md`：探索性 notebook 的使用原則。
+- `data/README.md`：資料來源、資料處理與隱私限制的紀錄方式。
+- `results/README.md`：實驗輸出與結果紀錄方式。
+- `figures/README.md`：論文圖表命名、追溯與圖說紀錄方式。
+
+## 下一步
+
+請先補充或交給 AI Agent 協助整理以下資訊：
+
+- 論文題目或暫定方向
+- 系所與學位要求
+- 教授目前給的研究範圍
+- 需要寫的程式類型
+- 資料來源
+- 預計使用的語言與工具
+- 截止日期與近期里程碑
+
+如果不知道如何開始，先回答 `docs/intake_questions.md` 最後的三題：
+
+1. 我的論文題目或大方向是什麼？
+2. 我需要寫的程式大概是什麼？
+3. 教授最近要求我完成的是什麼？
