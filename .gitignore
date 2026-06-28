@@ -23,6 +23,7 @@ data/raw/*
 data/processed/*
 results/*
 figures/*
+reports/*
 
 # Keep folder placeholders
 !data/raw/.gitkeep
@@ -33,3 +34,4 @@ figures/*
 !results/README.md
 !figures/.gitkeep
 !figures/README.md
+!reports/README.md

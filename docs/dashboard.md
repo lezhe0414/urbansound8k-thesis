@@ -79,6 +79,12 @@
 python3 scripts/check_project_status.py
 ```
 
+若要保存 Markdown 報告：
+
+```text
+python3 scripts/check_project_status.py --write-report
+```
+
 ## 最近提交
 
 ```text

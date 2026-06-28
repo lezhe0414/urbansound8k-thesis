@@ -14,8 +14,15 @@
 python3 scripts/check_project_status.py
 ```
 
+輸出 Markdown 報告：
+
+```text
+python3 scripts/check_project_status.py --write-report
+```
+
 用途：
 
 - 快速確認專案骨架是否完整。
 - 找出仍有大量「待填」或「待確認」的文件。
 - 提醒下一步應補論文方向、程式需求與教授要求。
+- 可將結果保存到 `reports/project_status.md`。

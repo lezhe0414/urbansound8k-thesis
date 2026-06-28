@@ -67,7 +67,7 @@
 ## Git 檢查
 
 - [ ] 工作區沒有不明變更。
-- [ ] 已執行 `python3 scripts/check_project_status.py` 或確認其檢查結果不影響本次交付。
+- [ ] 已執行 `python3 scripts/check_project_status.py`，必要時使用 `--write-report` 保存報告。
 - [ ] 重要變更已提交。
 - [ ] 提交訊息能說明本次變更目的。
 - [ ] 未提交大型資料、私人金鑰或敏感資料。

@@ -7,10 +7,12 @@ library so it can run before the thesis programming environment is finalized.
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+REPORT_PATH = ROOT / "reports" / "project_status.md"
 
 REQUIRED_FILES = [
     "README.md",
@@ -49,7 +51,7 @@ def count_markers(text: str) -> dict[str, int]:
     return {marker: text.count(marker) for marker in PLACEHOLDER_MARKERS}
 
 
-def main() -> int:
+def build_status() -> tuple[list[str], dict[str, int], list[tuple[str, int]]]:
     missing = []
     marker_totals = {marker: 0 for marker in PLACEHOLDER_MARKERS}
     files_with_markers: list[tuple[str, int]] = []
@@ -68,40 +70,109 @@ def main() -> int:
             for marker, count in counts.items():
                 marker_totals[marker] += count
 
-    print("Thesis project status")
-    print("=====================")
-    print(f"Root: {ROOT}")
-    print()
+    return missing, marker_totals, files_with_markers
 
+
+def render_text(missing: list[str], marker_totals: dict[str, int], files_with_markers: list[tuple[str, int]]) -> str:
+    lines = [
+        "Thesis project status",
+        "=====================",
+        f"Root: {ROOT}",
+        "",
+    ]
     if missing:
-        print("Missing required files:")
+        lines.append("Missing required files:")
         for rel_path in missing:
-            print(f"- {rel_path}")
+            lines.append(f"- {rel_path}")
     else:
-        print("Required files: OK")
+        lines.append("Required files: OK")
 
-    print()
-    print("Placeholder markers:")
+    lines.extend(["", "Placeholder markers:"])
     for marker, count in marker_totals.items():
-        print(f"- {marker}: {count}")
+        lines.append(f"- {marker}: {count}")
 
     if files_with_markers:
-        print()
-        print("Files with placeholder markers:")
+        lines.extend(["", "Files with placeholder markers:"])
         for rel_path, total in sorted(files_with_markers, key=lambda item: item[1], reverse=True):
-            print(f"- {rel_path}: {total}")
+            lines.append(f"- {rel_path}: {total}")
 
-    print()
-    print("Next input needed:")
+    lines.extend(["", "Next input needed:"])
     for item in NEXT_INPUT:
-        print(f"- {item}")
+        lines.append(f"- {item}")
 
-    print()
+    lines.append("")
     if missing:
-        print("Status: setup incomplete")
+        lines.append("Status: setup incomplete")
+    else:
+        lines.append("Status: setup files present; thesis content still needs user/professor input")
+
+    return "\n".join(lines) + "\n"
+
+
+def render_markdown(missing: list[str], marker_totals: dict[str, int], files_with_markers: list[tuple[str, int]]) -> str:
+    lines = [
+        "# Project Status Report",
+        "",
+        f"- Root: `{ROOT}`",
+        f"- Required files: {'missing files found' if missing else 'OK'}",
+        "",
+        "## Missing Required Files",
+        "",
+    ]
+    if missing:
+        lines.extend(f"- `{rel_path}`" for rel_path in missing)
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Placeholder Markers", "", "| Marker | Count |", "| --- | ---: |"])
+    for marker, count in marker_totals.items():
+        lines.append(f"| `{marker}` | {count} |")
+
+    lines.extend(["", "## Files With Placeholder Markers", "", "| File | Count |", "| --- | ---: |"])
+    if files_with_markers:
+        for rel_path, total in sorted(files_with_markers, key=lambda item: item[1], reverse=True):
+            lines.append(f"| `{rel_path}` | {total} |")
+    else:
+        lines.append("| None | 0 |")
+
+    lines.extend(["", "## Next Input Needed", ""])
+    lines.extend(f"- {item}" for item in NEXT_INPUT)
+
+    lines.extend([
+        "",
+        "## Status",
+        "",
+        "Setup incomplete." if missing else "Setup files present; thesis content still needs user/professor input.",
+        "",
+    ])
+    return "\n".join(lines)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Check thesis project setup status.")
+    parser.add_argument(
+        "--write-report",
+        action="store_true",
+        help=f"Write a Markdown report to {REPORT_PATH.relative_to(ROOT)}.",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    missing, marker_totals, files_with_markers = build_status()
+
+    print(render_text(missing, marker_totals, files_with_markers), end="")
+
+    if args.write_report:
+        REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        REPORT_PATH.write_text(render_markdown(missing, marker_totals, files_with_markers), encoding="utf-8")
+        print()
+        print(f"Wrote report: {REPORT_PATH.relative_to(ROOT)}")
+
+    if missing:
         return 1
 
-    print("Status: setup files present; thesis content still needs user/professor input")
     return 0
 
 
