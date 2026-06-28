@@ -48,6 +48,7 @@
 - 本週做出的重要決策：
 - 是否已更新 `docs/decision_log.md`：
 - 目前最大風險：
+- 是否已更新 `docs/risk_register.md`：
 - 需要使用者或教授確認的問題：
 
 ### AI Agent 使用
@@ -61,6 +62,7 @@
 - [ ] `docs/current_status.md` 是否仍準確。
 - [ ] `docs/milestones.md` 是否需要更新。
 - [ ] `docs/task_inbox.md` 是否有任務需要分類。
+- [ ] `docs/risk_register.md` 是否有新的或仍開放的高風險項目。
 - [ ] `docs/research_log.md` 是否有記錄本週進度。
 - [ ] `docs/meeting_notes.md` 是否有記錄教授回饋。
 - [ ] `docs/reproducibility_checklist.md` 是否有新增可勾選項目。
@@ -72,6 +74,7 @@
 
 - 本週完成事項摘要。
 - 下週優先任務。
+- 最高風險與下一步。
 - 需要使用者回答的問題。
 - 需要教授確認的問題。
 - 應更新的檔案清單。

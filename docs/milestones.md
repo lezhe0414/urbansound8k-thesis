@@ -32,6 +32,7 @@
 - [ ] 使用 `docs/professor_questions.md` 準備要問教授的問題。
 - [ ] 把零散想法先整理到 `docs/task_inbox.md`。
 - [ ] 用 `docs/artifact_index.md` 追蹤新增成果。
+- [ ] 用 `docs/risk_register.md` 追蹤目前高風險資訊缺口。
 - [ ] 補齊 `docs/thesis_plan.md` 的基本資訊。
 - [ ] 依 `docs/thesis_outline.md` 建立第一版章節大綱。
 - [ ] 列出教授已經給的要求。

@@ -34,6 +34,7 @@
 - 新增 AI 使用揭露草稿 `docs/ai_disclosure_draft.md`。
 - 新增論文寫作風格指南 `docs/writing_style_guide.md`。
 - 新增術語表 `docs/glossary.md`。
+- 新增風險與阻塞追蹤 `docs/risk_register.md`。
 
 ### 已知資訊
 
@@ -55,6 +56,7 @@
 - 使用 `docs/professor_questions.md` 準備下一次要向教授確認的問題。
 - 使用 `docs/next_input_template.md` 收集論文方向、程式需求與教授要求。
 - 用 `docs/artifact_index.md` 追蹤新增成果。
+- 用 `docs/risk_register.md` 追蹤高風險資訊缺口與阻塞。
 - 依 `docs/thesis_outline.md` 建立第一版正式章節架構。
 - 開始在 `docs/chapters/` 補第一章緒論或第二章文獻探討。
 - 開始撰寫前，依 `docs/writing_style_guide.md` 與 `docs/glossary.md` 統一語氣與術語。

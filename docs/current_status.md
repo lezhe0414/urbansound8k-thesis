@@ -37,6 +37,7 @@
 - `docs/task_inbox.md`：未分類任務入口。
 - `docs/decision_log.md`：重要決策紀錄。
 - `docs/artifact_index.md`：成果索引。
+- `docs/risk_register.md`：風險與阻塞追蹤。
 - `docs/research_log.md`：研究日誌。
 - `docs/meeting_notes.md`：教授會議紀錄。
 
@@ -105,6 +106,7 @@
 9. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
 10. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
 11. 若 AI 協助產生重要內容、程式或整理，更新 `docs/ai_usage_log.md`。
+12. 若出現會影響進度、資料、程式或交付的問題，更新 `docs/risk_register.md`。
 
 ## 目前完成度判斷
 

@@ -15,6 +15,7 @@
 - [ ] 已閱讀 `docs/current_status.md`。
 - [ ] 已確認本次要交付的內容範圍。
 - [ ] 已在 `docs/artifact_index.md` 找到對應成果。
+- [ ] 已檢查 `docs/risk_register.md`，沒有未處理的高風險交付阻塞。
 - [ ] 已更新 `docs/research_log.md`。
 - [ ] 若涉及教授要求，已更新 `docs/meeting_notes.md`。
 - [ ] 若涉及重要選擇，已更新 `docs/decision_log.md`。

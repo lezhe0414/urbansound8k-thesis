@@ -76,6 +76,7 @@
 | AI 揭露草稿 | `docs/ai_disclosure_draft.md` | 預備揭露文字 | 待確認 | 需教授與學校確認 |
 | 第一週啟動計畫 | `docs/first_week_plan.md` | 啟動任務 | 已確認 | 等待使用者填資訊 |
 | 教授問題清單 | `docs/professor_questions.md` | 準備會議問題 | 已確認 | 會後需更新會議紀錄 |
+| 風險登記表 | `docs/risk_register.md` | 追蹤風險與阻塞 | 草稿 | 需每週檢查 |
 | 里程碑 | `docs/milestones.md` | 追蹤進度 | 草稿 | 需日期與任務 |
 | 研究日誌 | `docs/research_log.md` | 追蹤脈絡 | 草稿 | 需持續更新 |
 | 決策紀錄 | `docs/decision_log.md` | 記錄重要決策 | 草稿 | 已有初始化決策 |

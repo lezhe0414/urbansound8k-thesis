@@ -51,6 +51,7 @@ The project should help the user:
 - Record major thesis, methodology, data, tooling, or professor-driven decisions in `docs/decision_log.md`.
 - Put unclassified tasks in `docs/task_inbox.md` before sorting them into milestones or specific files.
 - Track important deliverables in `docs/artifact_index.md`.
+- Track risks and blockers in `docs/risk_register.md`.
 - Before professor handoff or staged delivery, check `docs/submission_checklist.md`.
 
 ## Code Standards
