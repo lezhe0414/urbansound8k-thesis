@@ -31,6 +31,8 @@
 | R-003 | 尚未確認教授近期要求 | 高 | 補上教授最近要求 |
 | R-004 | 尚未確認資料來源與使用限制 | 高 | 確認資料來源或樣本 |
 
+若需要向教授確認上述事項，可使用 `docs/professor_update_template.md`。
+
 ## 下一步工作流
 
 取得使用者或教授資訊後，AI Agent 應依序更新：
@@ -61,6 +63,7 @@
 | 直接提供下一步資訊 | `docs/next_input_template.md` |
 | 第一週啟動 | `docs/first_week_plan.md` |
 | 準備問教授 | `docs/professor_questions.md` |
+| 傳給教授的訊息模板 | `docs/professor_update_template.md` |
 | 追蹤風險 | `docs/risk_register.md` |
 | 追蹤所有成果 | `docs/artifact_index.md` |
 | 追蹤任務與里程碑 | `docs/milestones.md` |

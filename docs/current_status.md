@@ -25,6 +25,7 @@
 - `docs/next_input_template.md`：下一次給 AI Agent 的填空範本。
 - `docs/first_week_plan.md`：第一週啟動計畫。
 - `docs/professor_questions.md`：要向教授確認的問題。
+- `docs/professor_update_template.md`：給教授的更新與詢問模板。
 - `docs/thesis_plan.md`：論文計畫。
 - `docs/thesis_outline.md`：論文章節大綱。
 - `docs/chapters/`：逐章草稿。

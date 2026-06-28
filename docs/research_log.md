@@ -36,6 +36,7 @@
 - 新增術語表 `docs/glossary.md`。
 - 新增風險與阻塞追蹤 `docs/risk_register.md`。
 - 新增專案儀表板 `docs/dashboard.md`。
+- 新增給教授的更新與詢問模板 `docs/professor_update_template.md`。
 
 ### 已知資訊
 
@@ -56,6 +57,7 @@
 - 先查看 `docs/current_status.md`，確認仍缺哪些資訊。
 - 依 `docs/first_week_plan.md` 完成第一週啟動任務。
 - 使用 `docs/professor_questions.md` 準備下一次要向教授確認的問題。
+- 使用 `docs/professor_update_template.md` 整理可傳給教授的訊息。
 - 使用 `docs/next_input_template.md` 收集論文方向、程式需求與教授要求。
 - 用 `docs/artifact_index.md` 追蹤新增成果。
 - 用 `docs/risk_register.md` 追蹤高風險資訊缺口與阻塞。

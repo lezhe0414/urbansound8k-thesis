@@ -38,6 +38,7 @@ The project should help the user:
 - Read `docs/current_status.md` first when resuming broad thesis support work.
 - Use `docs/first_week_plan.md` when the project still lacks thesis direction, coding task, professor request, or data source.
 - Use `docs/professor_questions.md` to prepare questions for the professor when requirements are unclear.
+- Use `docs/professor_update_template.md` when drafting a message or meeting summary for the professor.
 - Use `docs/next_input_template.md` when the user needs a concise way to provide thesis direction, coding needs, or professor requests.
 - Use `docs/weekly_review.md` for recurring progress reviews.
 - Record substantial AI assistance in `docs/ai_usage_log.md`.

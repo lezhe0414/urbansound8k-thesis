@@ -2,6 +2,8 @@
 
 這份文件用來準備和教授討論時需要確認的問題。確認後，請把答案整理到 `docs/meeting_notes.md`、`docs/thesis_plan.md`、`docs/decision_log.md` 或 `docs/milestones.md`。
 
+若需要把問題整理成可寄出或可傳送的訊息，請使用 `docs/professor_update_template.md`。
+
 ## 研究方向
 
 - 我的論文題目是否可以朝這個方向進行？
