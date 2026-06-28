@@ -38,22 +38,29 @@
 - 新增專案儀表板 `docs/dashboard.md`。
 - 新增給教授的更新與詢問模板 `docs/professor_update_template.md`。
 - 新增專案狀態檢查腳本 `scripts/check_project_status.py`。
+- 讀取 project definition PDF，確認題目為 sound event detection using machine learning techniques。
+- 確認 project definition 的主路線為 audio-to-spectrogram preprocessing 與 CNN classification。
+- 根據目前落後時程，將下一步收斂為資料處理與 CNN baseline。
+- 記錄 Transformer 策略：不直接取代 CNN，先作為可選比較模型。
 
 ### 已知資訊
 
 - 專案目標是協助完成論文寫作與程式碼開發。
 - 指導教授已同意使用 AI Agent。
+- 論文題目是 Sound Event Detection Using Machine Learning Techniques。
+- 原定 timeplan 要求 late June 完成 baseline CNN initial training 與 preliminary results。
+- 可用資料集包含 UrbanSound8K 或 ESC-50。
+- 程式工具以 Python、PyTorch、Librosa、NumPy、Matplotlib 為主。
 
 ### 待補資訊
 
-- 論文題目或暫定方向。
-- 程式碼要解決的問題。
-- 資料來源與研究方法。
+- 具體選用 UrbanSound8K 或 ESC-50。
+- 教授是否接受 Transformer 作為額外比較模型。
 - 教授對論文格式、進度和實驗的要求。
 
 ### 下一步
 
-- 補完 `docs/thesis_plan.md` 的基本資訊。
+- 建立資料處理與 CNN baseline 程式碼。
 - 先查看 `docs/dashboard.md`，快速確認目前階段、最高風險與下一步。
 - 先查看 `docs/current_status.md`，確認仍缺哪些資訊。
 - 依 `docs/first_week_plan.md` 完成第一週啟動任務。
@@ -69,9 +76,8 @@
 - 把未分類任務先放到 `docs/task_inbox.md`。
 - 把重要研究或技術選擇補到 `docs/decision_log.md`。
 - 先回答 `docs/intake_questions.md` 最後三題，以便 AI Agent 整理研究計畫。
-- 確定第一個可執行的研究或程式任務。
-- 寫程式前先用 `docs/code_task_spec.md` 定義目的、輸入、輸出與驗證方式。
-- 決定正式程式碼要使用的語言、框架與執行方式。
+- 使用 `docs/code_task_spec.md` 的規格開始撰寫 preprocessing、training、evaluation。
+- 決定是否先使用 UrbanSound8K 或 ESC-50。
 - 確認學校或教授要求的引用格式。
 - 每週使用 `docs/weekly_review.md` 檢查進度與風險。
 - 可執行 `python3 scripts/check_project_status.py` 快速檢查關鍵文件與待補標記；必要時使用 `--write-report` 保存報告。

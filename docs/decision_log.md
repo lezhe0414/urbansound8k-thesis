@@ -82,6 +82,46 @@
 
 #### 後續行動
 
-- [ ] 補上論文題目或暫定方向。
+- [x] 補上論文題目或暫定方向。
 - [ ] 補上教授近期要求。
-- [ ] 決定第一個要實作的程式任務。
+- [x] 決定第一個要實作的程式任務。
+
+---
+
+## DEC-002：保留 CNN baseline，將 Transformer 作為延伸比較
+
+- 日期：2026-06-28
+- 狀態：提議
+- 相關文件：`docs/thesis_plan.md`、`docs/code_task_spec.md`
+- 相關會議：待教授確認
+
+#### 背景
+
+Project definition 明確寫到使用 CNN 對 spectrogram representations 進行 sound event classification。使用者提出是否可改用 Transformer，因為可能比 CNN 更好。
+
+#### 選項
+
+1. 完全照 definition，只做 CNN。
+2. 完全改成 Transformer。
+3. 先完成 CNN baseline，再把 Transformer 作為比較或延伸模型。
+
+#### 決策
+
+採用選項 3：先完成 CNN baseline，之後若時間允許再加入 Transformer 或 transfer learning model 比較。
+
+#### 理由
+
+CNN 是 definition 明確承諾的交付，先完成可降低偏離題目與進度風險。Transformer 可能在預訓練或足夠資料下有較好表現，但從零訓練需要更多資料、時間與算力。將 Transformer 作為比較模型，可以保留創新性，同時不破壞原本研究方向。
+
+#### 影響
+
+- 對論文：論文主線仍是 spectrogram-based sound event detection，結果章可比較 CNN 與額外模型。
+- 對程式：第一階段只實作資料處理、CNN training、evaluation；第二階段再加 Transformer。
+- 對資料：先選一個資料集完成流程。
+- 對時程：可追回落後進度，避免一開始就做過大範圍。
+
+#### 後續行動
+
+- [ ] 完成 CNN baseline pipeline。
+- [ ] 向教授確認 Transformer comparison 是否合適。
+- [ ] 若 baseline 已有結果，再新增 Transformer 實驗。

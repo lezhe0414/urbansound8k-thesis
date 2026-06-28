@@ -13,16 +13,21 @@
 ## 最短版
 
 ```text
-老師您好，我目前想確認論文方向與下一步工作。
+老師您好，我目前根據 project definition 整理出下一步工作，想請您確認方向。
 
 我的暫定方向是：
+Sound Event Detection Using Machine Learning Techniques
 
 我預計需要撰寫的程式是：
+1. 將音訊資料轉換為 Mel-spectrogram。
+2. 實作 CNN baseline 進行 sound event classification。
+3. 輸出 accuracy、precision、recall、F1-score 與 confusion matrix。
+4. 若時間允許，再加入 Transformer-based model 作為比較。
 
 我想請老師確認：
-1. 這個方向是否合適？
-2. 程式需要做到什麼程度？
-3. 下一次會議前我應優先完成什麼？
+1. 我是否應先使用 UrbanSound8K 或 ESC-50？
+2. 除了 CNN baseline，是否可以加入 Transformer 作為比較模型？
+3. 下一次會議前，我是否應優先完成 data preprocessing 和 CNN baseline initial results？
 
 謝謝老師。
 ```

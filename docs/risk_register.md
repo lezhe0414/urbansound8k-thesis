@@ -19,12 +19,12 @@
 
 | ID | 風險 | 等級 | 影響 | 狀態 | 緩解策略 | 下一步 |
 | --- | --- | --- | --- | --- | --- | --- |
-| R-001 | 尚未確認論文題目或研究方向 | 高 | 無法開始正式研究計畫、文獻探討與章節草稿 | 開放 | 使用 `docs/next_input_template.md` 收集最短資訊 | 使用者補上論文大方向 |
-| R-002 | 尚未確認程式需要完成的功能 | 高 | 無法建立程式任務規格或原型 | 開放 | 使用 `docs/code_task_spec.md` 定義第一個程式任務 | 使用者或教授確認程式需求 |
-| R-003 | 尚未確認教授近期要求 | 高 | 任務優先順序可能錯誤 | 開放 | 使用 `docs/professor_questions.md` 準備確認問題 | 補上教授最近要求 |
-| R-004 | 尚未確認資料來源與使用限制 | 高 | 無法設計資料處理、實驗與結果章節 | 開放 | 使用 `data/README.md` 記錄資料來源與限制 | 確認資料來源或樣本 |
+| R-001 | 進度已落後原 timeplan | 高 | 6 月底 baseline CNN 初步結果尚未完成，可能壓縮寫作與實驗時間 | 開放 | 先做最小可交付 pipeline，不先擴大 scope | 立即完成資料處理與 CNN baseline |
+| R-002 | Transformer 完全取代 CNN 可能偏離 project definition | 中 | 最終成果可能與已提交 definition 不一致 | 監控 | CNN baseline 必做，Transformer 僅作 comparison/extension | 向教授確認是否接受 Transformer 比較 |
+| R-003 | 尚未確認教授近期要求 | 中 | 任務優先順序可能錯誤 | 開放 | 使用 `docs/professor_questions.md` 準備確認問題 | 補上教授最近要求 |
+| R-004 | 尚未下載並驗證資料集 | 高 | 無法訓練模型或產生實驗結果 | 開放 | 優先選一個公開資料集完成端到端流程 | 決定 UrbanSound8K 或 ESC-50 |
 | R-005 | 尚未確認學校格式與引用格式 | 中 | 後期可能需要重排格式或重做引用 | 開放 | 在 `docs/professor_questions.md` 詢問格式要求 | 向教授或系所確認格式 |
-| R-006 | 尚未確認截止日期與里程碑 | 中 | 無法安排週進度與交付節奏 | 開放 | 使用 `docs/milestones.md` 與 `docs/weekly_review.md` 管理 | 補上近期截止日期 |
+| R-006 | 8 頁論文篇幅有限 | 中 | 若模型與實驗過多，結果難以完整解釋 | 監控 | 聚焦一個資料集、CNN baseline、少量比較 | 不新增過多模型 |
 
 ## 新增風險模板
 

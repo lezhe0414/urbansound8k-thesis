@@ -1,26 +1,31 @@
 # 程式環境設定
 
-這份文件用來記錄論文程式碼需要的執行環境。現在尚未確定程式語言與框架，因此先保留通用欄位；確定後再補上具體命令。
+這份文件記錄 sound event detection 程式碼需要的執行環境。實際版本會在建立程式碼與依賴檔後補齊。
 
 ## 基本資訊
 
-- 主要程式語言：
-- 作業系統：
-- 套件管理工具：
-- 主要框架：
-- 資料庫或外部服務：
-- GPU / CPU 需求：
+- 主要程式語言：Python
+- 作業系統：macOS / Google Colab
+- 套件管理工具：pip 或 conda
+- 主要框架：PyTorch、Librosa、NumPy、scikit-learn、Matplotlib
+- 資料庫或外部服務：無；可選 Google Colab
+- GPU / CPU 需求：CPU 可跑小樣本；完整訓練建議 GPU
 
 ## 安裝方式
 
 ```text
-待填。之後可放 pip、conda、npm、R renv、Docker 等安裝命令。
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install torch torchaudio librosa numpy scikit-learn matplotlib pandas tqdm pyyaml
 ```
 
 ## 執行方式
 
 ```text
-待填。之後可放資料處理、模型訓練、評估、產圖等命令。
+python3 -m src.preprocess --dataset urban_sound_8k --raw-dir data/raw --out-dir data/processed
+python3 -m src.train --config configs/cnn_baseline.yaml
+python3 -m src.evaluate --checkpoint results/models/cnn_baseline.pt --split test
 ```
 
 ## 環境變數
@@ -37,7 +42,9 @@
 
 | 工具 | 版本 | 備註 |
 | --- | --- | --- |
-| 待填 | 待填 | 待填 |
+| Python | 待確認 | 使用本機或 Colab 實際環境確認 |
+| PyTorch | 待確認 | 模型訓練 |
+| Librosa | 待確認 | 音訊處理與 Mel-spectrogram |
 
 ## 重現步驟
 

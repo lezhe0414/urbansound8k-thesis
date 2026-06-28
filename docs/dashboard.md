@@ -4,21 +4,19 @@
 
 ## 目前階段
 
-起始規劃。
+研究方向已確認，進入程式原型與補進度階段。
 
-專案基礎設施已建立，包含論文規劃、章節草稿、程式碼規範、資料與實驗管理、文獻引用、AI 使用紀錄、風險管理與交付檢查。正式論文內容與程式實作尚未開始，因為仍缺研究方向、程式需求、資料來源與教授近期要求。
+Project definition 已確認方向為「Sound Event Detection Using Machine Learning Techniques」。核心技術路線是將音訊轉成 Mel-spectrogram 等頻譜圖，再以 CNN 進行聲音事件分類。可用公開資料集包含 UrbanSound8K 或 ESC-50，工具以 Python、PyTorch、Librosa、NumPy、Matplotlib 為主。
 
-## 立即需要使用者補充
+目前進度落後於原時程：definition 預期 6 月底已有 baseline CNN 初步結果，現在應優先補上可重複執行的資料處理與 baseline 模型，而不是先擴大論文範圍。
 
-請先補齊以下三句：
+## 立即執行方向
 
-```text
-我的論文大方向是：
-程式需要做的是：
-教授最近要求我完成的是：
-```
-
-可直接複製 `docs/next_input_template.md` 的建議版本填寫。
+1. 建立音訊資料處理流程：載入資料、切分 train/validation/test、產生 Mel-spectrogram。
+2. 建立 baseline CNN：先完成能訓練、評估、輸出指標與 confusion matrix 的最小版本。
+3. 若 baseline 可運作，再加入 Transformer 或 transfer learning 模型作比較，不建議直接放棄 CNN。
+4. 將每次實驗結果保存到 `results/`，圖表保存到 `figures/`。
+5. 需要向教授確認：是否接受將 Transformer 作為 CNN baseline 之外的比較模型。
 
 ## 最高風險
 
@@ -26,30 +24,24 @@
 
 | ID | 風險 | 等級 | 下一步 |
 | --- | --- | --- | --- |
-| R-001 | 尚未確認論文題目或研究方向 | 高 | 使用者補上論文大方向 |
-| R-002 | 尚未確認程式需要完成的功能 | 高 | 使用者或教授確認程式需求 |
-| R-003 | 尚未確認教授近期要求 | 高 | 補上教授最近要求 |
-| R-004 | 尚未確認資料來源與使用限制 | 高 | 確認資料來源或樣本 |
+| R-001 | 進度已落後原 timeplan | 高 | 先做最小可交付：資料處理 + CNN baseline |
+| R-002 | Transformer 可能偏離原 definition 的 CNN 承諾 | 中 | 保留 CNN baseline，Transformer 作比較模型 |
+| R-003 | 資料集尚未下載與驗證 | 高 | 先選 UrbanSound8K 或 ESC-50 其中一個 |
+| R-004 | 8 頁論文空間有限 | 中 | 聚焦一個資料集、少量模型、清楚評估 |
 
 若需要向教授確認上述事項，可使用 `docs/professor_update_template.md`。
 
 ## 下一步工作流
 
-取得使用者或教授資訊後，AI Agent 應依序更新：
+下一步 AI Agent 應依序執行：
 
-1. `docs/intake_questions.md`
-2. `docs/thesis_plan.md`
-3. `docs/current_status.md`
-4. `docs/risk_register.md`
-5. `docs/milestones.md`
+1. 建立 Python 專案依賴與執行方式。
+2. 建立資料處理腳本。
+3. 建立 CNN baseline 訓練腳本。
+4. 建立評估與圖表輸出腳本。
+5. 若時間允許，建立 Transformer/ViT-like 或 audio spectrogram transformer 比較實驗。
 
-若已有程式方向，接著更新：
-
-1. `docs/code_task_spec.md`
-2. `docs/environment.md`
-3. `src/` 或 `notebooks/`
-
-若已有文獻或教授指定閱讀，接著更新：
+文獻與寫作同步更新：
 
 1. `references/literature_notes.md`
 2. `references/citation_tracker.md`
@@ -101,8 +93,8 @@ b1f8459 Add thesis risk register
 - 論文規劃模板：已建立。
 - 程式與實驗模板：已建立。
 - 風險與交付管理：已建立。
-- 正式論文內容：尚未開始。
+- 正式論文內容：方向已確認，正文尚未開始。
 - 實際程式碼：尚未開始。
 - 實驗結果：尚未開始。
 
-目前不可將整體目標標記為完成，因為仍需使用者提供論文方向、程式需求、教授要求與資料來源。
+目前不可將整體目標標記為完成，因為仍需完成程式、實驗、圖表與 8 頁論文。

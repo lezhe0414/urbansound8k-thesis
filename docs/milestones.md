@@ -5,40 +5,44 @@
 ## 目前狀態
 
 - 專案建立日期：2026-06-28
-- 目前階段：起始規劃
-- 下一個主要目標：補齊論文題目、研究方向、程式需求與教授要求
+- 目前階段：研究方向已確認，進入程式原型
+- 下一個主要目標：完成 sound event detection 的資料處理與 CNN baseline
 
 ## 里程碑
 
 | 狀態 | 里程碑 | 預計日期 | 產出 | 備註 |
 | --- | --- | --- | --- | --- |
-| 未開始 | 確認論文題目與研究問題 | 待填 | `docs/thesis_plan.md` | 需要使用者或教授資訊 |
-| 未開始 | 完成初版文獻清單 | 待填 | `references/literature_notes.md` | 至少列出核心文獻 |
-| 未開始 | 確認資料來源與資料格式 | 待填 | `data/` 說明或資料樣本 | raw data 不直接覆蓋 |
-| 未開始 | 建立第一版程式原型 | 待填 | `src/` 或 `notebooks/` | 需先確認程式目標 |
-| 未開始 | 完成第一輪實驗 | 待填 | `results/`、`figures/` | 需包含可重複執行方式 |
-| 未開始 | 完成方法章節草稿 | 待填 | `docs/` 草稿 | 根據程式與實驗設計撰寫 |
-| 未開始 | 完成結果與討論草稿 | 待填 | `docs/` 草稿 | 根據實驗結果撰寫 |
-| 未開始 | 完成論文初稿 | 待填 | 完整草稿 | 交給教授前檢查引用與格式 |
+| 已確認 | 確認論文題目與研究問題 | 2026-06-28 | `docs/thesis_plan.md` | 來自 project definition |
+| 未開始 | 完成初版文獻清單 | 2026-07-02 | `references/literature_notes.md` | sound event detection、spectrogram CNN、可選 Transformer |
+| 未開始 | 確認資料來源與資料格式 | 2026-06-29 | `data/` 說明或資料樣本 | 優先 UrbanSound8K 或 ESC-50 |
+| 未開始 | 建立資料處理 pipeline | 2026-06-30 | `src/`、`data/processed/` | Mel-spectrogram preprocessing |
+| 未開始 | 建立 CNN baseline | 2026-07-02 | `src/`、`results/` | 補回 late June 應完成項目 |
+| 未開始 | 完成第一輪實驗 | 2026-07-05 | `results/`、`figures/` | metrics + confusion matrix |
+| 未開始 | 完成 draft dissertation 內容骨架 | 2026-07-09 | `docs/chapters/` | 原定 draft submission |
+| 未開始 | 加入 Transformer 或 transfer learning 比較 | 2026-07-15 | `src/`、`results/` | 需先有 CNN baseline |
+| 未開始 | 完成結果與討論草稿 | 2026-08-05 | `docs/` 草稿 | 根據實驗結果撰寫 |
+| 未開始 | 完成 8 頁 final PDF | 2026-08-19 | 完整 PDF | final submission |
 
 ## 任務清單
 
 ### 立即任務
 
-- [ ] 先查看 `docs/current_status.md`，確認目前資訊缺口。
-- [ ] 依 `docs/first_week_plan.md` 完成第一週啟動任務。
-- [ ] 使用 `docs/next_input_template.md` 收集下一次輸入。
-- [ ] 填寫 `docs/intake_questions.md`。
-- [ ] 使用 `docs/professor_questions.md` 準備要問教授的問題。
+- [x] 先查看 `docs/current_status.md`，確認目前資訊缺口。
+- [ ] 選定 UrbanSound8K 或 ESC-50。
+- [ ] 建立資料下載或放置說明。
+- [ ] 建立 Mel-spectrogram preprocessing。
+- [ ] 建立 CNN baseline training。
+- [ ] 建立 evaluation + confusion matrix 輸出。
+- [ ] 使用 `docs/professor_questions.md` 準備 CNN/Transformer 的確認問題。
 - [ ] 把零散想法先整理到 `docs/task_inbox.md`。
 - [ ] 用 `docs/artifact_index.md` 追蹤新增成果。
 - [ ] 用 `docs/risk_register.md` 追蹤目前高風險資訊缺口。
-- [ ] 補齊 `docs/thesis_plan.md` 的基本資訊。
+- [x] 補齊 `docs/thesis_plan.md` 的基本資訊。
 - [ ] 依 `docs/thesis_outline.md` 建立第一版章節大綱。
 - [ ] 列出教授已經給的要求。
 - [ ] 把教授近期要求整理到 `docs/meeting_notes.md`。
 - [ ] 將已確認的重要決策記到 `docs/decision_log.md`。
-- [ ] 決定第一個要實作的程式任務。
+- [x] 決定第一個要實作的程式任務。
 - [ ] 建立第一次 `docs/weekly_review.md` 週檢查紀錄。
 - [ ] 交付任何內容前使用 `docs/submission_checklist.md`。
 
@@ -56,9 +60,9 @@
 
 ### 程式任務
 
-- [ ] 決定使用的程式語言與環境。
-- [ ] 用 `docs/code_task_spec.md` 定義第一個程式任務。
-- [ ] 補上 `docs/environment.md` 的安裝與執行方式。
+- [x] 決定使用的程式語言與環境。
+- [x] 用 `docs/code_task_spec.md` 定義第一個程式任務。
+- [x] 補上 `docs/environment.md` 的安裝與執行方式。
 - [ ] 依 `src/README.md` 決定正式程式碼結構。
 - [ ] 依 `notebooks/README.md` 建立探索性分析規則。
 - [ ] 依 `data/README.md` 記錄資料來源與使用限制。

@@ -36,10 +36,11 @@ PLACEHOLDER_MARKERS = [
     "[citation needed]",
 ]
 
-NEXT_INPUT = [
-    "我的論文大方向是：",
-    "程式需要做的是：",
-    "教授最近要求我完成的是：",
+NEXT_ACTIONS = [
+    "選定 UrbanSound8K 或 ESC-50。",
+    "建立 Mel-spectrogram preprocessing。",
+    "完成 CNN baseline training/evaluation。",
+    "向教授確認 Transformer 是否可作為比較模型。",
 ]
 
 
@@ -96,15 +97,15 @@ def render_text(missing: list[str], marker_totals: dict[str, int], files_with_ma
         for rel_path, total in sorted(files_with_markers, key=lambda item: item[1], reverse=True):
             lines.append(f"- {rel_path}: {total}")
 
-    lines.extend(["", "Next input needed:"])
-    for item in NEXT_INPUT:
+    lines.extend(["", "Next actions:"])
+    for item in NEXT_ACTIONS:
         lines.append(f"- {item}")
 
     lines.append("")
     if missing:
         lines.append("Status: setup incomplete")
     else:
-        lines.append("Status: setup files present; thesis content still needs user/professor input")
+        lines.append("Status: setup files present; project direction known; implementation and experiments pending")
 
     return "\n".join(lines) + "\n"
 
@@ -135,14 +136,14 @@ def render_markdown(missing: list[str], marker_totals: dict[str, int], files_wit
     else:
         lines.append("| None | 0 |")
 
-    lines.extend(["", "## Next Input Needed", ""])
-    lines.extend(f"- {item}" for item in NEXT_INPUT)
+    lines.extend(["", "## Next Actions", ""])
+    lines.extend(f"- {item}" for item in NEXT_ACTIONS)
 
     lines.extend([
         "",
         "## Status",
         "",
-        "Setup incomplete." if missing else "Setup files present; thesis content still needs user/professor input.",
+        "Setup incomplete." if missing else "Setup files present; project direction known; implementation and experiments pending.",
         "",
     ])
     return "\n".join(lines)

@@ -8,6 +8,32 @@
 
 教授已同意使用 AI Agent，因此本專案已把 AI Agent 協作流程納入正式工作方式。
 
+## 已確認的 project definition
+
+- 題目：Sound Event Detection Using Machine Learning Techniques
+- 學校：Queen Mary University of London
+- 學生：CHE LI
+- 指導教授：Lin Wang
+- 核心任務：建立 deep learning-based sound event detection system。
+- 技術路線：音訊資料轉成 spectrogram/Mel-spectrogram，再以 CNN 分類聲音事件。
+- 範例類別：bird sounds、drone sounds、background noise。
+- 可用資料集：UrbanSound8K 或 ESC-50。
+- 評估指標：accuracy、precision、recall、F1-score，可加 confusion matrix。
+- 工具：Python、NumPy、PyTorch、Librosa、Matplotlib。
+- 原 timeplan：6 月初文獻與資料處理，6 月底 baseline CNN 初步結果，7 月 9 日前 draft dissertation，8 月 19 日前 final submission。
+
+## 目前判斷
+
+目前不是完成狀態。專案管理骨架已完成，論文方向也已確認，但正式程式碼、資料處理、模型訓練、實驗結果與論文正文尚未完成。
+
+因為進度已落後原 timeplan，下一步應縮小範圍，先完成最小可交付版本：
+
+1. 選定一個公開資料集。
+2. 建立 Mel-spectrogram preprocessing。
+3. 完成 CNN baseline training。
+4. 輸出 metrics 與 confusion matrix。
+5. 再決定是否加入 Transformer 比較。
+
 ## 已建立內容
 
 ### 協作規範
@@ -70,49 +96,26 @@
 - `references/citation_tracker.md`：引用追蹤表。
 - `references/references.bib`：BibTeX 參考文獻檔。
 
-## 尚未取得的必要資訊
+## 尚未取得或尚待確認的必要資訊
 
-目前尚未能開始撰寫正式內容或寫實際程式，因為缺少以下資訊：
+目前已能開始寫程式，但仍需確認：
 
-1. 論文題目或暫定研究方向。
-2. 學校、系所、學位與格式要求。
-3. 教授目前給的研究範圍或近期要求。
-4. 程式需要完成的功能。
-5. 資料來源、資料格式與使用限制。
-6. 預計使用的程式語言、框架或工具。
-7. 近期截止日期與里程碑。
+1. 最終使用 UrbanSound8K、ESC-50，或兩者擇一。
+2. 本機是否要訓練，或改用 Google Colab/GPU。
+3. 教授是否接受 Transformer 作為額外比較模型。
+4. 學校正式引用格式與 8 頁 PDF 排版要求。
+5. 7 月 9 日 draft 是否仍需提交，以及目前教授是否有新的優先事項。
 
 ## 下一步
 
-最有效的下一步是補齊以下三句：
+最有效的下一步是直接開始程式最小版本：
 
-```text
-我的論文大方向是：
-程式需要做的是：
-教授最近要求我完成的是：
-```
-
-也可以直接複製 `docs/next_input_template.md` 裡的建議版本填寫。
-
-如果需要先整理第一週該做什麼，請依 `docs/first_week_plan.md` 執行；如果需要和教授確認方向，請使用 `docs/professor_questions.md`。
-
-取得上述資訊後，AI Agent 應優先執行：
-
-1. 更新 `docs/dashboard.md`。
-2. 更新 `docs/intake_questions.md`。
-3. 更新 `docs/thesis_plan.md`。
-4. 更新 `docs/thesis_outline.md` 與 `docs/chapters/01_introduction.md`。
-5. 若開始撰寫正文，依 `docs/writing_style_guide.md` 與 `docs/glossary.md` 統一用語。
-6. 若已有程式方向，更新 `docs/environment.md` 並建立第一個 `src/` 或 `notebooks/` 原型。
-7. 寫程式前，先用 `docs/code_task_spec.md` 定義任務規格。
-8. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
-9. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
-10. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
-11. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
-12. 若 AI 協助產生重要內容、程式或整理，更新 `docs/ai_usage_log.md`。
-13. 若出現會影響進度、資料、程式或交付的問題，更新 `docs/risk_register.md`。
-14. 可執行 `python3 scripts/check_project_status.py` 檢查關鍵文件與待補標記。
+1. 建立 `src/` 下的資料處理、模型、訓練、評估模組。
+2. 先支援一個資料集，避免 scope 過大。
+3. 優先完成 CNN baseline，因為這是 definition 明確承諾的交付。
+4. 保留 Transformer 作為 comparison/extension，避免 final product 與 definition 差異太大。
+5. 每次實驗都要保存 metrics、圖表和設定，方便 8 頁論文快速整理。
 
 ## 目前完成度判斷
 
-專案基礎設施已完成，但論文內容與程式實作尚未開始。整體目標尚未完成，因為正式論文內容、研究方法、程式碼與實驗結果都需要使用者提供研究方向後才能落地。
+專案基礎設施已完成，研究方向已確認；整體目標尚未完成，因為正式程式碼、實驗結果、圖表與 8 頁論文仍需完成。

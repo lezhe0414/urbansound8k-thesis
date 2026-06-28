@@ -22,12 +22,12 @@
 
 | 成果 | 路徑 | 對應章節 | 狀態 | 證據來源 | 備註 |
 | --- | --- | --- | --- | --- | --- |
-| 論文計畫 | `docs/thesis_plan.md` | 全文 | 待補 | 使用者與教授資訊 | 需補研究方向 |
+| 論文計畫 | `docs/thesis_plan.md` | 全文 | 草稿 | Project definition PDF | 已補 sound event detection 方向 |
 | 論文章節大綱 | `docs/thesis_outline.md` | 全文 | 草稿 | 通用章節架構 | 需依學校格式調整 |
 | 寫作風格指南 | `docs/writing_style_guide.md` | 全文 | 已確認 | 文件檢查 | 需依學校格式調整 |
 | 術語表 | `docs/glossary.md` | 全文 | 草稿 | 研究領域術語 | 需依題目補充 |
 | 摘要 | `docs/chapters/00_abstract.md` | 摘要 | 待補 | 研究結果 | 建議最後撰寫 |
-| 緒論 | `docs/chapters/01_introduction.md` | 第一章 | 待補 | 研究方向、文獻 | 需先取得題目 |
+| 緒論 | `docs/chapters/01_introduction.md` | 第一章 | 待補 | 研究方向、文獻 | 已取得題目，待寫正文 |
 | 文獻探討 | `docs/chapters/02_literature_review.md` | 第二章 | 待補 | 文獻筆記 | 需核心文獻 |
 | 研究方法 | `docs/chapters/03_methodology.md` | 第三章 | 待補 | 程式與資料流程 | 需方法與資料 |
 | 系統或實驗設計 | `docs/chapters/04_system_or_experiment_design.md` | 第四章 | 待補 | 程式與實驗設定 | 需確認論文類型 |
@@ -41,16 +41,18 @@
 | 程式碼目錄規則 | `src/README.md` | 正式程式碼管理 | 已確認 | 文件檢查 | 尚未有實作 |
 | 專案狀態檢查腳本 | `scripts/check_project_status.py` | 檢查關鍵文件與待補標記 | 已確認 | 執行腳本 | 可用 `--write-report` 輸出報告 |
 | Notebook 規則 | `notebooks/README.md` | 探索性分析管理 | 已確認 | 文件檢查 | 尚未有 notebook |
-| 程式環境設定 | `docs/environment.md` | 記錄安裝與執行方式 | 待補 | 待確認語言與工具 | 需使用者提供技術方向 |
-| 程式任務規格 | `docs/code_task_spec.md` | 定義程式任務需求與驗證方式 | 已確認 | 文件檢查 | 寫程式前使用 |
+| 程式環境設定 | `docs/environment.md` | 記錄安裝與執行方式 | 草稿 | Project definition PDF | Python/PyTorch/Librosa |
+| 程式任務規格 | `docs/code_task_spec.md` | 定義 sound event detection baseline | 已確認 | Project definition PDF | 下一步開始實作 |
+| CNN baseline | `src/` | Sound event classification | 待補 | 待實作 | 優先任務 |
+| Transformer comparison | `src/` | 可選模型比較 | 待確認 | 待教授確認 | 不取代 CNN baseline |
 
 ## 資料
 
 | 成果 | 路徑 | 用途 | 狀態 | 證據來源 | 備註 |
 | --- | --- | --- | --- | --- | --- |
 | 資料管理規則 | `data/README.md` | 資料來源與限制管理 | 已確認 | 文件檢查 | 尚未有資料 |
-| 原始資料目錄 | `data/raw/` | 保存原始資料 | 待補 | 資料來源 | 預設不提交資料檔 |
-| 處理後資料目錄 | `data/processed/` | 保存清理後資料 | 待補 | 資料處理程式 | 預設不提交資料檔 |
+| 原始資料目錄 | `data/raw/` | 保存 UrbanSound8K 或 ESC-50 | 待補 | 公開資料集 | 預設不提交資料檔 |
+| 處理後資料目錄 | `data/processed/` | 保存 spectrogram features | 待補 | 資料處理程式 | 預設不提交資料檔 |
 
 ## 實驗與結果
 
