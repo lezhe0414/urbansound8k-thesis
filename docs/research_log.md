@@ -42,6 +42,10 @@
 - 確認 project definition 的主路線為 audio-to-spectrogram preprocessing 與 CNN classification。
 - 根據目前落後時程，將下一步收斂為資料處理與 CNN baseline。
 - 記錄 Transformer 策略：不直接取代 CNN，先作為可選比較模型。
+- 建立 UrbanSound8K Mel-spectrogram classification MVP 程式架構。
+- 新增 CNN baseline 與 Spectrogram Transformer 模型。
+- 新增 preprocessing、training、evaluation 命令。
+- 新增 synthetic UrbanSound8K-like dataset 產生器，方便沒有正式資料時做 smoke test。
 
 ### 已知資訊
 
@@ -78,6 +82,9 @@
 - 先回答 `docs/intake_questions.md` 最後三題，以便 AI Agent 整理研究計畫。
 - 使用 `docs/code_task_spec.md` 的規格開始撰寫 preprocessing、training、evaluation。
 - 決定是否先使用 UrbanSound8K 或 ESC-50。
+- 下載 UrbanSound8K 正式資料並放入 `data/raw/UrbanSound8K/`。
+- 跑 `python3 -m src.preprocess` 產生 Mel-spectrogram cache。
+- 分別跑 CNN baseline 與 Spectrogram Transformer 的 fold 10 訓練。
 - 確認學校或教授要求的引用格式。
 - 每週使用 `docs/weekly_review.md` 檢查進度與風險。
 - 可執行 `python3 scripts/check_project_status.py` 快速檢查關鍵文件與待補標記；必要時使用 `--write-report` 保存報告。

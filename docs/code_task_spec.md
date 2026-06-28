@@ -71,9 +71,10 @@ Audio spectrogram preprocessing + CNN baseline classification
 ### 執行方式
 
 ```text
-python3 -m src.preprocess --dataset urban_sound_8k --raw-dir data/raw --out-dir data/processed
-python3 -m src.train --config configs/cnn_baseline.yaml
-python3 -m src.evaluate --checkpoint results/models/cnn_baseline.pt --split test
+python3 -m src.preprocess --raw-dir data/raw/UrbanSound8K --out-dir data/processed/urbansound8k_mels
+python3 -m src.train --config configs/cnn_baseline.yaml --fold 10
+python3 -m src.train --config configs/transformer_baseline.yaml --fold 10
+python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 ```
 
 ### 驗證方式

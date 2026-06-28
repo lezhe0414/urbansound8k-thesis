@@ -26,13 +26,13 @@
 
 目前不是完成狀態。專案管理骨架已完成，論文方向也已確認，但正式程式碼、資料處理、模型訓練、實驗結果與論文正文尚未完成。
 
-因為進度已落後原 timeplan，下一步應縮小範圍，先完成最小可交付版本：
+因為進度已落後原 timeplan，目前已先建立最小可交付版本的程式架構。接下來要用正式資料跑出結果：
 
-1. 選定一個公開資料集。
-2. 建立 Mel-spectrogram preprocessing。
-3. 完成 CNN baseline training。
-4. 輸出 metrics 與 confusion matrix。
-5. 再決定是否加入 Transformer 比較。
+1. 下載 UrbanSound8K 並放到 `data/raw/UrbanSound8K/`。
+2. 安裝 `requirements.txt`。
+3. 執行 Mel-spectrogram preprocessing。
+4. 分別訓練 CNN baseline 與 Spectrogram Transformer。
+5. 輸出 metrics 與 confusion matrix，作為週五討論材料。
 
 ## 已建立內容
 
@@ -100,21 +100,19 @@
 
 目前已能開始寫程式，但仍需確認：
 
-1. 最終使用 UrbanSound8K、ESC-50，或兩者擇一。
-2. 本機是否要訓練，或改用 Google Colab/GPU。
-3. 教授是否接受 Transformer 作為額外比較模型。
-4. 學校正式引用格式與 8 頁 PDF 排版要求。
-5. 7 月 9 日 draft 是否仍需提交，以及目前教授是否有新的優先事項。
+1. 本機是否要訓練，或改用 Google Colab/GPU。
+2. 教授是否接受 Transformer 作為主要比較模型。
+3. 學校正式引用格式與 8 頁 PDF 排版要求。
+4. 7 月 9 日 draft 是否仍需提交，以及目前教授是否有新的優先事項。
 
 ## 下一步
 
 最有效的下一步是直接開始程式最小版本：
 
-1. 建立 `src/` 下的資料處理、模型、訓練、評估模組。
-2. 先支援一個資料集，避免 scope 過大。
-3. 優先完成 CNN baseline，因為這是 definition 明確承諾的交付。
-4. 保留 Transformer 作為 comparison/extension，避免 final product 與 definition 差異太大。
-5. 每次實驗都要保存 metrics、圖表和設定，方便 8 頁論文快速整理。
+1. 將 UrbanSound8K 放入 `data/raw/UrbanSound8K/`。
+2. 跑 `python3 -m src.preprocess --raw-dir data/raw/UrbanSound8K --out-dir data/processed/urbansound8k_mels`。
+3. 跑 CNN baseline 與 Spectrogram Transformer 的 fold 10 訓練。
+4. 將 metrics、confusion matrix 和設定帶去和教授討論。
 
 ## 目前完成度判斷
 

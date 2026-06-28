@@ -61,6 +61,63 @@
 25. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
 26. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
 
+## UrbanSound8K MVP 快速執行
+
+本專案目前的程式主線是將 UrbanSound8K 音訊轉成 Mel-spectrogram，再用 CNN baseline 與 Spectrogram Transformer 進行 10 類聲音分類。
+
+安裝環境：
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+正式資料需放在：
+
+```text
+data/raw/UrbanSound8K/
+├── audio/
+│   ├── fold1/
+│   └── ...
+└── metadata/
+    └── UrbanSound8K.csv
+```
+
+先產生 Mel-spectrogram：
+
+```bash
+python3 -m src.preprocess \
+  --raw-dir data/raw/UrbanSound8K \
+  --out-dir data/processed/urbansound8k_mels
+```
+
+訓練 CNN baseline：
+
+```bash
+python3 -m src.train --config configs/cnn_baseline.yaml --fold 10
+```
+
+訓練 Spectrogram Transformer：
+
+```bash
+python3 -m src.train --config configs/transformer_baseline.yaml --fold 10
+```
+
+重新評估已訓練 run：
+
+```bash
+python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
+```
+
+如果暫時沒有 UrbanSound8K，可先建立 synthetic smoke-test dataset：
+
+```bash
+python3 scripts/create_synthetic_urbansound8k.py --out-dir data/raw/UrbanSound8K_synthetic
+python3 -m src.preprocess --raw-dir data/raw/UrbanSound8K_synthetic --out-dir data/processed/urbansound8k_synthetic_mels
+```
+
 ## 重要文件入口
 
 - `docs/intake_questions.md`：還不知道怎麼開始時，先回答這份訪談表。
@@ -104,18 +161,9 @@
 
 ## 下一步
 
-請先補充或交給 AI Agent 協助整理以下資訊：
+目前最重要的下一步：
 
-- 論文題目或暫定方向
-- 系所與學位要求
-- 教授目前給的研究範圍
-- 需要寫的程式類型
-- 資料來源
-- 預計使用的語言與工具
-- 截止日期與近期里程碑
-
-如果不知道如何開始，先回答 `docs/intake_questions.md` 最後的三題：
-
-1. 我的論文題目或大方向是什麼？
-2. 我需要寫的程式大概是什麼？
-3. 教授最近要求我完成的是什麼？
+1. 下載 UrbanSound8K 並放到 `data/raw/UrbanSound8K/`。
+2. 跑 preprocessing。
+3. 先用 `--fold 10` 跑 CNN baseline 與 Transformer。
+4. 將 metrics 與 confusion matrix 帶去和教授討論。

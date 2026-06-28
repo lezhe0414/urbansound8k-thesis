@@ -4,19 +4,21 @@
 
 ## 建議結構
 
-目前尚未確定論文題目與程式語言，因此先保留技術中立的結構建議：
+目前程式主線已確定為 UrbanSound8K spectrogram sound classification：
 
 ```text
 src/
 ├── README.md
-├── data/          # 資料讀取、清理、轉換
-├── models/        # 模型、演算法或核心方法
-├── evaluation/    # 評估指標、比較方法、統計檢定
-├── visualization/ # 圖表產生
-└── utils/         # 共用工具
+├── preprocess.py              # UrbanSound8K audio -> Mel-spectrogram cache
+├── train.py                   # CNN / Transformer training
+├── evaluate.py                # trained run evaluation
+├── data/urbansound8k.py       # processed dataset loader
+├── models/cnn.py              # CNN baseline
+├── models/spectrogram_transformer.py
+└── utils/                     # config, metrics, plotting, seed helpers
 ```
 
-等研究方向確定後，再依實際技術建立需要的子資料夾。
+CNN 是 baseline；Spectrogram Transformer 是主要比較模型。
 
 ## 程式碼最低要求
 
@@ -36,6 +38,15 @@ src/
 - 評估：`evaluate.*`
 - 圖表：`make_figures.*`
 - 共用工具：`utils.*`
+
+## 目前可執行命令
+
+```bash
+python3 -m src.preprocess --raw-dir data/raw/UrbanSound8K --out-dir data/processed/urbansound8k_mels
+python3 -m src.train --config configs/cnn_baseline.yaml --fold 10
+python3 -m src.train --config configs/transformer_baseline.yaml --fold 10
+python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
+```
 
 ## 從 notebook 移到 src 的標準
 

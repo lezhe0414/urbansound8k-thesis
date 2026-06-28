@@ -15,11 +15,11 @@
 | 已確認 | 確認論文題目與研究問題 | 2026-06-28 | `docs/thesis_plan.md` | 來自 project definition |
 | 未開始 | 完成初版文獻清單 | 2026-07-02 | `references/literature_notes.md` | sound event detection、spectrogram CNN、可選 Transformer |
 | 未開始 | 確認資料來源與資料格式 | 2026-06-29 | `data/` 說明或資料樣本 | 優先 UrbanSound8K 或 ESC-50 |
-| 未開始 | 建立資料處理 pipeline | 2026-06-30 | `src/`、`data/processed/` | Mel-spectrogram preprocessing |
-| 未開始 | 建立 CNN baseline | 2026-07-02 | `src/`、`results/` | 補回 late June 應完成項目 |
+| 草稿 | 建立資料處理 pipeline | 2026-06-30 | `src/`、`data/processed/` | Mel-spectrogram preprocessing 已有程式，待正式資料驗證 |
+| 草稿 | 建立 CNN baseline | 2026-07-02 | `src/`、`results/` | 模型與訓練程式已建立，待正式資料訓練 |
 | 未開始 | 完成第一輪實驗 | 2026-07-05 | `results/`、`figures/` | metrics + confusion matrix |
 | 未開始 | 完成 draft dissertation 內容骨架 | 2026-07-09 | `docs/chapters/` | 原定 draft submission |
-| 未開始 | 加入 Transformer 或 transfer learning 比較 | 2026-07-15 | `src/`、`results/` | 需先有 CNN baseline |
+| 草稿 | 加入 Transformer 或 transfer learning 比較 | 2026-07-15 | `src/`、`results/` | Spectrogram Transformer 已建立，待正式資料訓練 |
 | 未開始 | 完成結果與討論草稿 | 2026-08-05 | `docs/` 草稿 | 根據實驗結果撰寫 |
 | 未開始 | 完成 8 頁 final PDF | 2026-08-19 | 完整 PDF | final submission |
 
@@ -28,11 +28,11 @@
 ### 立即任務
 
 - [x] 先查看 `docs/current_status.md`，確認目前資訊缺口。
-- [ ] 選定 UrbanSound8K 或 ESC-50。
+- [x] 選定 UrbanSound8K。
 - [ ] 建立資料下載或放置說明。
-- [ ] 建立 Mel-spectrogram preprocessing。
-- [ ] 建立 CNN baseline training。
-- [ ] 建立 evaluation + confusion matrix 輸出。
+- [x] 建立 Mel-spectrogram preprocessing。
+- [x] 建立 CNN baseline training。
+- [x] 建立 evaluation + confusion matrix 輸出。
 - [ ] 使用 `docs/professor_questions.md` 準備 CNN/Transformer 的確認問題。
 - [ ] 把零散想法先整理到 `docs/task_inbox.md`。
 - [ ] 用 `docs/artifact_index.md` 追蹤新增成果。
@@ -66,8 +66,8 @@
 - [ ] 依 `src/README.md` 決定正式程式碼結構。
 - [ ] 依 `notebooks/README.md` 建立探索性分析規則。
 - [ ] 依 `data/README.md` 記錄資料來源與使用限制。
-- [ ] 建立可重複執行的資料處理流程。
-- [ ] 建立實驗或模型腳本。
+- [x] 建立可重複執行的資料處理流程。
+- [x] 建立實驗或模型腳本。
 - [ ] 每次實驗依 `docs/experiment_template.md` 留下紀錄。
 - [ ] 用 `docs/reproducibility_checklist.md` 檢查程式與實驗是否可重現。
 - [ ] 儲存結果與圖表。
