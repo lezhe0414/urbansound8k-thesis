@@ -41,6 +41,7 @@
 - `src/README.md`：正式程式碼放置規則。
 - `notebooks/README.md`：探索性 notebook 規則。
 - `docs/environment.md`：程式環境與執行方式。
+- `docs/code_task_spec.md`：程式任務規格模板。
 - `.env.example`：環境變數樣板。
 - `docs/experiment_template.md`：實驗紀錄模板。
 - `docs/reproducibility_checklist.md`：可重複研究檢查清單。
@@ -93,10 +94,11 @@
 2. 更新 `docs/thesis_plan.md`。
 3. 更新 `docs/thesis_outline.md` 與 `docs/chapters/01_introduction.md`。
 4. 若已有程式方向，更新 `docs/environment.md` 並建立第一個 `src/` 或 `notebooks/` 原型。
-5. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
-6. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
-7. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
-8. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
+5. 寫程式前，先用 `docs/code_task_spec.md` 定義任務規格。
+6. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
+7. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
+8. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
+9. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
 
 ## 目前完成度判斷
 

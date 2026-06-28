@@ -56,6 +56,7 @@
 ### 程式任務
 
 - [ ] 決定使用的程式語言與環境。
+- [ ] 用 `docs/code_task_spec.md` 定義第一個程式任務。
 - [ ] 補上 `docs/environment.md` 的安裝與執行方式。
 - [ ] 依 `src/README.md` 決定正式程式碼結構。
 - [ ] 依 `notebooks/README.md` 建立探索性分析規則。

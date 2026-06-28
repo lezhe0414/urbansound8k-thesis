@@ -39,6 +39,7 @@
 | 程式碼目錄規則 | `src/README.md` | 正式程式碼管理 | 已確認 | 文件檢查 | 尚未有實作 |
 | Notebook 規則 | `notebooks/README.md` | 探索性分析管理 | 已確認 | 文件檢查 | 尚未有 notebook |
 | 程式環境設定 | `docs/environment.md` | 記錄安裝與執行方式 | 待補 | 待確認語言與工具 | 需使用者提供技術方向 |
+| 程式任務規格 | `docs/code_task_spec.md` | 定義程式任務需求與驗證方式 | 已確認 | 文件檢查 | 寫程式前使用 |
 
 ## 資料
 
@@ -81,6 +82,7 @@
 
 1. `docs/thesis_plan.md` 的研究方向與問題。
 2. `docs/chapters/01_introduction.md` 的緒論初稿。
-3. `docs/environment.md` 的程式語言與執行方式。
-4. `src/` 或 `notebooks/` 的第一個可驗證程式原型。
-5. `references/literature_notes.md` 的第一批核心文獻。
+3. `docs/code_task_spec.md` 的第一個程式任務規格。
+4. `docs/environment.md` 的程式語言與執行方式。
+5. `src/` 或 `notebooks/` 的第一個可驗證程式原型。
+6. `references/literature_notes.md` 的第一批核心文獻。

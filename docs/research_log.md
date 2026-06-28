@@ -29,6 +29,7 @@
 - 新增教授問題清單 `docs/professor_questions.md`。
 - 新增成果索引 `docs/artifact_index.md`。
 - 新增交付檢查清單 `docs/submission_checklist.md`。
+- 新增程式任務規格模板 `docs/code_task_spec.md`。
 
 ### 已知資訊
 
@@ -57,6 +58,7 @@
 - 把重要研究或技術選擇補到 `docs/decision_log.md`。
 - 先回答 `docs/intake_questions.md` 最後三題，以便 AI Agent 整理研究計畫。
 - 確定第一個可執行的研究或程式任務。
+- 寫程式前先用 `docs/code_task_spec.md` 定義目的、輸入、輸出與驗證方式。
 - 決定正式程式碼要使用的語言、框架與執行方式。
 - 確認學校或教授要求的引用格式。
 - 每週使用 `docs/weekly_review.md` 檢查進度與風險。

@@ -58,6 +58,7 @@ The project should help the user:
 - Store generated outputs in `results/` or `figures/`, not mixed into source folders.
 - Avoid committing large raw datasets unless the user explicitly wants that.
 - Record runtime setup, package managers, environment variables, and reproduction commands in `docs/environment.md`.
+- Define coding tasks in `docs/code_task_spec.md` before implementing thesis-related code.
 - Do not commit real secrets. Use `.env.example` for public environment variable names and `.env` for local private values.
 
 ## Thesis Workflow
