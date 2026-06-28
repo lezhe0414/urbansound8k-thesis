@@ -24,6 +24,8 @@
 | --- | --- | --- | --- | --- | --- |
 | 論文計畫 | `docs/thesis_plan.md` | 全文 | 待補 | 使用者與教授資訊 | 需補研究方向 |
 | 論文章節大綱 | `docs/thesis_outline.md` | 全文 | 草稿 | 通用章節架構 | 需依學校格式調整 |
+| 寫作風格指南 | `docs/writing_style_guide.md` | 全文 | 已確認 | 文件檢查 | 需依學校格式調整 |
+| 術語表 | `docs/glossary.md` | 全文 | 草稿 | 研究領域術語 | 需依題目補充 |
 | 摘要 | `docs/chapters/00_abstract.md` | 摘要 | 待補 | 研究結果 | 建議最後撰寫 |
 | 緒論 | `docs/chapters/01_introduction.md` | 第一章 | 待補 | 研究方向、文獻 | 需先取得題目 |
 | 文獻探討 | `docs/chapters/02_literature_review.md` | 第二章 | 待補 | 文獻筆記 | 需核心文獻 |
@@ -84,7 +86,8 @@
 
 1. `docs/thesis_plan.md` 的研究方向與問題。
 2. `docs/chapters/01_introduction.md` 的緒論初稿。
-3. `docs/code_task_spec.md` 的第一個程式任務規格。
-4. `docs/environment.md` 的程式語言與執行方式。
-5. `src/` 或 `notebooks/` 的第一個可驗證程式原型。
-6. `references/literature_notes.md` 的第一批核心文獻。
+3. `docs/glossary.md` 的研究領域核心術語。
+4. `docs/code_task_spec.md` 的第一個程式任務規格。
+5. `docs/environment.md` 的程式語言與執行方式。
+6. `src/` 或 `notebooks/` 的第一個可驗證程式原型。
+7. `references/literature_notes.md` 的第一批核心文獻。

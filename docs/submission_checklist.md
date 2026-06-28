@@ -24,6 +24,8 @@
 
 - [ ] 本次交付章節放在 `docs/chapters/` 或指定位置。
 - [ ] 章節標題符合目前論文大綱。
+- [ ] 語氣符合 `docs/writing_style_guide.md`。
+- [ ] 重要術語與縮寫已同步到 `docs/glossary.md`。
 - [ ] 重要主張有文獻、資料或實驗支撐。
 - [ ] 尚未有來源的句子標示 `[citation needed]`。
 - [ ] 內容沒有把未驗證推測寫成已證實事實。

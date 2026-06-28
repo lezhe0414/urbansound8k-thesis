@@ -47,6 +47,7 @@ The project should help the user:
 - When adding analysis or experiment code, include a minimal way to run or verify it.
 - If a claim depends on literature, data, or experiment output, identify the evidence source.
 - Separate speculation from verified results.
+- Follow `docs/writing_style_guide.md` and `docs/glossary.md` when drafting or revising thesis prose.
 - Record major thesis, methodology, data, tooling, or professor-driven decisions in `docs/decision_log.md`.
 - Put unclassified tasks in `docs/task_inbox.md` before sorting them into milestones or specific files.
 - Track important deliverables in `docs/artifact_index.md`.

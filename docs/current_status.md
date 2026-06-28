@@ -27,6 +27,8 @@
 - `docs/thesis_plan.md`：論文計畫。
 - `docs/thesis_outline.md`：論文章節大綱。
 - `docs/chapters/`：逐章草稿。
+- `docs/writing_style_guide.md`：論文寫作風格指南。
+- `docs/glossary.md`：術語表。
 
 ### 進度與決策管理
 
@@ -95,13 +97,14 @@
 1. 更新 `docs/intake_questions.md`。
 2. 更新 `docs/thesis_plan.md`。
 3. 更新 `docs/thesis_outline.md` 與 `docs/chapters/01_introduction.md`。
-4. 若已有程式方向，更新 `docs/environment.md` 並建立第一個 `src/` 或 `notebooks/` 原型。
-5. 寫程式前，先用 `docs/code_task_spec.md` 定義任務規格。
-6. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
-7. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
-8. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
-9. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
-10. 若 AI 協助產生重要內容、程式或整理，更新 `docs/ai_usage_log.md`。
+4. 若開始撰寫正文，依 `docs/writing_style_guide.md` 與 `docs/glossary.md` 統一用語。
+5. 若已有程式方向，更新 `docs/environment.md` 並建立第一個 `src/` 或 `notebooks/` 原型。
+6. 寫程式前，先用 `docs/code_task_spec.md` 定義任務規格。
+7. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
+8. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
+9. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
+10. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
+11. 若 AI 協助產生重要內容、程式或整理，更新 `docs/ai_usage_log.md`。
 
 ## 目前完成度判斷
 

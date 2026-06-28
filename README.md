@@ -45,16 +45,17 @@
 9. 用 `docs/milestones.md` 追蹤論文、程式、實驗與教授回饋。
 10. 每次與教授討論後，把結論寫進 `docs/research_log.md` 與 `docs/meeting_notes.md`。
 11. 重要 AI 協助記錄到 `docs/ai_usage_log.md`。
-12. 每週用 `docs/weekly_review.md` 檢查進度與風險。
-13. 章節正式草稿放在 `docs/chapters/`。
-14. 寫程式前先用 `docs/code_task_spec.md` 定義任務規格。
-15. 程式原型可先放 `notebooks/`，確定要重複執行後整理到 `src/`。
-16. 程式環境與執行方式記在 `docs/environment.md`。
-17. 每次實驗前後參考 `docs/experiment_template.md` 紀錄目的、命令、參數與結果。
-18. 用 `docs/reproducibility_checklist.md` 檢查程式、資料與實驗是否能支撐論文。
-19. 交給教授或階段交付前，用 `docs/submission_checklist.md` 檢查。
-20. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
-21. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
+12. 寫作時依 `docs/writing_style_guide.md` 與 `docs/glossary.md` 統一語氣和術語。
+13. 每週用 `docs/weekly_review.md` 檢查進度與風險。
+14. 章節正式草稿放在 `docs/chapters/`。
+15. 寫程式前先用 `docs/code_task_spec.md` 定義任務規格。
+16. 程式原型可先放 `notebooks/`，確定要重複執行後整理到 `src/`。
+17. 程式環境與執行方式記在 `docs/environment.md`。
+18. 每次實驗前後參考 `docs/experiment_template.md` 紀錄目的、命令、參數與結果。
+19. 用 `docs/reproducibility_checklist.md` 檢查程式、資料與實驗是否能支撐論文。
+20. 交給教授或階段交付前，用 `docs/submission_checklist.md` 檢查。
+21. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
+22. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
 
 ## 重要文件入口
 
@@ -66,6 +67,8 @@
 - `docs/thesis_plan.md`：整理論文題目、研究問題、方法與預期成果。
 - `docs/thesis_outline.md`：建立論文章節架構與各章待補內容。
 - `docs/chapters/`：逐章撰寫正式草稿。
+- `docs/writing_style_guide.md`：論文語氣、段落、引用與 AI 改稿原則。
+- `docs/glossary.md`：統一術語、縮寫與翻譯決策。
 - `docs/task_inbox.md`：暫存尚未分類的論文、程式、資料、文獻任務。
 - `docs/decision_log.md`：記錄重要研究與技術決策，以及決策理由。
 - `docs/artifact_index.md`：追蹤所有重要成果、狀態、證據來源與對應章節。

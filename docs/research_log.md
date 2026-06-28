@@ -32,6 +32,8 @@
 - 新增程式任務規格模板 `docs/code_task_spec.md`。
 - 新增 AI Agent 使用紀錄 `docs/ai_usage_log.md`。
 - 新增 AI 使用揭露草稿 `docs/ai_disclosure_draft.md`。
+- 新增論文寫作風格指南 `docs/writing_style_guide.md`。
+- 新增術語表 `docs/glossary.md`。
 
 ### 已知資訊
 
@@ -55,6 +57,7 @@
 - 用 `docs/artifact_index.md` 追蹤新增成果。
 - 依 `docs/thesis_outline.md` 建立第一版正式章節架構。
 - 開始在 `docs/chapters/` 補第一章緒論或第二章文獻探討。
+- 開始撰寫前，依 `docs/writing_style_guide.md` 與 `docs/glossary.md` 統一語氣與術語。
 - 把教授既有要求補到 `docs/meeting_notes.md`。
 - 把未分類任務先放到 `docs/task_inbox.md`。
 - 把重要研究或技術選擇補到 `docs/decision_log.md`。
