@@ -14,6 +14,7 @@
 
 - `AGENTS.md`：AI Agent 協作規則。
 - `README.md`：專案入口與工作流程。
+- `docs/dashboard.md`：專案儀表板。
 - `docs/ai_workflow.md`：如何讓 AI Agent 協助寫作、文獻、程式與實驗。
 - `docs/ai_usage_log.md`：AI Agent 使用紀錄。
 - `docs/ai_disclosure_draft.md`：AI 使用揭露草稿。
@@ -95,18 +96,19 @@
 
 取得上述資訊後，AI Agent 應優先執行：
 
-1. 更新 `docs/intake_questions.md`。
-2. 更新 `docs/thesis_plan.md`。
-3. 更新 `docs/thesis_outline.md` 與 `docs/chapters/01_introduction.md`。
-4. 若開始撰寫正文，依 `docs/writing_style_guide.md` 與 `docs/glossary.md` 統一用語。
-5. 若已有程式方向，更新 `docs/environment.md` 並建立第一個 `src/` 或 `notebooks/` 原型。
-6. 寫程式前，先用 `docs/code_task_spec.md` 定義任務規格。
-7. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
-8. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
-9. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
-10. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
-11. 若 AI 協助產生重要內容、程式或整理，更新 `docs/ai_usage_log.md`。
-12. 若出現會影響進度、資料、程式或交付的問題，更新 `docs/risk_register.md`。
+1. 更新 `docs/dashboard.md`。
+2. 更新 `docs/intake_questions.md`。
+3. 更新 `docs/thesis_plan.md`。
+4. 更新 `docs/thesis_outline.md` 與 `docs/chapters/01_introduction.md`。
+5. 若開始撰寫正文，依 `docs/writing_style_guide.md` 與 `docs/glossary.md` 統一用語。
+6. 若已有程式方向，更新 `docs/environment.md` 並建立第一個 `src/` 或 `notebooks/` 原型。
+7. 寫程式前，先用 `docs/code_task_spec.md` 定義任務規格。
+8. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
+9. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
+10. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
+11. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
+12. 若 AI 協助產生重要內容、程式或整理，更新 `docs/ai_usage_log.md`。
+13. 若出現會影響進度、資料、程式或交付的問題，更新 `docs/risk_register.md`。
 
 ## 目前完成度判斷
 

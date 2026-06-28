@@ -35,6 +35,7 @@
 - 新增論文寫作風格指南 `docs/writing_style_guide.md`。
 - 新增術語表 `docs/glossary.md`。
 - 新增風險與阻塞追蹤 `docs/risk_register.md`。
+- 新增專案儀表板 `docs/dashboard.md`。
 
 ### 已知資訊
 
@@ -51,6 +52,7 @@
 ### 下一步
 
 - 補完 `docs/thesis_plan.md` 的基本資訊。
+- 先查看 `docs/dashboard.md`，快速確認目前階段、最高風險與下一步。
 - 先查看 `docs/current_status.md`，確認仍缺哪些資訊。
 - 依 `docs/first_week_plan.md` 完成第一週啟動任務。
 - 使用 `docs/professor_questions.md` 準備下一次要向教授確認的問題。

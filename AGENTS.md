@@ -34,6 +34,7 @@ The project should help the user:
 ## Collaboration Rules
 
 - Inspect current files before changing them.
+- Read `docs/dashboard.md` first when resuming broad thesis support work.
 - Read `docs/current_status.md` first when resuming broad thesis support work.
 - Use `docs/first_week_plan.md` when the project still lacks thesis direction, coding task, professor request, or data source.
 - Use `docs/professor_questions.md` to prepare questions for the professor when requirements are unclear.
