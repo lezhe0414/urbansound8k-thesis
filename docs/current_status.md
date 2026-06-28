@@ -19,6 +19,7 @@
 ### 論文規劃
 
 - `docs/intake_questions.md`：論文需求訪談表。
+- `docs/next_input_template.md`：下一次給 AI Agent 的填空範本。
 - `docs/thesis_plan.md`：論文計畫。
 - `docs/thesis_outline.md`：論文章節大綱。
 - `docs/chapters/`：逐章草稿。
@@ -26,6 +27,7 @@
 ### 進度與決策管理
 
 - `docs/milestones.md`：里程碑與任務追蹤。
+- `docs/weekly_review.md`：每週進度檢查。
 - `docs/task_inbox.md`：未分類任務入口。
 - `docs/decision_log.md`：重要決策紀錄。
 - `docs/research_log.md`：研究日誌。
@@ -77,6 +79,8 @@
 教授最近要求我完成的是：
 ```
 
+也可以直接複製 `docs/next_input_template.md` 裡的建議版本填寫。
+
 取得上述資訊後，AI Agent 應優先執行：
 
 1. 更新 `docs/intake_questions.md`。
@@ -84,6 +88,7 @@
 3. 更新 `docs/thesis_outline.md` 與 `docs/chapters/01_introduction.md`。
 4. 若已有程式方向，更新 `docs/environment.md` 並建立第一個 `src/` 或 `notebooks/` 原型。
 5. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
+6. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
 
 ## 目前完成度判斷
 

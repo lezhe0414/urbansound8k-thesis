@@ -26,6 +26,7 @@
 ### 立即任務
 
 - [ ] 先查看 `docs/current_status.md`，確認目前資訊缺口。
+- [ ] 使用 `docs/next_input_template.md` 收集下一次輸入。
 - [ ] 填寫 `docs/intake_questions.md`。
 - [ ] 把零散想法先整理到 `docs/task_inbox.md`。
 - [ ] 補齊 `docs/thesis_plan.md` 的基本資訊。
@@ -34,6 +35,7 @@
 - [ ] 把教授近期要求整理到 `docs/meeting_notes.md`。
 - [ ] 將已確認的重要決策記到 `docs/decision_log.md`。
 - [ ] 決定第一個要實作的程式任務。
+- [ ] 建立第一次 `docs/weekly_review.md` 週檢查紀錄。
 
 ### 寫作任務
 

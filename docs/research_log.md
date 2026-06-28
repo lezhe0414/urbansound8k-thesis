@@ -23,6 +23,8 @@
 - 新增逐章論文草稿資料夾 `docs/chapters/`。
 - 新增引用管理入口 `references/README.md`、`references/citation_tracker.md`、`references/references.bib`。
 - 新增目前狀態摘要 `docs/current_status.md`。
+- 新增下一次輸入範本 `docs/next_input_template.md`。
+- 新增每週進度檢查 `docs/weekly_review.md`。
 
 ### 已知資訊
 
@@ -40,6 +42,7 @@
 
 - 補完 `docs/thesis_plan.md` 的基本資訊。
 - 先查看 `docs/current_status.md`，確認仍缺哪些資訊。
+- 使用 `docs/next_input_template.md` 收集論文方向、程式需求與教授要求。
 - 依 `docs/thesis_outline.md` 建立第一版正式章節架構。
 - 開始在 `docs/chapters/` 補第一章緒論或第二章文獻探討。
 - 把教授既有要求補到 `docs/meeting_notes.md`。
@@ -49,3 +52,4 @@
 - 確定第一個可執行的研究或程式任務。
 - 決定正式程式碼要使用的語言、框架與執行方式。
 - 確認學校或教授要求的引用格式。
+- 每週使用 `docs/weekly_review.md` 檢查進度與風險。

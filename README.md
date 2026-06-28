@@ -36,22 +36,24 @@
 
 1. 先看 `docs/current_status.md`，確認目前完成度與資訊缺口。
 2. 在 `docs/thesis_plan.md` 補上題目、研究問題、方法與目前限制。
-3. 如果還不確定怎麼描述需求，先填 `docs/intake_questions.md`。
+3. 如果還不確定怎麼描述需求，先看 `docs/next_input_template.md` 或填 `docs/intake_questions.md`。
 4. 不確定要放哪裡的事項，先放進 `docs/task_inbox.md`。
 5. 重要方向、技術選型或教授要求改變時，記到 `docs/decision_log.md`。
 6. 用 `docs/milestones.md` 追蹤論文、程式、實驗與教授回饋。
 7. 每次與教授討論後，把結論寫進 `docs/research_log.md` 與 `docs/meeting_notes.md`。
-8. 章節正式草稿放在 `docs/chapters/`。
-9. 程式原型可先放 `notebooks/`，確定要重複執行後整理到 `src/`。
-10. 程式環境與執行方式記在 `docs/environment.md`。
-11. 每次實驗前後參考 `docs/experiment_template.md` 紀錄目的、命令、參數與結果。
-12. 用 `docs/reproducibility_checklist.md` 檢查程式、資料與實驗是否能支撐論文。
-13. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
-14. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
+8. 每週用 `docs/weekly_review.md` 檢查進度與風險。
+9. 章節正式草稿放在 `docs/chapters/`。
+10. 程式原型可先放 `notebooks/`，確定要重複執行後整理到 `src/`。
+11. 程式環境與執行方式記在 `docs/environment.md`。
+12. 每次實驗前後參考 `docs/experiment_template.md` 紀錄目的、命令、參數與結果。
+13. 用 `docs/reproducibility_checklist.md` 檢查程式、資料與實驗是否能支撐論文。
+14. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
+15. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
 
 ## 重要文件入口
 
 - `docs/intake_questions.md`：還不知道怎麼開始時，先回答這份訪談表。
+- `docs/next_input_template.md`：下一次給 AI Agent 的可複製填空範本。
 - `docs/current_status.md`：目前完成度、資訊缺口與下一步。
 - `docs/thesis_plan.md`：整理論文題目、研究問題、方法與預期成果。
 - `docs/thesis_outline.md`：建立論文章節架構與各章待補內容。
@@ -59,6 +61,7 @@
 - `docs/task_inbox.md`：暫存尚未分類的論文、程式、資料、文獻任務。
 - `docs/decision_log.md`：記錄重要研究與技術決策，以及決策理由。
 - `docs/milestones.md`：追蹤論文、程式、實驗、教授回饋與期限。
+- `docs/weekly_review.md`：每週檢查論文、程式、資料、文獻與風險。
 - `docs/meeting_notes.md`：記錄教授會議、修改要求與下次會議前任務。
 - `docs/ai_workflow.md`：說明如何讓 AI Agent 協助寫作、文獻與程式。
 - `docs/environment.md`：記錄程式語言、工具、安裝命令與重現步驟。

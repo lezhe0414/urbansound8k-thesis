@@ -35,6 +35,8 @@ The project should help the user:
 
 - Inspect current files before changing them.
 - Read `docs/current_status.md` first when resuming broad thesis support work.
+- Use `docs/next_input_template.md` when the user needs a concise way to provide thesis direction, coding needs, or professor requests.
+- Use `docs/weekly_review.md` for recurring progress reviews.
 - Do not delete or rewrite user work unless explicitly asked.
 - Prefer small, traceable changes with clear purpose.
 - Keep code reproducible: document inputs, outputs, parameters, and commands.
