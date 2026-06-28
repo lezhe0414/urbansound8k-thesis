@@ -31,6 +31,7 @@
 - [ ] 填寫 `docs/intake_questions.md`。
 - [ ] 使用 `docs/professor_questions.md` 準備要問教授的問題。
 - [ ] 把零散想法先整理到 `docs/task_inbox.md`。
+- [ ] 用 `docs/artifact_index.md` 追蹤新增成果。
 - [ ] 補齊 `docs/thesis_plan.md` 的基本資訊。
 - [ ] 依 `docs/thesis_outline.md` 建立第一版章節大綱。
 - [ ] 列出教授已經給的要求。
@@ -38,6 +39,7 @@
 - [ ] 將已確認的重要決策記到 `docs/decision_log.md`。
 - [ ] 決定第一個要實作的程式任務。
 - [ ] 建立第一次 `docs/weekly_review.md` 週檢查紀錄。
+- [ ] 交付任何內容前使用 `docs/submission_checklist.md`。
 
 ### 寫作任務
 

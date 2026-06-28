@@ -27,6 +27,8 @@
 - 新增每週進度檢查 `docs/weekly_review.md`。
 - 新增第一週啟動計畫 `docs/first_week_plan.md`。
 - 新增教授問題清單 `docs/professor_questions.md`。
+- 新增成果索引 `docs/artifact_index.md`。
+- 新增交付檢查清單 `docs/submission_checklist.md`。
 
 ### 已知資訊
 
@@ -47,6 +49,7 @@
 - 依 `docs/first_week_plan.md` 完成第一週啟動任務。
 - 使用 `docs/professor_questions.md` 準備下一次要向教授確認的問題。
 - 使用 `docs/next_input_template.md` 收集論文方向、程式需求與教授要求。
+- 用 `docs/artifact_index.md` 追蹤新增成果。
 - 依 `docs/thesis_outline.md` 建立第一版正式章節架構。
 - 開始在 `docs/chapters/` 補第一章緒論或第二章文獻探討。
 - 把教授既有要求補到 `docs/meeting_notes.md`。
@@ -57,3 +60,4 @@
 - 決定正式程式碼要使用的語言、框架與執行方式。
 - 確認學校或教授要求的引用格式。
 - 每週使用 `docs/weekly_review.md` 檢查進度與風險。
+- 交付教授或階段成果前使用 `docs/submission_checklist.md`。

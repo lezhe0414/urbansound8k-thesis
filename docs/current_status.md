@@ -32,6 +32,7 @@
 - `docs/weekly_review.md`：每週進度檢查。
 - `docs/task_inbox.md`：未分類任務入口。
 - `docs/decision_log.md`：重要決策紀錄。
+- `docs/artifact_index.md`：成果索引。
 - `docs/research_log.md`：研究日誌。
 - `docs/meeting_notes.md`：教授會議紀錄。
 
@@ -43,6 +44,7 @@
 - `.env.example`：環境變數樣板。
 - `docs/experiment_template.md`：實驗紀錄模板。
 - `docs/reproducibility_checklist.md`：可重複研究檢查清單。
+- `docs/submission_checklist.md`：交付前檢查清單。
 
 ### 資料、結果與圖表
 
@@ -94,6 +96,7 @@
 5. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
 6. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
 7. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
+8. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
 
 ## 目前完成度判斷
 

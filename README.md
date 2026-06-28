@@ -41,16 +41,18 @@
 5. 不確定要問教授什麼時，先看 `docs/professor_questions.md`。
 6. 不確定要放哪裡的事項，先放進 `docs/task_inbox.md`。
 7. 重要方向、技術選型或教授要求改變時，記到 `docs/decision_log.md`。
-8. 用 `docs/milestones.md` 追蹤論文、程式、實驗與教授回饋。
-9. 每次與教授討論後，把結論寫進 `docs/research_log.md` 與 `docs/meeting_notes.md`。
-10. 每週用 `docs/weekly_review.md` 檢查進度與風險。
-11. 章節正式草稿放在 `docs/chapters/`。
-12. 程式原型可先放 `notebooks/`，確定要重複執行後整理到 `src/`。
-13. 程式環境與執行方式記在 `docs/environment.md`。
-14. 每次實驗前後參考 `docs/experiment_template.md` 紀錄目的、命令、參數與結果。
-15. 用 `docs/reproducibility_checklist.md` 檢查程式、資料與實驗是否能支撐論文。
-16. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
-17. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
+8. 用 `docs/artifact_index.md` 追蹤所有重要成果。
+9. 用 `docs/milestones.md` 追蹤論文、程式、實驗與教授回饋。
+10. 每次與教授討論後，把結論寫進 `docs/research_log.md` 與 `docs/meeting_notes.md`。
+11. 每週用 `docs/weekly_review.md` 檢查進度與風險。
+12. 章節正式草稿放在 `docs/chapters/`。
+13. 程式原型可先放 `notebooks/`，確定要重複執行後整理到 `src/`。
+14. 程式環境與執行方式記在 `docs/environment.md`。
+15. 每次實驗前後參考 `docs/experiment_template.md` 紀錄目的、命令、參數與結果。
+16. 用 `docs/reproducibility_checklist.md` 檢查程式、資料與實驗是否能支撐論文。
+17. 交給教授或階段交付前，用 `docs/submission_checklist.md` 檢查。
+18. 每次實驗輸出放到 `results/`，圖表放到 `figures/`。
+19. 每篇重要文獻都在 `references/literature_notes.md` 留下摘要、方法、可引用觀點與疑問，引用需求追蹤在 `references/citation_tracker.md`。
 
 ## 重要文件入口
 
@@ -64,6 +66,7 @@
 - `docs/chapters/`：逐章撰寫正式草稿。
 - `docs/task_inbox.md`：暫存尚未分類的論文、程式、資料、文獻任務。
 - `docs/decision_log.md`：記錄重要研究與技術決策，以及決策理由。
+- `docs/artifact_index.md`：追蹤所有重要成果、狀態、證據來源與對應章節。
 - `docs/milestones.md`：追蹤論文、程式、實驗、教授回饋與期限。
 - `docs/weekly_review.md`：每週檢查論文、程式、資料、文獻與風險。
 - `docs/meeting_notes.md`：記錄教授會議、修改要求與下次會議前任務。
@@ -71,6 +74,7 @@
 - `docs/environment.md`：記錄程式語言、工具、安裝命令與重現步驟。
 - `docs/experiment_template.md`：每次實驗或跑程式後的紀錄格式。
 - `docs/reproducibility_checklist.md`：交付前檢查研究是否可追蹤、可重現。
+- `docs/submission_checklist.md`：交付教授、階段成果或初稿前的檢查清單。
 - `.env.example`：環境變數樣板，實際 `.env` 不提交。
 - `references/README.md`：文獻與引用管理流程。
 - `references/literature_notes.md`：文獻閱讀與引用重點。

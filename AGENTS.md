@@ -47,6 +47,8 @@ The project should help the user:
 - Separate speculation from verified results.
 - Record major thesis, methodology, data, tooling, or professor-driven decisions in `docs/decision_log.md`.
 - Put unclassified tasks in `docs/task_inbox.md` before sorting them into milestones or specific files.
+- Track important deliverables in `docs/artifact_index.md`.
+- Before professor handoff or staged delivery, check `docs/submission_checklist.md`.
 
 ## Code Standards
 
@@ -67,6 +69,7 @@ For each substantial task, aim to leave behind at least one durable artifact:
 - an experiment script or notebook;
 - a result table, chart, or log;
 - a literature summary;
+- an artifact index update in `docs/artifact_index.md`;
 - or a decision record in `docs/research_log.md`.
 - or a formal decision in `docs/decision_log.md`.
 
