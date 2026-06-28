@@ -50,6 +50,12 @@
 - 目前最大風險：
 - 需要使用者或教授確認的問題：
 
+### AI Agent 使用
+
+- 本週 AI Agent 協助的重點：
+- 是否已更新 `docs/ai_usage_log.md`：
+- 是否有需要教授確認的 AI 使用範圍：
+
 ## 每週固定檢查清單
 
 - [ ] `docs/current_status.md` 是否仍準確。
@@ -59,6 +65,7 @@
 - [ ] `docs/meeting_notes.md` 是否有記錄教授回饋。
 - [ ] `docs/reproducibility_checklist.md` 是否有新增可勾選項目。
 - [ ] `references/citation_tracker.md` 是否有待補引用。
+- [ ] `docs/ai_usage_log.md` 是否有記錄重要 AI 協助。
 - [ ] 程式或實驗結果是否能支撐論文章節。
 
 ## AI Agent 每週整理時應輸出

@@ -30,6 +30,8 @@
 - 新增成果索引 `docs/artifact_index.md`。
 - 新增交付檢查清單 `docs/submission_checklist.md`。
 - 新增程式任務規格模板 `docs/code_task_spec.md`。
+- 新增 AI Agent 使用紀錄 `docs/ai_usage_log.md`。
+- 新增 AI 使用揭露草稿 `docs/ai_disclosure_draft.md`。
 
 ### 已知資訊
 
@@ -63,3 +65,4 @@
 - 確認學校或教授要求的引用格式。
 - 每週使用 `docs/weekly_review.md` 檢查進度與風險。
 - 交付教授或階段成果前使用 `docs/submission_checklist.md`。
+- 重要 AI 協助需記錄到 `docs/ai_usage_log.md`，是否正式揭露需向教授確認。

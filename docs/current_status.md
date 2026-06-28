@@ -15,6 +15,8 @@
 - `AGENTS.md`：AI Agent 協作規則。
 - `README.md`：專案入口與工作流程。
 - `docs/ai_workflow.md`：如何讓 AI Agent 協助寫作、文獻、程式與實驗。
+- `docs/ai_usage_log.md`：AI Agent 使用紀錄。
+- `docs/ai_disclosure_draft.md`：AI 使用揭露草稿。
 
 ### 論文規劃
 
@@ -99,6 +101,7 @@
 7. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
 8. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
 9. 若新增任何重要成果，更新 `docs/artifact_index.md`；交付前使用 `docs/submission_checklist.md`。
+10. 若 AI 協助產生重要內容、程式或整理，更新 `docs/ai_usage_log.md`。
 
 ## 目前完成度判斷
 

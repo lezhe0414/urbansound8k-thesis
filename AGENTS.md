@@ -39,6 +39,8 @@ The project should help the user:
 - Use `docs/professor_questions.md` to prepare questions for the professor when requirements are unclear.
 - Use `docs/next_input_template.md` when the user needs a concise way to provide thesis direction, coding needs, or professor requests.
 - Use `docs/weekly_review.md` for recurring progress reviews.
+- Record substantial AI assistance in `docs/ai_usage_log.md`.
+- Treat `docs/ai_disclosure_draft.md` as a draft only; professor and school requirements decide final disclosure wording.
 - Do not delete or rewrite user work unless explicitly asked.
 - Prefer small, traceable changes with clear purpose.
 - Keep code reproducible: document inputs, outputs, parameters, and commands.

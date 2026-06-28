@@ -56,6 +56,7 @@
 - AI Agent 可協助的範圍是否有限制？
 - 程式碼、文字潤飾、文獻整理、圖表產生是否都可使用 AI Agent？
 - 是否需要保留 AI 協作紀錄？
+- 若需要揭露，是否可使用 `docs/ai_disclosure_draft.md` 類似格式？
 
 ## 會後整理
 
@@ -66,3 +67,4 @@
 - `docs/decision_log.md`
 - `docs/milestones.md`
 - `docs/current_status.md`
+- `docs/ai_usage_log.md`

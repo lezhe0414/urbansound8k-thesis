@@ -18,6 +18,7 @@
 - [ ] 已更新 `docs/research_log.md`。
 - [ ] 若涉及教授要求，已更新 `docs/meeting_notes.md`。
 - [ ] 若涉及重要選擇，已更新 `docs/decision_log.md`。
+- [ ] 若 AI Agent 協助了重要內容，已更新 `docs/ai_usage_log.md`。
 
 ## 論文內容檢查
 
@@ -58,6 +59,7 @@
 - [ ] 已列出希望教授確認的問題。
 - [ ] 已列出下一步計畫。
 - [ ] 已把教授可能會問的資料、方法、程式、引用來源準備好。
+- [ ] 若需揭露 AI 使用，已檢查 `docs/ai_disclosure_draft.md`。
 
 ## Git 檢查
 
