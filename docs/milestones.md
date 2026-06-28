@@ -26,8 +26,10 @@
 ### 立即任務
 
 - [ ] 先查看 `docs/current_status.md`，確認目前資訊缺口。
+- [ ] 依 `docs/first_week_plan.md` 完成第一週啟動任務。
 - [ ] 使用 `docs/next_input_template.md` 收集下一次輸入。
 - [ ] 填寫 `docs/intake_questions.md`。
+- [ ] 使用 `docs/professor_questions.md` 準備要問教授的問題。
 - [ ] 把零散想法先整理到 `docs/task_inbox.md`。
 - [ ] 補齊 `docs/thesis_plan.md` 的基本資訊。
 - [ ] 依 `docs/thesis_outline.md` 建立第一版章節大綱。

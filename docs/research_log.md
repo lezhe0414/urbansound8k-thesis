@@ -25,6 +25,8 @@
 - 新增目前狀態摘要 `docs/current_status.md`。
 - 新增下一次輸入範本 `docs/next_input_template.md`。
 - 新增每週進度檢查 `docs/weekly_review.md`。
+- 新增第一週啟動計畫 `docs/first_week_plan.md`。
+- 新增教授問題清單 `docs/professor_questions.md`。
 
 ### 已知資訊
 
@@ -42,6 +44,8 @@
 
 - 補完 `docs/thesis_plan.md` 的基本資訊。
 - 先查看 `docs/current_status.md`，確認仍缺哪些資訊。
+- 依 `docs/first_week_plan.md` 完成第一週啟動任務。
+- 使用 `docs/professor_questions.md` 準備下一次要向教授確認的問題。
 - 使用 `docs/next_input_template.md` 收集論文方向、程式需求與教授要求。
 - 依 `docs/thesis_outline.md` 建立第一版正式章節架構。
 - 開始在 `docs/chapters/` 補第一章緒論或第二章文獻探討。

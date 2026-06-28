@@ -20,6 +20,8 @@
 
 - `docs/intake_questions.md`：論文需求訪談表。
 - `docs/next_input_template.md`：下一次給 AI Agent 的填空範本。
+- `docs/first_week_plan.md`：第一週啟動計畫。
+- `docs/professor_questions.md`：要向教授確認的問題。
 - `docs/thesis_plan.md`：論文計畫。
 - `docs/thesis_outline.md`：論文章節大綱。
 - `docs/chapters/`：逐章草稿。
@@ -81,6 +83,8 @@
 
 也可以直接複製 `docs/next_input_template.md` 裡的建議版本填寫。
 
+如果需要先整理第一週該做什麼，請依 `docs/first_week_plan.md` 執行；如果需要和教授確認方向，請使用 `docs/professor_questions.md`。
+
 取得上述資訊後，AI Agent 應優先執行：
 
 1. 更新 `docs/intake_questions.md`。
@@ -89,6 +93,7 @@
 4. 若已有程式方向，更新 `docs/environment.md` 並建立第一個 `src/` 或 `notebooks/` 原型。
 5. 若已有文獻或教授指定閱讀，更新 `references/literature_notes.md` 與 `references/citation_tracker.md`。
 6. 若是每週整理，更新 `docs/weekly_review.md`、`docs/milestones.md` 與 `docs/research_log.md`。
+7. 若取得教授回覆，更新 `docs/meeting_notes.md`、`docs/decision_log.md` 與 `docs/current_status.md`。
 
 ## 目前完成度判斷
 
