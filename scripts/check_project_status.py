@@ -37,8 +37,8 @@ PLACEHOLDER_MARKERS = [
 ]
 
 NEXT_ACTIONS = [
-    "若需要正式分數，將 CNN baseline 與 Spectrogram Transformer 的 fold 10 設定跑完整 epochs。",
-    "整理 smoke run metrics 與 confusion matrix，準備週五和教授討論。",
+    "補 CNN baseline 的 fold 10 正式訓練，必要時改用 Colab/GPU。",
+    "整理 Transformer fold 10 metrics 與 confusion matrix，準備週五和教授討論。",
     "確認教授是否接受 Transformer 作為 CNN baseline 之外的比較模型。",
     "開始補 8 頁論文的方法與初步結果段落。",
 ]
@@ -105,7 +105,7 @@ def render_text(missing: list[str], marker_totals: dict[str, int], files_with_ma
     if missing:
         lines.append("Status: setup incomplete")
     else:
-        lines.append("Status: setup files present; MVP code present; UrbanSound8K downloaded and preprocessed; smoke experiments completed")
+        lines.append("Status: setup files present; MVP code present; UrbanSound8K downloaded and preprocessed; smoke experiments completed; Transformer fold 10 completed")
 
     return "\n".join(lines) + "\n"
 
@@ -143,7 +143,7 @@ def render_markdown(missing: list[str], marker_totals: dict[str, int], files_wit
         "",
         "## Status",
         "",
-        "Setup incomplete." if missing else "Setup files present; MVP code present; UrbanSound8K downloaded and preprocessed; smoke experiments completed.",
+        "Setup incomplete." if missing else "Setup files present; MVP code present; UrbanSound8K downloaded and preprocessed; smoke experiments completed; Transformer fold 10 completed.",
         "",
     ])
     return "\n".join(lines)

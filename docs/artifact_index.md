@@ -65,6 +65,7 @@
 | 實驗紀錄模板 | `docs/experiment_template.md` | 記錄每次實驗 | 已確認 | 文件檢查 | 尚未有實驗 |
 | CNN smoke result | `results/cnn_baseline_smoke_fold10/` | CNN pipeline 驗證 | 已確認 | `src.train` | 子集 smoke run，非正式分數 |
 | Transformer smoke result | `results/transformer_baseline_smoke_fold10/` | Transformer pipeline 驗證 | 已確認 | `src.train` | 子集 smoke run，非正式分數 |
+| Transformer fold 10 result | `results/transformer_baseline_fold10/` | 正式主模型結果 | 已確認 | `src.train`、`src.evaluate` | test accuracy 0.6547，macro F1 0.6644 |
 | 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用

@@ -24,7 +24,7 @@
 
 ## 目前判斷
 
-目前不是完成狀態。專案管理骨架已完成，論文方向已確認，UrbanSound8K 已下載並驗證，Mel-spectrogram preprocessing 已完成，CNN baseline 與 Spectrogram Transformer 的 smoke run 已可輸出 metrics、checkpoint 與 confusion matrix。
+目前不是完成狀態。專案管理骨架已完成，論文方向已確認，UrbanSound8K 已下載並驗證，Mel-spectrogram preprocessing 已完成，CNN baseline 與 Spectrogram Transformer 的 smoke run 已可輸出 metrics、checkpoint 與 confusion matrix；Spectrogram Transformer 已完成 fold 10 正式訓練與評估。
 
 因為進度已落後原 timeplan，目前策略是先保住可展示、可重複執行的端到端 pipeline，再視本機速度或 Colab/GPU 資源補正式長訓練結果：
 
@@ -32,7 +32,8 @@
 2. 已執行 Mel-spectrogram preprocessing，輸出到 `data/processed/urbansound8k_mels/`。
 3. 已跑 CNN baseline smoke run：`results/cnn_baseline_smoke_fold10/`，圖表在 `figures/cnn_baseline_smoke_fold10_confusion_matrix.png`。
 4. 已跑 Spectrogram Transformer smoke run：`results/transformer_baseline_smoke_fold10/`，圖表在 `figures/transformer_baseline_smoke_fold10_confusion_matrix.png`。
-5. 下一步是跑正式 full-data/full-epoch 訓練，或改用 Colab/GPU 加速。
+5. Spectrogram Transformer fold 10 正式結果：test accuracy `0.6547`、macro precision `0.6879`、macro recall `0.6711`、macro F1 `0.6644`。
+6. 下一步是補 CNN baseline 正式長訓練，建議改用 Colab/GPU 或較快環境。
 
 ## 已建立內容
 
@@ -115,11 +116,11 @@
 
 最有效的下一步是把目前 smoke 結果整理成討論材料，並決定正式訓練資源：
 
-1. 檢查 `results/*_smoke_fold10/metrics.json` 與 `figures/*_smoke_fold10*_confusion_matrix.png`。
-2. 在 Colab/GPU 或較快環境跑正式 `configs/cnn_baseline.yaml` 與 `configs/transformer_baseline.yaml`。
-3. 將模型選型、資料處理流程、初步結果和「CNN baseline + Transformer comparison」策略帶去和教授討論。
+1. 檢查 `results/transformer_baseline_fold10/metrics.json` 與 `figures/transformer_baseline_fold10_confusion_matrix.png`。
+2. 在 Colab/GPU 或較快環境補跑正式 `configs/cnn_baseline.yaml`。
+3. 將模型選型、資料處理流程、Transformer 初步結果和「CNN baseline + Transformer comparison」策略帶去和教授討論。
 4. 開始撰寫方法章與初步結果段落。
 
 ## 目前完成度判斷
 
-專案基礎設施、MVP 程式碼、資料下載、資料處理與 smoke 實驗已完成；整體目標尚未完成，因為正式長訓練結果、文獻整理、圖表解讀與 8 頁論文仍需完成。
+專案基礎設施、MVP 程式碼、資料下載、資料處理、smoke 實驗與 Transformer fold 10 正式結果已完成；整體目標尚未完成，因為 CNN baseline 正式結果、文獻整理、圖表解讀與 8 頁論文仍需完成。

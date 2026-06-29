@@ -8,13 +8,13 @@
 
 Project definition 已確認方向為「Sound Event Detection Using Machine Learning Techniques」。核心技術路線是將音訊轉成 Mel-spectrogram 等頻譜圖，再以 CNN 進行聲音事件分類。可用公開資料集包含 UrbanSound8K 或 ESC-50，工具以 Python、PyTorch、Librosa、NumPy、Matplotlib 為主。
 
-目前進度仍落後於原時程，但端到端 pipeline 已能運作：UrbanSound8K 已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 的 smoke run 已輸出 metrics 與 confusion matrix。下一步應優先跑正式長訓練或改用 Colab/GPU，而不是再擴大模型範圍。
+目前進度仍落後於原時程，但端到端 pipeline 已能運作：UrbanSound8K 已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 的 smoke run 已輸出 metrics 與 confusion matrix；Spectrogram Transformer fold 10 已完成正式訓練，test accuracy 約 `0.655`、macro F1 約 `0.664`。下一步應優先補 CNN baseline 正式結果，必要時改用 Colab/GPU，而不是再擴大模型範圍。
 
 ## 立即執行方向
 
 1. 保留 CNN baseline，不把 CNN 從論文中拿掉。
 2. 使用 Spectrogram Transformer 作為現代比較模型，和 CNN baseline 形成清楚對照。
-3. 用 `configs/*_smoke.yaml` 展示 pipeline 已跑通；用 `configs/*_baseline.yaml` 補正式分數。
+3. 用 `configs/*_smoke.yaml` 展示 pipeline 已跑通；已完成 `configs/transformer_baseline.yaml` 正式結果，接著補 `configs/cnn_baseline.yaml`。
 4. 將每次實驗結果保存到 `results/`，圖表保存到 `figures/`。
 5. 需要向教授確認：是否接受將 Transformer 作為 CNN baseline 之外的比較模型。
 
@@ -36,8 +36,8 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 下一步 AI Agent 應依序執行：
 
 1. 跑正式 CNN baseline 訓練，必要時改用 Colab/GPU。
-2. 跑正式 Spectrogram Transformer 訓練。
-3. 整理 metrics 與 confusion matrix。
+2. 整理 Transformer metrics 與 confusion matrix，準備教授討論。
+3. 若 CNN 來不及正式長訓練，明確標示 CNN 目前是 baseline architecture/smoke result，Transformer 是已完成正式 fold 10 結果。
 4. 撰寫方法章草稿，說明 audio-to-spectrogram 與模型比較。
 5. 準備週五教授討論重點。
 
@@ -95,6 +95,6 @@ b1f8459 Add thesis risk register
 - 風險與交付管理：已建立。
 - 正式論文內容：方向已確認，正文尚未開始。
 - 實際程式碼：MVP 已完成。
-- 實驗結果：smoke run 已完成，正式長訓練待補。
+- 實驗結果：smoke run 已完成，Transformer fold 10 正式結果已完成，CNN 正式長訓練待補。
 
 目前不可將整體目標標記為完成，因為仍需完成正式實驗、圖表解讀與 8 頁論文。
