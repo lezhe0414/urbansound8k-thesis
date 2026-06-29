@@ -10,6 +10,96 @@ MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，
 
 整個論文專案尚未完成，因為 CNN baseline 正式長訓練、結果解讀、文獻整理與 8 頁論文 PDF 仍待補。
 
+## 實作流程圖
+
+```mermaid
+flowchart TD
+    A["UrbanSound8K raw audio<br/>8732 .wav files, 10 classes"] --> B["Read metadata<br/>metadata/UrbanSound8K.csv"]
+    A --> C["Load audio with librosa<br/>mono, 22050 Hz"]
+    C --> D["Normalize duration<br/>pad or trim to 4.0 seconds"]
+    D --> E["Convert to Mel-spectrogram<br/>128 mel bins, n_fft 2048, hop 512"]
+    E --> F["Standardize each spectrogram<br/>mean 0, std 1"]
+    F --> G["Save processed cache<br/>.npz files + metadata.csv"]
+    G --> H["Fold split<br/>fold 10 test, fold 1 validation, folds 2-9 train"]
+    H --> I["CNN baseline<br/>spectrogram as image"]
+    H --> J["Spectrogram Transformer<br/>16x16 patches + class token"]
+    I --> K["Train / validation loop<br/>checkpoint best model"]
+    J --> K
+    K --> L["Evaluate on test fold"]
+    L --> M["metrics.json<br/>accuracy, precision, recall, F1"]
+    L --> N["confusion matrix figure"]
+```
+
+## 資料與張量尺寸變化
+
+### Preprocessing 變化
+
+| 步驟 | 輸入 | 參數 / 操作 | 輸出 |
+| --- | --- | --- | --- |
+| Raw dataset | 8732 個 `.wav` 檔 | UrbanSound8K 官方 10 folds | `audio/fold1` 到 `audio/fold10` |
+| Metadata | `UrbanSound8K.csv` | 讀取 `slice_file_name`、`fold`、`classID`、`class` | 8732 筆標籤紀錄 |
+| Audio loading | 每個原始音訊長度不一 | `sample_rate=22050`、mono | 1D audio array |
+| Duration normalization | 1D audio array | 補 0 或截斷到 `4.0` 秒 | `88200` samples |
+| Mel-spectrogram | `88200` samples | `n_mels=128`、`n_fft=2048`、`hop_length=512` | `128 x 173` spectrogram |
+| Standardization | `128 x 173` spectrogram | 每個 spectrogram 各自做 mean/std normalize | `128 x 173` float32 |
+| Cache | `128 x 173` float32 + label | `np.savez_compressed` | 每筆一個 `.npz` |
+| Processed metadata | 8732 processed items | 保存 fold、class、path | `data/processed/urbansound8k_mels/metadata.csv` |
+
+### Fold 10 正式切分
+
+目前正式 Transformer 使用 `--fold 10`：
+
+| Split | Fold | 樣本數 | Batch size | 每個 epoch batch 數 |
+| --- | --- | ---: | ---: | ---: |
+| Train | folds 2-9 | 7022 | 32 | 220 |
+| Validation | fold 1 | 873 | 32 | 28 |
+| Test | fold 10 | 837 | 32 | 27 |
+
+說明：train 的 `7022 / 32 = 219.44`，所以每個 epoch 是 220 個 training batches；最後一個 batch 會小於 32。validation 和 test 同理。
+
+### Transformer 內部形狀變化
+
+正式 Transformer 設定來自 `configs/transformer_baseline.yaml`：
+
+| 階段 | Shape / 數量 | 說明 |
+| --- | --- | --- |
+| DataLoader batch | `[32, 1, 128, 173]` | batch size 32、1 channel、Mel-spectrogram 高 128、寬 173 |
+| Patch embedding | `[32, 128, 8, 10]` | `patch_size=[16,16]`，產生 `8 x 10 = 80` 個 patches，每個 patch embed 到 128 維 |
+| Flatten patches | `[32, 80, 128]` | 每筆資料 80 個 patch tokens |
+| Add class token | `[32, 81, 128]` | 80 個 patch tokens + 1 個 class token |
+| Transformer encoder | `[32, 81, 128]` | `depth=3`、`num_heads=4` |
+| Classification head | `[32, 10]` | 10 個 UrbanSound8K 類別 logits |
+
+正式訓練設定：
+
+| 設定 | 數值 |
+| --- | ---: |
+| Epochs | 10 |
+| Batch size | 32 |
+| Learning rate | 0.0005 |
+| Weight decay | 0.0001 |
+| Transformer depth | 3 |
+| Attention heads | 4 |
+| Embedding dimension | 128 |
+| MLP ratio | 2.0 |
+| Dropout | 0.1 |
+
+### CNN baseline 內部形狀變化
+
+CNN baseline 將 Mel-spectrogram 當成單通道影像。輸入 shape 同樣是 `[batch, 1, 128, 173]`。
+
+| 階段 | Shape / 數量 | 說明 |
+| --- | --- | --- |
+| DataLoader batch | `[32, 1, 128, 173]` | batch size 32 |
+| CNN block 1 | `[32, 32, 64, 86]` | 兩層 convolution + max pooling |
+| CNN block 2 | `[32, 64, 32, 43]` | channel 增加、時間/頻率維度下降 |
+| CNN block 3 | `[32, 128, 16, 21]` | 繼續抽取高階局部特徵 |
+| CNN block 4 | `[32, 256, 8, 10]` | 最後 convolution feature map |
+| Adaptive average pooling | `[32, 256, 1, 1]` | 壓成固定長度 feature |
+| Classification head | `[32, 10]` | 10 個 UrbanSound8K 類別 logits |
+
+目前 CNN 已完成 smoke run，但正式長訓練因本機 CPU 上速度偏慢而尚未完成。
+
 ## 已做到
 
 | 項目 | 狀態 | 證據 / 路徑 | 備註 |
