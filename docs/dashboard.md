@@ -52,6 +52,7 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 | 目的 | 文件 |
 | --- | --- |
 | 看目前完成度 | `docs/current_status.md` |
+| 看 MVP 已做 / 未做 checklist | `docs/progress_tracker.md` |
 | 直接提供下一步資訊 | `docs/next_input_template.md` |
 | 第一週啟動 | `docs/first_week_plan.md` |
 | 準備問教授 | `docs/professor_questions.md` |

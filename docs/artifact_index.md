@@ -82,6 +82,7 @@
 | --- | --- | --- | --- | --- |
 | 專案儀表板 | `docs/dashboard.md` | 快速查看階段、風險與下一步 | 已確認 | 恢復工作時優先讀取 |
 | 目前狀態 | `docs/current_status.md` | 接續工作前讀取 | 已確認 | 需隨研究資訊更新 |
+| MVP 進度追蹤 | `docs/progress_tracker.md` | 追蹤已做、未做、結果與下一步 | 已確認 | 每次重要更新時同步維護 |
 | AI 使用紀錄 | `docs/ai_usage_log.md` | 記錄 AI 協助範圍 | 草稿 | 需持續更新 |
 | AI 揭露草稿 | `docs/ai_disclosure_draft.md` | 預備揭露文字 | 待確認 | 需教授與學校確認 |
 | 第一週啟動計畫 | `docs/first_week_plan.md` | 啟動任務 | 已確認 | 等待使用者填資訊 |
