@@ -44,6 +44,11 @@ class ProcessedDatasetTests(unittest.TestCase):
             self.assertEqual(tuple(x.shape), (1, 128, 173))
             self.assertEqual(int(y.item()), 0)
 
+            limited = UrbanSound8KMelDataset(root, split="train", test_fold=10, max_samples=3, preload=True)
+            self.assertEqual(len(limited), 3)
+            x, _ = limited[0]
+            self.assertEqual(tuple(x.shape), (1, 128, 173))
+
 
 if __name__ == "__main__":
     unittest.main()

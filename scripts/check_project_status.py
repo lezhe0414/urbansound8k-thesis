@@ -37,10 +37,10 @@ PLACEHOLDER_MARKERS = [
 ]
 
 NEXT_ACTIONS = [
-    "下載 UrbanSound8K 並放到 data/raw/UrbanSound8K/。",
-    "安裝 requirements.txt。",
-    "執行 preprocessing 產生 Mel-spectrogram cache。",
-    "跑 CNN baseline 與 Spectrogram Transformer 的 fold 10 訓練。",
+    "若需要正式分數，將 CNN baseline 與 Spectrogram Transformer 的 fold 10 設定跑完整 epochs。",
+    "整理 smoke run metrics 與 confusion matrix，準備週五和教授討論。",
+    "確認教授是否接受 Transformer 作為 CNN baseline 之外的比較模型。",
+    "開始補 8 頁論文的方法與初步結果段落。",
 ]
 
 
@@ -105,7 +105,7 @@ def render_text(missing: list[str], marker_totals: dict[str, int], files_with_ma
     if missing:
         lines.append("Status: setup incomplete")
     else:
-        lines.append("Status: setup files present; MVP code present; dataset, dependency install, and experiments pending")
+        lines.append("Status: setup files present; MVP code present; UrbanSound8K downloaded and preprocessed; smoke experiments completed")
 
     return "\n".join(lines) + "\n"
 
@@ -143,7 +143,7 @@ def render_markdown(missing: list[str], marker_totals: dict[str, int], files_wit
         "",
         "## Status",
         "",
-        "Setup incomplete." if missing else "Setup files present; MVP code present; dataset, dependency install, and experiments pending.",
+        "Setup incomplete." if missing else "Setup files present; MVP code present; UrbanSound8K downloaded and preprocessed; smoke experiments completed.",
         "",
     ])
     return "\n".join(lines)

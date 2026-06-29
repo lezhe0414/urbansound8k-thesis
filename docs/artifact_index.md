@@ -43,27 +43,29 @@
 | Notebook 規則 | `notebooks/README.md` | 探索性分析管理 | 已確認 | 文件檢查 | 尚未有 notebook |
 | 程式環境設定 | `docs/environment.md` | 記錄安裝與執行方式 | 草稿 | Project definition PDF | Python/PyTorch/Librosa |
 | 程式任務規格 | `docs/code_task_spec.md` | 定義 sound event detection baseline | 已確認 | Project definition PDF | MVP 已建立，待正式資料訓練 |
-| CNN baseline | `src/models/cnn.py` | Sound event classification baseline | 草稿 | 程式檢查 | 可訓練架構已建立 |
-| Transformer comparison | `src/models/spectrogram_transformer.py` | 現代模型比較 | 草稿 | 程式檢查 | 作為主要比較模型 |
-| Preprocessing pipeline | `src/preprocess.py` | Audio to Mel-spectrogram | 草稿 | 程式檢查 | 需正式資料驗證 |
-| Training pipeline | `src/train.py` | 模型訓練與測試 | 草稿 | 程式檢查 | 產生 metrics 與 checkpoint |
-| Evaluation pipeline | `src/evaluate.py` | 重跑評估與圖表 | 草稿 | 程式檢查 | 產生 evaluation metrics |
+| CNN baseline | `src/models/cnn.py` | Sound event classification baseline | 已確認 | smoke run | 可訓練架構已建立，本機 CPU 較慢 |
+| Transformer comparison | `src/models/spectrogram_transformer.py` | 現代模型比較 | 已確認 | smoke run | 作為主要比較模型 |
+| Preprocessing pipeline | `src/preprocess.py` | Audio to Mel-spectrogram | 已確認 | UrbanSound8K preprocessing | 已處理 8732 筆 |
+| Training pipeline | `src/train.py` | 模型訓練與測試 | 已確認 | smoke run | 產生 metrics 與 checkpoint |
+| Evaluation pipeline | `src/evaluate.py` | 重跑評估與圖表 | 已確認 | smoke run evaluation | 產生 evaluation metrics |
+| Smoke run configs | `configs/cnn_smoke.yaml`、`configs/transformer_smoke.yaml` | 本機快速驗證 | 已確認 | smoke run | 使用真實資料子集 |
 
 ## 資料
 
 | 成果 | 路徑 | 用途 | 狀態 | 證據來源 | 備註 |
 | --- | --- | --- | --- | --- | --- |
 | 資料管理規則 | `data/README.md` | 資料來源與限制管理 | 已確認 | 文件檢查 | 尚未有資料 |
-| 原始資料目錄 | `data/raw/` | 保存 UrbanSound8K 或 ESC-50 | 待補 | 公開資料集 | 預設不提交資料檔 |
-| 處理後資料目錄 | `data/processed/` | 保存 spectrogram features | 待補 | `src/preprocess.py` | 預設不提交資料檔 |
+| 原始資料目錄 | `data/raw/UrbanSound8K_soundata/` | 保存 UrbanSound8K | 已確認 | `soundata.validate()` | 8732 個音訊檔，預設不提交資料檔 |
+| 處理後資料目錄 | `data/processed/urbansound8k_mels/` | 保存 spectrogram features | 已確認 | `src.preprocess` | 8732 筆 Mel-spectrogram，預設不提交資料檔 |
 
 ## 實驗與結果
 
 | 成果 | 路徑 | 用途 | 狀態 | 證據來源 | 備註 |
 | --- | --- | --- | --- | --- | --- |
 | 實驗紀錄模板 | `docs/experiment_template.md` | 記錄每次實驗 | 已確認 | 文件檢查 | 尚未有實驗 |
-| 結果目錄 | `results/` | 儲存實驗輸出 | 待補 | 實驗執行 | 預設不提交輸出檔 |
-| 圖表目錄 | `figures/` | 儲存論文圖表 | 待補 | 程式或手動繪製來源 | 預設不提交大型輸出 |
+| CNN smoke result | `results/cnn_baseline_smoke_fold10/` | CNN pipeline 驗證 | 已確認 | `src.train` | 子集 smoke run，非正式分數 |
+| Transformer smoke result | `results/transformer_baseline_smoke_fold10/` | Transformer pipeline 驗證 | 已確認 | `src.train` | 子集 smoke run，非正式分數 |
+| 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用
 

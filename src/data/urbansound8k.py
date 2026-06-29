@@ -29,6 +29,8 @@ class UrbanSound8KMelDataset:
         split: SplitName,
         test_fold: int,
         val_fold: int | None = None,
+        max_samples: int | None = None,
+        preload: bool = False,
     ) -> None:
         try:
             import torch
@@ -50,8 +52,11 @@ class UrbanSound8KMelDataset:
 
         metadata = pd.read_csv(metadata_path)
         self.items = self._select_items(metadata)
+        if max_samples is not None:
+            self.items = self.items[: int(max_samples)]
         if not self.items:
             raise ValueError(f"No items found for split={split}, test_fold={test_fold}, val_fold={self.val_fold}.")
+        self._cache = self._preload_items() if preload else None
 
     @staticmethod
     def _default_val_fold(test_fold: int) -> int:
@@ -89,10 +94,24 @@ class UrbanSound8KMelDataset:
     def __len__(self) -> int:
         return len(self.items)
 
+    def _preload_items(self) -> list:
+        cache = []
+        for item in self.items:
+            cache.append((self._load_mel(item.path), int(item.class_id)))
+        return cache
+
+    @staticmethod
+    def _load_mel(path: Path) -> np.ndarray:
+        with np.load(path) as payload:
+            return payload["mel"].astype(np.float32)
+
     def __getitem__(self, index: int):
         item = self.items[index]
-        with np.load(item.path) as payload:
-            mel = payload["mel"].astype(np.float32)
+        if self._cache is None:
+            mel = self._load_mel(item.path)
+            class_id = item.class_id
+        else:
+            mel, class_id = self._cache[index]
         x = self._torch.from_numpy(mel).unsqueeze(0)
-        y = self._torch.tensor(item.class_id, dtype=self._torch.long)
+        y = self._torch.tensor(class_id, dtype=self._torch.long)
         return x, y

@@ -85,12 +85,32 @@ data/raw/UrbanSound8K/
     └── UrbanSound8K.csv
 ```
 
+也可以直接用 `soundata` 下載到目前已採用的路徑：
+
+```bash
+python - <<'PY'
+import urllib.request
+import soundata
+
+dataset = soundata.initialize("urbansound8k", data_home="data/raw/UrbanSound8K_soundata")
+dataset.download()
+dataset.validate()
+PY
+```
+
 先產生 Mel-spectrogram：
 
 ```bash
 python3 -m src.preprocess \
-  --raw-dir data/raw/UrbanSound8K \
+  --raw-dir data/raw/UrbanSound8K_soundata \
   --out-dir data/processed/urbansound8k_mels
+```
+
+本機快速 smoke run：
+
+```bash
+python3 -m src.train --config configs/cnn_smoke.yaml --fold 10
+python3 -m src.train --config configs/transformer_smoke.yaml --fold 10
 ```
 
 訓練 CNN baseline：

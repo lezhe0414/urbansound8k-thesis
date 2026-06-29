@@ -79,9 +79,35 @@ def train_one_fold(config: dict, fold: int) -> Path:
     run_dir = results_dir / f"{run_name}_fold{fold}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    train_set = UrbanSound8KMelDataset(processed_dir, split="train", test_fold=fold, val_fold=val_fold)
-    val_set = UrbanSound8KMelDataset(processed_dir, split="val", test_fold=fold, val_fold=val_fold)
-    test_set = UrbanSound8KMelDataset(processed_dir, split="test", test_fold=fold, val_fold=val_fold)
+    preload = bool(data_config.get("preload", False))
+    max_train_samples = data_config.get("max_train_samples")
+    max_val_samples = data_config.get("max_val_samples")
+    max_test_samples = data_config.get("max_test_samples")
+
+    train_set = UrbanSound8KMelDataset(
+        processed_dir,
+        split="train",
+        test_fold=fold,
+        val_fold=val_fold,
+        max_samples=max_train_samples,
+        preload=preload,
+    )
+    val_set = UrbanSound8KMelDataset(
+        processed_dir,
+        split="val",
+        test_fold=fold,
+        val_fold=val_fold,
+        max_samples=max_val_samples,
+        preload=preload,
+    )
+    test_set = UrbanSound8KMelDataset(
+        processed_dir,
+        split="test",
+        test_fold=fold,
+        val_fold=val_fold,
+        max_samples=max_test_samples,
+        preload=preload,
+    )
 
     train_loader = DataLoader(
         train_set,

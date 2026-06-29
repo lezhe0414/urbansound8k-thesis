@@ -15,6 +15,7 @@
 | 日期 | AI 協助內容 | 涉及檔案 / 成果 | 使用者後續確認 | 備註 |
 | --- | --- | --- | --- | --- |
 | 2026-06-28 | 建立論文協作專案骨架、文件模板、程式與實驗管理流程 | `README.md`、`AGENTS.md`、`docs/`、`src/`、`references/` | 待使用者確認後續研究內容 | 教授已同意使用 AI Agent |
+| 2026-06-29 | 協助下載並驗證 UrbanSound8K，執行 Mel-spectrogram preprocessing，跑 CNN 與 Transformer smoke experiments，並更新可重複執行設定 | `data/raw/UrbanSound8K_soundata/`、`data/processed/urbansound8k_mels/`、`configs/`、`src/`、`results/`、`figures/` | 待使用者確認正式長訓練環境與教授回饋 | 資料與結果輸出未提交到 git |
 
 ## 可記錄的協助類型
 

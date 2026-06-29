@@ -1,0 +1,35 @@
+run_name: transformer_baseline_smoke
+seed: 42
+
+data:
+  processed_dir: data/processed/urbansound8k_mels
+  num_classes: 10
+  val_fold_offset: 1
+  preload: true
+  max_train_samples: 256
+  max_val_samples: 128
+  max_test_samples: 128
+
+model:
+  name: spectrogram_transformer
+  in_channels: 1
+  num_classes: 10
+  patch_size: [16, 16]
+  embed_dim: 128
+  depth: 3
+  num_heads: 4
+  mlp_ratio: 2.0
+  dropout: 0.1
+  max_patches: 512
+
+training:
+  batch_size: 32
+  epochs: 1
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  num_workers: 0
+  device: auto
+
+outputs:
+  results_dir: results
+  figures_dir: figures
