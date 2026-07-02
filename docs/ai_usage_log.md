@@ -16,6 +16,7 @@
 | --- | --- | --- | --- | --- |
 | 2026-06-28 | 建立論文協作專案骨架、文件模板、程式與實驗管理流程 | `README.md`、`AGENTS.md`、`docs/`、`src/`、`references/` | 待使用者確認後續研究內容 | 教授已同意使用 AI Agent |
 | 2026-06-29 | 協助下載並驗證 UrbanSound8K，執行 Mel-spectrogram preprocessing，跑 CNN 與 Transformer smoke experiments，完成 Transformer fold 10 正式訓練與評估，並更新可重複執行設定 | `data/raw/UrbanSound8K_soundata/`、`data/processed/urbansound8k_mels/`、`configs/`、`src/`、`results/`、`figures/` | 待使用者確認 CNN 正式長訓練環境與教授回饋 | 資料與結果輸出未提交到 git |
+| 2026-07-02 | 協助建立 Google Colab CNN baseline 執行 notebook，並用英文註解說明 GitHub 同步、資料下載、preprocessing、訓練、評估與結果打包流程 | `notebooks/2026-07-02-colab-cnn-baseline.ipynb`、`docs/progress_tracker.md`、`docs/artifact_index.md` | 待使用者於 Colab 執行並下載結果 | Colab 用於 GPU 訓練；GitHub 仍作為程式碼來源 |
 
 ## 可記錄的協助類型
 

@@ -29,6 +29,16 @@ python3 -m src.train --config configs/transformer_baseline.yaml --fold 10
 python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 ```
 
+## Google Colab CNN baseline
+
+若本機 CPU 訓練 CNN 太慢，可使用下列 notebook 在 Colab GPU 上執行正式 CNN fold 10：
+
+```text
+notebooks/2026-07-02-colab-cnn-baseline.ipynb
+```
+
+此流程以 GitHub repo 作為程式碼來源。Colab runtime 只負責重新下載 UrbanSound8K、產生 Mel-spectrogram cache、訓練 CNN、評估並打包輸出。跑完後需將 `results/cnn_baseline_fold10/` 和對應 `figures/` 圖檔下載回本地。
+
 沒有正式資料時，可先建立 synthetic dataset 檢查 pipeline：
 
 ```bash

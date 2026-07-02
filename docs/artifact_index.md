@@ -40,7 +40,8 @@
 | --- | --- | --- | --- | --- | --- |
 | 程式碼目錄規則 | `src/README.md` | 正式程式碼管理 | 已確認 | 文件檢查 | 已有 MVP 實作 |
 | 專案狀態檢查腳本 | `scripts/check_project_status.py` | 檢查關鍵文件與待補標記 | 已確認 | 執行腳本 | 可用 `--write-report` 輸出報告 |
-| Notebook 規則 | `notebooks/README.md` | 探索性分析管理 | 已確認 | 文件檢查 | 尚未有 notebook |
+| Notebook 規則 | `notebooks/README.md` | 探索性分析管理 | 已確認 | 文件檢查 | 已有 Colab 執行 notebook |
+| Colab CNN baseline notebook | `notebooks/2026-07-02-colab-cnn-baseline.ipynb` | 在 Colab GPU 執行 CNN fold 10 正式訓練 | 已確認 | notebook 文件檢查 | 含英文註解；GitHub 為程式碼來源，資料與輸出不提交 |
 | 程式環境設定 | `docs/environment.md` | 記錄安裝與執行方式 | 草稿 | Project definition PDF | Python/PyTorch/Librosa |
 | 程式任務規格 | `docs/code_task_spec.md` | 定義 sound event detection baseline | 已確認 | Project definition PDF | MVP 已建立，待正式資料訓練 |
 | CNN baseline | `src/models/cnn.py` | Sound event classification baseline | 已確認 | smoke run | 可訓練架構已建立，本機 CPU 較慢 |
