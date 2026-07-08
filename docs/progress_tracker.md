@@ -1,6 +1,6 @@
 # MVP 進度追蹤
 
-更新日期：2026-07-02
+更新日期：2026-07-08
 
 這份文件用來集中追蹤 UrbanSound8K 聲音分類 MVP 的已完成、未完成與下一步。之後每次程式、資料、實驗、圖表或論文草稿有重要更新時，都要同步更新本文件。
 
@@ -115,6 +115,7 @@ CNN baseline 將 Mel-spectrogram 當成單通道影像。輸入 shape 同樣是 
 | Training script | 完成 | `src/train.py` | 可輸出 checkpoint、history、metrics、confusion matrix |
 | Evaluation script | 完成 | `src/evaluate.py` | 可重讀 checkpoint 重新評估 |
 | Colab CNN baseline notebook | 完成 | `notebooks/2026-07-02-colab-cnn-baseline.ipynb` | 用英文註解記錄 GitHub clone、資料下載、preprocess、CNN 訓練、評估與結果打包流程 |
+| Colab CNN + Transformer notebook | 完成 | `notebooks/2026-07-08-colab-cnn-transformer-fold10.ipynb` | 使用 Google Drive cache，支援 CNN baseline 與 Spectrogram Transformer fold 10 訓練、評估、metrics 與結果打包 |
 | CNN smoke run | 完成 | `results/cnn_baseline_smoke_fold10/` | 只驗證流程，非正式結果 |
 | Transformer smoke run | 完成 | `results/transformer_baseline_smoke_fold10/` | 只驗證流程，非正式結果 |
 | Transformer fold 10 正式訓練 | 完成 | `results/transformer_baseline_fold10/` | 10 epochs，完整 train/val/test split |
@@ -208,6 +209,15 @@ python3 -m src.train --config configs/transformer_baseline.yaml --fold 10
 python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 ```
 
+正式 10-fold cross validation：
+
+```bash
+python3 -m src.train --config configs/cnn_baseline.yaml --fold all
+python3 -m src.train --config configs/transformer_baseline.yaml --fold all
+```
+
+說明：`--fold all` 會依序跑 fold 1 到 fold 10，並輸出 `results/<run_name>_10fold_summary.json` 與 `results/<run_name>_10fold_summary.csv`，包含 accuracy、macro precision、macro recall、macro F1、test loss 的平均與標準差。
+
 正式 CNN fold 10：
 
 ```bash
@@ -222,6 +232,14 @@ notebooks/2026-07-02-colab-cnn-baseline.ipynb
 ```
 
 說明：這個 notebook 用於在 Google Colab GPU 上跑正式 CNN baseline。GitHub repo 是程式碼來源，Colab runtime 只負責下載資料、產生 processed cache、訓練與打包結果。跑完後應把 `results/cnn_baseline_fold10/` 和 `figures/cnn_baseline_fold10*_confusion_matrix.png` 下載回本地，再更新本文件的 CNN metrics。
+
+Colab CNN + Transformer fold 10：
+
+```text
+notebooks/2026-07-08-colab-cnn-transformer-fold10.ipynb
+```
+
+說明：這個 notebook 是更新版 Colab 執行流程，使用 Google Drive 保存 UrbanSound8K raw audio 與 Mel-spectrogram cache，並在同一份 notebook 中跑 CNN baseline 與 Spectrogram Transformer。跑完後下載 `fold10_model_comparison_artifacts.zip`，再把 CNN/Transformer metrics 更新到本文件。
 
 測試與狀態檢查：
 

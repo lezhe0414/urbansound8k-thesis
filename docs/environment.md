@@ -29,6 +29,21 @@ python3 -m src.train --config configs/transformer_baseline.yaml --fold 10
 python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 ```
 
+正式 10-fold cross validation：
+
+```bash
+python3 -m src.train --config configs/cnn_baseline.yaml --fold all
+python3 -m src.train --config configs/transformer_baseline.yaml --fold all
+```
+
+每個模型會輸出：
+
+```text
+results/<run_name>_fold1/ ... results/<run_name>_fold10/
+results/<run_name>_10fold_summary.json
+results/<run_name>_10fold_summary.csv
+```
+
 ## Google Colab CNN baseline
 
 若本機 CPU 訓練 CNN 太慢，可使用下列 notebook 在 Colab GPU 上執行正式 CNN fold 10：
@@ -38,6 +53,14 @@ notebooks/2026-07-02-colab-cnn-baseline.ipynb
 ```
 
 此流程以 GitHub repo 作為程式碼來源。Colab runtime 只負責重新下載 UrbanSound8K、產生 Mel-spectrogram cache、訓練 CNN、評估並打包輸出。跑完後需將 `results/cnn_baseline_fold10/` 和對應 `figures/` 圖檔下載回本地。
+
+若要在 Colab 同時跑 CNN baseline 與 Spectrogram Transformer fold 10，使用：
+
+```text
+notebooks/2026-07-08-colab-cnn-transformer-fold10.ipynb
+```
+
+這個 notebook 使用 Google Drive 保存 UrbanSound8K raw audio 與 processed Mel-spectrogram cache，避免每次 Colab runtime 重開都重新下載或 preprocessing。
 
 沒有正式資料時，可先建立 synthetic dataset 檢查 pipeline：
 

@@ -24,6 +24,7 @@ data/processed/*
 results/*
 figures/*
 reports/*
+experiment_artifacts/*
 
 # Keep folder placeholders
 !data/raw/.gitkeep

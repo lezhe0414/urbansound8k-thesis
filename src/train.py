@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from pathlib import Path
 
@@ -183,6 +184,46 @@ def train_one_fold(config: dict, fold: int) -> Path:
     return run_dir
 
 
+def summarize_cross_validation(run_dirs: list[Path], run_name: str, results_dir: Path) -> Path:
+    metric_keys = ["accuracy", "precision_macro", "recall_macro", "f1_macro", "test_loss"]
+    rows: list[dict[str, float | int]] = []
+    for run_dir in run_dirs:
+        metrics_path = run_dir / "metrics.json"
+        if not metrics_path.exists():
+            raise FileNotFoundError(f"Missing metrics file: {metrics_path}")
+        metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+        fold = int(run_dir.name.rsplit("_fold", 1)[1])
+        row: dict[str, float | int] = {"fold": fold}
+        for key in metric_keys:
+            row[key] = float(metrics[key])
+        rows.append(row)
+
+    rows = sorted(rows, key=lambda item: int(item["fold"]))
+    summary: dict[str, object] = {
+        "run_name": run_name,
+        "folds": rows,
+        "mean": {},
+        "std": {},
+    }
+    for key in metric_keys:
+        values = torch.tensor([float(row[key]) for row in rows], dtype=torch.float32)
+        summary["mean"][key] = float(values.mean().item())
+        summary["std"][key] = float(values.std(unbiased=False).item())
+
+    summary_path = results_dir / f"{run_name}_10fold_summary.json"
+    csv_path = results_dir / f"{run_name}_10fold_summary.csv"
+    summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    with csv_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["fold", *metric_keys])
+        writer.writeheader()
+        writer.writerows(rows)
+
+    print(f"Wrote 10-fold summary to {summary_path}")
+    print(f"Wrote 10-fold CSV to {csv_path}")
+    print(json.dumps({"mean": summary["mean"], "std": summary["std"]}, indent=2, sort_keys=True))
+    return summary_path
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train UrbanSound8K spectrogram classifiers.")
     parser.add_argument("--config", required=True, help="Path to YAML config.")
@@ -193,9 +234,13 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     config = load_config(args.config)
+    run_name = str(config.get("run_name", config["model"]["name"]))
+    results_dir = Path(config.get("outputs", {}).get("results_dir", "results"))
     if args.fold == "all":
+        run_dirs = []
         for fold in range(1, 11):
-            train_one_fold(config, fold)
+            run_dirs.append(train_one_fold(config, fold))
+        summarize_cross_validation(run_dirs, run_name, results_dir)
     else:
         fold = int(args.fold)
         if fold < 1 or fold > 10:
