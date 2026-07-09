@@ -1,4 +1,4 @@
-run_name: cnn_baseline
+run_name: pretrained_ast_baseline
 seed: 42
 
 data:
@@ -7,16 +7,18 @@ data:
   val_fold_offset: 1
 
 model:
-  name: cnn
-  in_channels: 1
+  name: pretrained_ast
+  pretrained_name: MIT/ast-finetuned-audioset-10-10-0.4593
   num_classes: 10
-  dropout: 0.4
+  num_mel_bins: 128
+  max_length: 1024
+  freeze_encoder: false
 
 training:
-  batch_size: 32
-  epochs: 12
-  learning_rate: 0.0004
-  weight_decay: 0.0015
+  batch_size: 8
+  epochs: 10
+  learning_rate: 0.00002
+  weight_decay: 0.01
   label_smoothing: 0.03
   class_weighting:
     enabled: true
@@ -26,17 +28,17 @@ training:
     power: 0.5
   scheduler:
     name: cosine
-    min_learning_rate: 0.00001
+    min_learning_rate: 0.000001
   spec_augment:
     probability: 0.0
-    frequency_mask_param: 12
-    time_mask_param: 24
+    frequency_mask_param: 8
+    time_mask_param: 16
     num_frequency_masks: 1
     num_time_masks: 1
   mixup:
-    enabled: true
+    enabled: false
     alpha: 0.05
-    probability: 0.15
+    probability: 0.1
   num_workers: 0
   device: auto
 
