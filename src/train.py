@@ -63,6 +63,23 @@ def _apply_spec_augment(inputs: torch.Tensor, config: dict) -> torch.Tensor:
     return augmented
 
 
+def _class_weights(dataset: UrbanSound8KMelDataset, labels: list[int], device: torch.device, config: dict) -> torch.Tensor | None:
+    if not bool(config.get("enabled", False)):
+        return None
+
+    counts = torch.zeros(len(labels), dtype=torch.float32)
+    label_to_index = {label: index for index, label in enumerate(labels)}
+    for item in dataset.items:
+        counts[label_to_index[int(item.class_id)]] += 1.0
+
+    counts = counts.clamp_min(1.0)
+    total = counts.sum()
+    weights = total / (len(labels) * counts)
+    weights = weights.pow(float(config.get("power", 1.0)))
+    weights = weights / weights.mean()
+    return weights.to(device)
+
+
 def _run_epoch(model, loader, criterion, device, optimizer=None, augment_config: dict | None = None) -> tuple[float, list[int], list[int]]:
     training = optimizer is not None
     model.train(training)
@@ -160,7 +177,11 @@ def train_one_fold(config: dict, fold: int) -> Path:
 
     device = _device(str(training_config.get("device", "auto")))
     model = build_model(config).to(device)
-    criterion = nn.CrossEntropyLoss(label_smoothing=float(training_config.get("label_smoothing", 0.0)))
+    class_weights = _class_weights(train_set, labels, device, training_config.get("class_weighting", {}))
+    criterion = nn.CrossEntropyLoss(
+        weight=class_weights,
+        label_smoothing=float(training_config.get("label_smoothing", 0.0)),
+    )
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=float(training_config.get("learning_rate", 0.001)),

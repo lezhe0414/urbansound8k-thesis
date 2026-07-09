@@ -24,6 +24,9 @@ training:
   learning_rate: 0.0004
   weight_decay: 0.001
   label_smoothing: 0.03
+  class_weighting:
+    enabled: true
+    power: 0.5
   scheduler:
     name: cosine
     min_learning_rate: 0.00001
