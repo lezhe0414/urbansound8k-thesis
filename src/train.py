@@ -131,17 +131,33 @@ def train_one_fold(config: dict, fold: int) -> Path:
 
     device = _device(str(training_config.get("device", "auto")))
     model = build_model(config).to(device)
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(label_smoothing=float(training_config.get("label_smoothing", 0.0)))
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=float(training_config.get("learning_rate", 0.001)),
         weight_decay=float(training_config.get("weight_decay", 0.0001)),
     )
+    epochs = int(training_config.get("epochs", 10))
+    scheduler_config = training_config.get("scheduler", {})
+    scheduler_name = str(scheduler_config.get("name", "none")).lower()
+    scheduler = None
+    if scheduler_name == "cosine":
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer,
+            T_max=epochs,
+            eta_min=float(scheduler_config.get("min_learning_rate", 0.0)),
+        )
+    elif scheduler_name == "reduce_on_plateau":
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer,
+            mode="max",
+            factor=float(scheduler_config.get("factor", 0.5)),
+            patience=int(scheduler_config.get("patience", 1)),
+        )
 
     history: list[dict] = []
     best_f1 = -1.0
     best_path = run_dir / "best_model.pt"
-    epochs = int(training_config.get("epochs", 10))
     for epoch in range(1, epochs + 1):
         train_loss, train_true, train_pred = _run_epoch(model, train_loader, criterion, device, optimizer)
         val_loss, val_true, val_pred = _run_epoch(model, val_loader, criterion, device)
@@ -155,12 +171,18 @@ def train_one_fold(config: dict, fold: int) -> Path:
             "val_accuracy": val_metrics["accuracy"],
             "train_f1_macro": train_metrics["f1_macro"],
             "val_f1_macro": val_metrics["f1_macro"],
+            "learning_rate": optimizer.param_groups[0]["lr"],
         }
         history.append(row)
         print(json.dumps(row, sort_keys=True))
         if val_metrics["f1_macro"] > best_f1:
             best_f1 = val_metrics["f1_macro"]
             torch.save({"model_state": model.state_dict(), "config": config, "fold": fold, "val_fold": val_fold}, best_path)
+        if scheduler is not None:
+            if scheduler_name == "reduce_on_plateau":
+                scheduler.step(val_metrics["f1_macro"])
+            else:
+                scheduler.step()
 
     torch.save({"model_state": model.state_dict(), "config": config, "fold": fold, "val_fold": val_fold}, run_dir / "last_model.pt")
     write_history_csv(history, run_dir / "history.csv")

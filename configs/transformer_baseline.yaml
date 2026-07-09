@@ -20,9 +20,13 @@ model:
 
 training:
   batch_size: 32
-  epochs: 3
+  epochs: 5
   learning_rate: 0.0003
   weight_decay: 0.0015
+  label_smoothing: 0.05
+  scheduler:
+    name: cosine
+    min_learning_rate: 0.00001
   num_workers: 0
   device: auto
 
