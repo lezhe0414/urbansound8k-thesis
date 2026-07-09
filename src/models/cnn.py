@@ -10,13 +10,19 @@ except ImportError as exc:  # pragma: no cover - exercised only without deps
 class SpectrogramCNN(nn.Module):
     """Compact CNN baseline for Mel-spectrogram image classification."""
 
-    def __init__(self, in_channels: int = 1, num_classes: int = 10, dropout: float = 0.25) -> None:
+    def __init__(
+        self,
+        in_channels: int = 1,
+        num_classes: int = 10,
+        dropout: float = 0.25,
+        spatial_dropout: float = 0.0,
+    ) -> None:
         super().__init__()
         self.features = nn.Sequential(
-            self._block(in_channels, 32),
-            self._block(32, 64),
-            self._block(64, 128),
-            self._block(128, 256),
+            self._block(in_channels, 32, spatial_dropout),
+            self._block(32, 64, spatial_dropout),
+            self._block(64, 128, spatial_dropout),
+            self._block(128, 256, spatial_dropout),
         )
         self.pool = nn.AdaptiveAvgPool2d((1, 1))
         self.classifier = nn.Sequential(
@@ -26,7 +32,7 @@ class SpectrogramCNN(nn.Module):
         )
 
     @staticmethod
-    def _block(in_channels: int, out_channels: int) -> nn.Sequential:
+    def _block(in_channels: int, out_channels: int, spatial_dropout: float) -> nn.Sequential:
         return nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm2d(out_channels),
@@ -34,6 +40,7 @@ class SpectrogramCNN(nn.Module):
             nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
+            nn.Dropout2d(spatial_dropout) if spatial_dropout > 0.0 else nn.Identity(),
             nn.MaxPool2d(kernel_size=2),
         )
 
