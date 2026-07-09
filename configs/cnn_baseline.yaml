@@ -10,14 +10,14 @@ model:
   name: resnet_cnn
   in_channels: 1
   num_classes: 10
-  dropout: 0.35
+  dropout: 0.3
   base_channels: 32
 
 training:
   batch_size: 32
-  epochs: 10
-  learning_rate: 0.00045
-  weight_decay: 0.001
+  epochs: 15
+  learning_rate: 0.0004
+  weight_decay: 0.0008
   label_smoothing: 0.03
   class_weighting:
     enabled: true
@@ -36,8 +36,8 @@ training:
     num_time_masks: 1
   mixup:
     enabled: true
-    alpha: 0.2
-    probability: 0.5
+    alpha: 0.1
+    probability: 0.25
   num_workers: 0
   device: auto
 
