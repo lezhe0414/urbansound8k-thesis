@@ -10,13 +10,13 @@ model:
   name: cnn
   in_channels: 1
   num_classes: 10
-  dropout: 0.4
+  dropout: 0.35
 
 training:
   batch_size: 32
-  epochs: 12
-  learning_rate: 0.0004
-  weight_decay: 0.0015
+  epochs: 10
+  learning_rate: 0.00045
+  weight_decay: 0.001
   label_smoothing: 0.03
   class_weighting:
     enabled: true
@@ -34,7 +34,7 @@ training:
     num_frequency_masks: 1
     num_time_masks: 1
   mixup:
-    enabled: true
+    enabled: false
     alpha: 0.05
     probability: 0.15
   num_workers: 0
