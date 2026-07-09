@@ -20,7 +20,7 @@ training:
   label_smoothing: 0.03
   scheduler:
     name: cosine
-    min_learning_rate: 0.00001
+    min_learning_rate: 0.00005
   spec_augment:
     probability: 0.0
     frequency_mask_param: 12
