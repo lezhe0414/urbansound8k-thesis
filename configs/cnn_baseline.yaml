@@ -10,13 +10,13 @@ model:
   name: cnn
   in_channels: 1
   num_classes: 10
-  dropout: 0.45
+  dropout: 0.55
 
 training:
   batch_size: 32
-  epochs: 4
-  learning_rate: 0.0003
-  weight_decay: 0.003
+  epochs: 6
+  learning_rate: 0.00015
+  weight_decay: 0.01
   num_workers: 0
   device: auto
 
