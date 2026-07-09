@@ -11,16 +11,16 @@ model:
   in_channels: 1
   num_classes: 10
   patch_size: [16, 16]
-  embed_dim: 96
+  embed_dim: 128
   depth: 2
   num_heads: 4
   mlp_ratio: 2.0
-  dropout: 0.2
+  dropout: 0.15
   max_patches: 512
 
 training:
   batch_size: 32
-  epochs: 8
+  epochs: 7
   learning_rate: 0.0003
   weight_decay: 0.001
   num_workers: 0
