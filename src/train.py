@@ -63,6 +63,27 @@ def _apply_spec_augment(inputs: torch.Tensor, config: dict) -> torch.Tensor:
     return augmented
 
 
+def _apply_mixup(
+    inputs: torch.Tensor,
+    targets: torch.Tensor,
+    config: dict,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, float]:
+    if not bool(config.get("enabled", False)):
+        return inputs, targets, targets, 1.0
+
+    probability = float(config.get("probability", 1.0))
+    alpha = float(config.get("alpha", 0.2))
+    if alpha <= 0.0 or probability <= 0.0 or inputs.size(0) < 2:
+        return inputs, targets, targets, 1.0
+    if torch.rand((), device=inputs.device).item() > probability:
+        return inputs, targets, targets, 1.0
+
+    mix_lambda = float(torch.distributions.Beta(alpha, alpha).sample().item())
+    permutation = torch.randperm(inputs.size(0), device=inputs.device)
+    mixed_inputs = mix_lambda * inputs + (1.0 - mix_lambda) * inputs[permutation]
+    return mixed_inputs, targets, targets[permutation], mix_lambda
+
+
 def _class_weights(dataset: UrbanSound8KMelDataset, labels: list[int], device: torch.device, config: dict) -> torch.Tensor | None:
     if not bool(config.get("enabled", False)):
         return None
@@ -98,7 +119,15 @@ def _class_aware_sampler(dataset: UrbanSound8KMelDataset, labels: list[int], con
     return WeightedRandomSampler(sample_weights, num_samples=len(sample_weights), replacement=True)
 
 
-def _run_epoch(model, loader, criterion, device, optimizer=None, augment_config: dict | None = None) -> tuple[float, list[int], list[int]]:
+def _run_epoch(
+    model,
+    loader,
+    criterion,
+    device,
+    optimizer=None,
+    augment_config: dict | None = None,
+    mixup_config: dict | None = None,
+) -> tuple[float, list[int], list[int]]:
     training = optimizer is not None
     model.train(training)
     total_loss = 0.0
@@ -112,8 +141,15 @@ def _run_epoch(model, loader, criterion, device, optimizer=None, augment_config:
             optimizer.zero_grad(set_to_none=True)
             if augment_config:
                 inputs = _apply_spec_augment(inputs, augment_config)
+            if mixup_config:
+                inputs, targets_a, targets_b, mix_lambda = _apply_mixup(inputs, targets, mixup_config)
+            else:
+                targets_a, targets_b, mix_lambda = targets, targets, 1.0
         logits = model(inputs)
-        loss = criterion(logits, targets)
+        if training and mix_lambda < 1.0:
+            loss = mix_lambda * criterion(logits, targets_a) + (1.0 - mix_lambda) * criterion(logits, targets_b)
+        else:
+            loss = criterion(logits, targets)
         if training:
             loss.backward()
             optimizer.step()
@@ -209,6 +245,7 @@ def train_one_fold(config: dict, fold: int) -> Path:
     )
     epochs = int(training_config.get("epochs", 10))
     augment_config = training_config.get("spec_augment", {})
+    mixup_config = training_config.get("mixup", {})
     scheduler_config = training_config.get("scheduler", {})
     scheduler_name = str(scheduler_config.get("name", "none")).lower()
     scheduler = None
@@ -230,7 +267,15 @@ def train_one_fold(config: dict, fold: int) -> Path:
     best_f1 = -1.0
     best_path = run_dir / "best_model.pt"
     for epoch in range(1, epochs + 1):
-        train_loss, train_true, train_pred = _run_epoch(model, train_loader, criterion, device, optimizer, augment_config)
+        train_loss, train_true, train_pred = _run_epoch(
+            model,
+            train_loader,
+            criterion,
+            device,
+            optimizer,
+            augment_config,
+            mixup_config,
+        )
         val_loss, val_true, val_pred = _run_epoch(model, val_loader, criterion, device)
         train_metrics = classification_metrics(train_true, train_pred, labels)
         val_metrics = classification_metrics(val_true, val_pred, labels)

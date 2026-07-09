@@ -39,6 +39,10 @@ training:
     time_mask_param: 16
     num_frequency_masks: 1
     num_time_masks: 1
+  mixup:
+    enabled: true
+    alpha: 0.2
+    probability: 0.3
   num_workers: 0
   device: auto
 
