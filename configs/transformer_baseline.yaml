@@ -15,14 +15,14 @@ model:
   depth: 2
   num_heads: 4
   mlp_ratio: 2.0
-  dropout: 0.25
+  dropout: 0.2
   max_patches: 512
 
 training:
   batch_size: 32
-  epochs: 4
+  epochs: 7
   learning_rate: 0.0003
-  weight_decay: 0.002
+  weight_decay: 0.0015
   num_workers: 0
   device: auto
 
