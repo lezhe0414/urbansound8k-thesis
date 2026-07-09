@@ -20,7 +20,7 @@ model:
 
 training:
   batch_size: 32
-  epochs: 7
+  epochs: 3
   learning_rate: 0.0003
   weight_decay: 0.0015
   num_workers: 0
