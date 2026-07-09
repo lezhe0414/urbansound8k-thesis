@@ -7,7 +7,7 @@ from pathlib import Path
 
 import torch
 from torch import nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, WeightedRandomSampler
 from tqdm import tqdm
 
 from src.data import UrbanSound8KMelDataset
@@ -78,6 +78,24 @@ def _class_weights(dataset: UrbanSound8KMelDataset, labels: list[int], device: t
     weights = weights.pow(float(config.get("power", 1.0)))
     weights = weights / weights.mean()
     return weights.to(device)
+
+
+def _class_aware_sampler(dataset: UrbanSound8KMelDataset, labels: list[int], config: dict) -> WeightedRandomSampler | None:
+    if not bool(config.get("enabled", False)):
+        return None
+
+    counts = torch.zeros(len(labels), dtype=torch.float32)
+    label_to_index = {label: index for index, label in enumerate(labels)}
+    item_indices: list[int] = []
+    for item in dataset.items:
+        class_index = label_to_index[int(item.class_id)]
+        counts[class_index] += 1.0
+        item_indices.append(class_index)
+
+    counts = counts.clamp_min(1.0)
+    class_weights = (1.0 / counts).pow(float(config.get("power", 1.0)))
+    sample_weights = torch.tensor([float(class_weights[index]) for index in item_indices], dtype=torch.float32)
+    return WeightedRandomSampler(sample_weights, num_samples=len(sample_weights), replacement=True)
 
 
 def _run_epoch(model, loader, criterion, device, optimizer=None, augment_config: dict | None = None) -> tuple[float, list[int], list[int]]:
@@ -156,10 +174,12 @@ def train_one_fold(config: dict, fold: int) -> Path:
         preload=preload,
     )
 
+    train_sampler = _class_aware_sampler(train_set, labels, training_config.get("class_aware_sampling", {}))
     train_loader = DataLoader(
         train_set,
         batch_size=int(training_config.get("batch_size", 32)),
-        shuffle=True,
+        shuffle=train_sampler is None,
+        sampler=train_sampler,
         num_workers=int(training_config.get("num_workers", 0)),
     )
     val_loader = DataLoader(
