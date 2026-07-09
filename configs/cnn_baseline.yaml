@@ -16,11 +16,11 @@ training:
   batch_size: 32
   epochs: 10
   learning_rate: 0.00045
-  weight_decay: 0.001
+  weight_decay: 0.0012
   label_smoothing: 0.03
   scheduler:
     name: cosine
-    min_learning_rate: 0.00002
+    min_learning_rate: 0.000015
   spec_augment:
     probability: 0.0
     frequency_mask_param: 12
