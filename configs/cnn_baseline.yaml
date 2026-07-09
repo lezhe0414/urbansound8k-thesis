@@ -22,7 +22,7 @@ training:
     name: cosine
     min_learning_rate: 0.00001
   spec_augment:
-    probability: 0.3
+    probability: 0.0
     frequency_mask_param: 12
     time_mask_param: 24
     num_frequency_masks: 1

@@ -10,27 +10,27 @@ model:
   name: spectrogram_transformer
   in_channels: 1
   num_classes: 10
-  patch_size: [8, 16]
-  embed_dim: 128
+  patch_size: [16, 16]
+  embed_dim: 192
   depth: 3
   num_heads: 4
   mlp_ratio: 2.0
-  dropout: 0.2
+  dropout: 0.15
   max_patches: 512
 
 training:
   batch_size: 32
   epochs: 10
-  learning_rate: 0.00035
-  weight_decay: 0.0015
+  learning_rate: 0.0004
+  weight_decay: 0.001
   label_smoothing: 0.03
   scheduler:
     name: cosine
     min_learning_rate: 0.00001
   spec_augment:
-    probability: 0.3
-    frequency_mask_param: 6
-    time_mask_param: 12
+    probability: 0.5
+    frequency_mask_param: 8
+    time_mask_param: 16
     num_frequency_masks: 1
     num_time_masks: 1
   num_workers: 0
