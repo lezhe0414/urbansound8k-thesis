@@ -10,7 +10,7 @@ model:
   name: cnn
   in_channels: 1
   num_classes: 10
-  dropout: 0.3
+  dropout: 0.35
 
 training:
   batch_size: 32
