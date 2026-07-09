@@ -11,7 +11,7 @@ model:
   in_channels: 1
   num_classes: 10
   dropout: 0.35
-  spatial_dropout: 0.03
+  spatial_dropout: 0.05
 
 training:
   batch_size: 32
