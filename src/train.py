@@ -36,7 +36,34 @@ def _class_names(processed_dir: Path) -> list[str]:
     return [str(row["class"]) for row in classes.to_dict("records")]
 
 
-def _run_epoch(model, loader, criterion, device, optimizer=None) -> tuple[float, list[int], list[int]]:
+def _apply_spec_augment(inputs: torch.Tensor, config: dict) -> torch.Tensor:
+    probability = float(config.get("probability", 0.0))
+    if probability <= 0.0 or torch.rand((), device=inputs.device).item() > probability:
+        return inputs
+
+    augmented = inputs.clone()
+    batch_size, _, freq_bins, time_steps = augmented.shape
+    freq_param = int(config.get("frequency_mask_param", 0))
+    time_param = int(config.get("time_mask_param", 0))
+    num_freq_masks = int(config.get("num_frequency_masks", 1))
+    num_time_masks = int(config.get("num_time_masks", 1))
+
+    for batch_idx in range(batch_size):
+        for _ in range(num_freq_masks):
+            width = int(torch.randint(0, max(freq_param, 1) + 1, (), device=inputs.device).item())
+            if width > 0 and width < freq_bins:
+                start = int(torch.randint(0, freq_bins - width + 1, (), device=inputs.device).item())
+                augmented[batch_idx, :, start : start + width, :] = 0
+        for _ in range(num_time_masks):
+            width = int(torch.randint(0, max(time_param, 1) + 1, (), device=inputs.device).item())
+            if width > 0 and width < time_steps:
+                start = int(torch.randint(0, time_steps - width + 1, (), device=inputs.device).item())
+                augmented[batch_idx, :, :, start : start + width] = 0
+
+    return augmented
+
+
+def _run_epoch(model, loader, criterion, device, optimizer=None, augment_config: dict | None = None) -> tuple[float, list[int], list[int]]:
     training = optimizer is not None
     model.train(training)
     total_loss = 0.0
@@ -48,6 +75,8 @@ def _run_epoch(model, loader, criterion, device, optimizer=None) -> tuple[float,
         targets = targets.to(device)
         if training:
             optimizer.zero_grad(set_to_none=True)
+            if augment_config:
+                inputs = _apply_spec_augment(inputs, augment_config)
         logits = model(inputs)
         loss = criterion(logits, targets)
         if training:
@@ -138,6 +167,7 @@ def train_one_fold(config: dict, fold: int) -> Path:
         weight_decay=float(training_config.get("weight_decay", 0.0001)),
     )
     epochs = int(training_config.get("epochs", 10))
+    augment_config = training_config.get("spec_augment", {})
     scheduler_config = training_config.get("scheduler", {})
     scheduler_name = str(scheduler_config.get("name", "none")).lower()
     scheduler = None
@@ -159,7 +189,7 @@ def train_one_fold(config: dict, fold: int) -> Path:
     best_f1 = -1.0
     best_path = run_dir / "best_model.pt"
     for epoch in range(1, epochs + 1):
-        train_loss, train_true, train_pred = _run_epoch(model, train_loader, criterion, device, optimizer)
+        train_loss, train_true, train_pred = _run_epoch(model, train_loader, criterion, device, optimizer, augment_config)
         val_loss, val_true, val_pred = _run_epoch(model, val_loader, criterion, device)
         train_metrics = classification_metrics(train_true, train_pred, labels)
         val_metrics = classification_metrics(val_true, val_pred, labels)
