@@ -14,7 +14,7 @@ model:
 
 training:
   batch_size: 32
-  epochs: 8
+  epochs: 10
   learning_rate: 0.00045
   weight_decay: 0.001
   label_smoothing: 0.03
@@ -22,7 +22,7 @@ training:
     name: cosine
     min_learning_rate: 0.00001
   spec_augment:
-    probability: 0.7
+    probability: 0.3
     frequency_mask_param: 12
     time_mask_param: 24
     num_frequency_masks: 1
