@@ -118,3 +118,27 @@ python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 - [ ] 實驗已用 `docs/experiment_template.md` 或同等格式記錄。
 - [ ] 成果已更新到 `docs/artifact_index.md`。
 - [ ] 若支撐論文內容，已更新對應章節。
+
+---
+
+## 程式任務規格：CNN Spectrogram Data Augmentation Ablation
+
+- 狀態：程式完成，待 Colab 正式實驗
+- 更新日期：2026-08-13
+- 目的：在不更改 CNN 架構與 preprocessing 的條件下，量化不同資料增強強度對 validation Macro F1 的影響。
+- 輸入：已快取的 normalized Mel-spectrogram、UrbanSound8K 官方 fold、augmentation YAML config。
+- 方法：逐樣本時間位移、頻率位移、時間伸縮、強度縮放、Gaussian noise、time/frequency masking，以及逐樣本 Mixup 或 spectrogram CutMix。
+- 控制：control、light、balanced、strong 四組使用相同 seed、模型、optimizer、sampling 與 epoch，只改 augmentation。
+- 模型選擇：只依 validation Macro F1 選擇設定；fold 10 test 不用於選參數，僅評估勝出設定一次。
+- 輸出：各組 history/checkpoint、validation 排名 CSV、勝出設定的 test metrics 與 confusion matrix。
+
+執行方式：
+
+```text
+python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
+```
+
+驗證證據：
+
+- `tests/test_augmentation.py` 驗證形狀、有限值、零填充位移、Mixup/CutMix、舊設定相容性與參數錯誤處理。
+- `configs/cnn_aug_smoke.yaml` 已用真實 processed data 完成 1 epoch end-to-end smoke run。

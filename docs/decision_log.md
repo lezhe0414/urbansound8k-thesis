@@ -125,3 +125,37 @@ CNN 是 definition 明確承諾的交付，先完成可降低偏離題目與進�
 - [ ] 完成 CNN baseline pipeline。
 - [ ] 向教授確認 Transformer comparison 是否合適。
 - [ ] 若 baseline 已有結果，再新增 Transformer 實驗。
+
+---
+
+## DEC-003：以 validation-only ablation 選擇 CNN 資料增強策略
+
+- 日期：2026-08-13
+- 狀態：已決定
+- 相關文件：`src/data/augmentation.py`、`configs/cnn_aug_*.yaml`、`scripts/run_cnn_augmentation_ablation.py`
+- 相關會議：2026-08-07 supervisor meeting
+
+#### 背景
+
+CNN fold 10 evaluation 已達約 0.81--0.83 accuracy 與 0.82--0.84 Macro F1，繼續只調 learning rate 或 dropout 的改善有限。需要測試能否透過資料增強降低 overfitting，同時避免用 test 結果反覆選參數。
+
+#### 決策
+
+固定 CNN 架構、training seed、optimizer、class weighting、class-aware sampling 與 epoch，建立 control、light、balanced、strong 四組 augmentation profile。使用 validation Macro F1 選擇最佳 profile，然後只對勝出設定執行 fold 10 test evaluation。
+
+#### 理由
+
+此設計可將差異主要歸因於 augmentation 強度，也避免 test leakage。逐樣本增強比原本整個 batch 共用一次遮罩決策更具多樣性；Mixup/CutMix 使用逐樣本 mixing coefficient，使 loss 與訓練指標更一致。
+
+#### 影響
+
+- 對論文：可加入一個有控制組的 augmentation ablation，而非只陳述反覆調參。
+- 對程式：新增即時 spectrogram augmentation，不必重新 preprocessing。
+- 對資料：raw 與 processed data 均不修改。
+- 對時程：先跑 fold 10 選定策略，再只對勝出設定做 seed stability 與正式 10-fold。
+
+#### 後續行動
+
+- [ ] 在 Colab 跑四組 fold 10 validation ablation。
+- [ ] 保存 validation 排名與勝出設定的 test evaluation artifacts。
+- [ ] 根據結果建立單一 final config，再做 seed ensemble 或 10-fold。

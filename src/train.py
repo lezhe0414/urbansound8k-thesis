@@ -10,7 +10,13 @@ from torch import nn
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from tqdm import tqdm
 
-from src.data import UrbanSound8KMelDataset
+from src.data import (
+    SpectrogramAugmenter,
+    SpectrogramBatchMixer,
+    UrbanSound8KMelDataset,
+    augmentation_config_from_training,
+    batch_mix_config_from_training,
+)
 from src.models import build_model
 from src.utils.config import load_config
 from src.utils.metrics import classification_metrics, confusion_matrix_array, write_history_csv
@@ -34,54 +40,6 @@ def _class_names(processed_dir: Path) -> list[str]:
     metadata = pd.read_csv(processed_dir / "metadata.csv")
     classes = metadata[["classID", "class"]].drop_duplicates().sort_values("classID")
     return [str(row["class"]) for row in classes.to_dict("records")]
-
-
-def _apply_spec_augment(inputs: torch.Tensor, config: dict) -> torch.Tensor:
-    probability = float(config.get("probability", 0.0))
-    if probability <= 0.0 or torch.rand((), device=inputs.device).item() > probability:
-        return inputs
-
-    augmented = inputs.clone()
-    batch_size, _, freq_bins, time_steps = augmented.shape
-    freq_param = int(config.get("frequency_mask_param", 0))
-    time_param = int(config.get("time_mask_param", 0))
-    num_freq_masks = int(config.get("num_frequency_masks", 1))
-    num_time_masks = int(config.get("num_time_masks", 1))
-
-    for batch_idx in range(batch_size):
-        for _ in range(num_freq_masks):
-            width = int(torch.randint(0, max(freq_param, 1) + 1, (), device=inputs.device).item())
-            if width > 0 and width < freq_bins:
-                start = int(torch.randint(0, freq_bins - width + 1, (), device=inputs.device).item())
-                augmented[batch_idx, :, start : start + width, :] = 0
-        for _ in range(num_time_masks):
-            width = int(torch.randint(0, max(time_param, 1) + 1, (), device=inputs.device).item())
-            if width > 0 and width < time_steps:
-                start = int(torch.randint(0, time_steps - width + 1, (), device=inputs.device).item())
-                augmented[batch_idx, :, :, start : start + width] = 0
-
-    return augmented
-
-
-def _apply_mixup(
-    inputs: torch.Tensor,
-    targets: torch.Tensor,
-    config: dict,
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, float]:
-    if not bool(config.get("enabled", False)):
-        return inputs, targets, targets, 1.0
-
-    probability = float(config.get("probability", 1.0))
-    alpha = float(config.get("alpha", 0.2))
-    if alpha <= 0.0 or probability <= 0.0 or inputs.size(0) < 2:
-        return inputs, targets, targets, 1.0
-    if torch.rand((), device=inputs.device).item() > probability:
-        return inputs, targets, targets, 1.0
-
-    mix_lambda = float(torch.distributions.Beta(alpha, alpha).sample().item())
-    permutation = torch.randperm(inputs.size(0), device=inputs.device)
-    mixed_inputs = mix_lambda * inputs + (1.0 - mix_lambda) * inputs[permutation]
-    return mixed_inputs, targets, targets[permutation], mix_lambda
 
 
 def _class_weights(dataset: UrbanSound8KMelDataset, labels: list[int], device: torch.device, config: dict) -> torch.Tensor | None:
@@ -125,8 +83,8 @@ def _run_epoch(
     criterion,
     device,
     optimizer=None,
-    augment_config: dict | None = None,
-    mixup_config: dict | None = None,
+    augmenter: SpectrogramAugmenter | None = None,
+    batch_mixer: SpectrogramBatchMixer | None = None,
 ) -> tuple[float, list[int], list[int]]:
     training = optimizer is not None
     model.train(training)
@@ -137,26 +95,31 @@ def _run_epoch(
     for inputs, targets in tqdm(loader, desc="train" if training else "eval", leave=False):
         inputs = inputs.to(device)
         targets = targets.to(device)
+        metric_targets = targets
         if training:
             optimizer.zero_grad(set_to_none=True)
-            if augment_config:
-                inputs = _apply_spec_augment(inputs, augment_config)
-            if mixup_config:
-                inputs, targets_a, targets_b, mix_lambda = _apply_mixup(inputs, targets, mixup_config)
+            if augmenter is not None:
+                inputs = augmenter(inputs)
+            if batch_mixer is not None:
+                mixed_batch = batch_mixer(inputs, targets)
+                inputs = mixed_batch.inputs
+                metric_targets = mixed_batch.metric_targets
+        with torch.set_grad_enabled(training):
+            logits = model(inputs)
+            if training and batch_mixer is not None and mixed_batch.method != "none":
+                loss = (
+                    mixed_batch.lambdas * criterion(logits, mixed_batch.targets_a)
+                    + (1.0 - mixed_batch.lambdas) * criterion(logits, mixed_batch.targets_b)
+                ).mean()
             else:
-                targets_a, targets_b, mix_lambda = targets, targets, 1.0
-        logits = model(inputs)
-        if training and mix_lambda < 1.0:
-            loss = mix_lambda * criterion(logits, targets_a) + (1.0 - mix_lambda) * criterion(logits, targets_b)
-        else:
-            loss = criterion(logits, targets)
-        if training:
-            loss.backward()
-            optimizer.step()
+                loss = criterion(logits, targets).mean()
+            if training:
+                loss.backward()
+                optimizer.step()
 
         total_loss += float(loss.item()) * inputs.size(0)
         predictions = logits.argmax(dim=1)
-        y_true.extend(targets.detach().cpu().tolist())
+        y_true.extend(metric_targets.detach().cpu().tolist())
         y_pred.extend(predictions.detach().cpu().tolist())
 
     return total_loss / max(len(loader.dataset), 1), y_true, y_pred
@@ -184,6 +147,7 @@ def train_one_fold(config: dict, fold: int) -> Path:
     max_train_samples = data_config.get("max_train_samples")
     max_val_samples = data_config.get("max_val_samples")
     max_test_samples = data_config.get("max_test_samples")
+    run_test = bool(config.get("evaluation", {}).get("run_test", True))
 
     train_set = UrbanSound8KMelDataset(
         processed_dir,
@@ -201,15 +165,6 @@ def train_one_fold(config: dict, fold: int) -> Path:
         max_samples=max_val_samples,
         preload=preload,
     )
-    test_set = UrbanSound8KMelDataset(
-        processed_dir,
-        split="test",
-        test_fold=fold,
-        val_fold=val_fold,
-        max_samples=max_test_samples,
-        preload=preload,
-    )
-
     train_sampler = _class_aware_sampler(train_set, labels, training_config.get("class_aware_sampling", {}))
     train_loader = DataLoader(
         train_set,
@@ -224,19 +179,13 @@ def train_one_fold(config: dict, fold: int) -> Path:
         shuffle=False,
         num_workers=int(training_config.get("num_workers", 0)),
     )
-    test_loader = DataLoader(
-        test_set,
-        batch_size=int(training_config.get("batch_size", 32)),
-        shuffle=False,
-        num_workers=int(training_config.get("num_workers", 0)),
-    )
-
     device = _device(str(training_config.get("device", "auto")))
     model = build_model(config).to(device)
     class_weights = _class_weights(train_set, labels, device, training_config.get("class_weighting", {}))
     criterion = nn.CrossEntropyLoss(
         weight=class_weights,
         label_smoothing=float(training_config.get("label_smoothing", 0.0)),
+        reduction="none",
     )
     optimizer = torch.optim.AdamW(
         model.parameters(),
@@ -244,8 +193,8 @@ def train_one_fold(config: dict, fold: int) -> Path:
         weight_decay=float(training_config.get("weight_decay", 0.0001)),
     )
     epochs = int(training_config.get("epochs", 10))
-    augment_config = training_config.get("spec_augment", {})
-    mixup_config = training_config.get("mixup", {})
+    augmenter = SpectrogramAugmenter(augmentation_config_from_training(training_config))
+    batch_mixer = SpectrogramBatchMixer(batch_mix_config_from_training(training_config))
     scheduler_config = training_config.get("scheduler", {})
     scheduler_name = str(scheduler_config.get("name", "none")).lower()
     scheduler = None
@@ -273,8 +222,8 @@ def train_one_fold(config: dict, fold: int) -> Path:
             criterion,
             device,
             optimizer,
-            augment_config,
-            mixup_config,
+            augmenter,
+            batch_mixer,
         )
         val_loss, val_true, val_pred = _run_epoch(model, val_loader, criterion, device)
         train_metrics = classification_metrics(train_true, train_pred, labels)
@@ -307,6 +256,24 @@ def train_one_fold(config: dict, fold: int) -> Path:
         encoding="utf-8",
     )
 
+    if not run_test:
+        print(f"Wrote tuning outputs to {run_dir}; test evaluation was intentionally skipped")
+        return run_dir
+
+    test_set = UrbanSound8KMelDataset(
+        processed_dir,
+        split="test",
+        test_fold=fold,
+        val_fold=val_fold,
+        max_samples=max_test_samples,
+        preload=preload,
+    )
+    test_loader = DataLoader(
+        test_set,
+        batch_size=int(training_config.get("batch_size", 32)),
+        shuffle=False,
+        num_workers=int(training_config.get("num_workers", 0)),
+    )
     checkpoint = torch.load(best_path, map_location=device)
     model.load_state_dict(checkpoint["model_state"])
     test_loss, test_true, test_pred = _run_epoch(model, test_loader, criterion, device)
@@ -375,6 +342,8 @@ def main() -> int:
     run_name = str(config.get("run_name", config["model"]["name"]))
     results_dir = Path(config.get("outputs", {}).get("results_dir", "results"))
     if args.fold == "all":
+        if not bool(config.get("evaluation", {}).get("run_test", True)):
+            raise ValueError("10-fold evaluation requires evaluation.run_test: true")
         run_dirs = []
         for fold in range(1, 11):
             run_dirs.append(train_one_fold(config, fold))

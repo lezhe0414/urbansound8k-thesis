@@ -18,6 +18,7 @@
 | 2026-06-29 | 協助下載並驗證 UrbanSound8K，執行 Mel-spectrogram preprocessing，跑 CNN 與 Transformer smoke experiments，完成 Transformer fold 10 正式訓練與評估，並更新可重複執行設定 | `data/raw/UrbanSound8K_soundata/`、`data/processed/urbansound8k_mels/`、`configs/`、`src/`、`results/`、`figures/` | 待使用者確認 CNN 正式長訓練環境與教授回饋 | 資料與結果輸出未提交到 git |
 | 2026-07-02 | 協助建立 Google Colab CNN baseline 執行 notebook，並用英文註解說明 GitHub 同步、資料下載、preprocessing、訓練、評估與結果打包流程 | `notebooks/2026-07-02-colab-cnn-baseline.ipynb`、`docs/progress_tracker.md`、`docs/artifact_index.md` | 待使用者於 Colab 執行並下載結果 | Colab 用於 GPU 訓練；GitHub 仍作為程式碼來源 |
 | 2026-07-08 | 協助新增 Google Colab CNN + Transformer fold 10 notebook，整理 Drive cache、CNN baseline、Spectrogram Transformer、metrics 與 artifacts 打包流程 | `notebooks/2026-07-08-colab-cnn-transformer-fold10.ipynb`、`docs/progress_tracker.md`、`docs/artifact_index.md` | 待使用者於 Colab 執行並回填 CNN/Transformer metrics | 大型資料與實驗輸出仍不提交到 git |
+| 2026-08-13 | 設計並實作 CNN Mel-spectrogram data augmentation ablation，包括逐樣本增強、Mixup/CutMix、validation-only model selection、測試與 Colab 執行流程 | `src/data/augmentation.py`、`src/train.py`、`configs/cnn_aug_*.yaml`、`scripts/run_cnn_augmentation_ablation.py`、`tests/test_augmentation.py` | 待使用者於 Colab 執行四組正式 fold 10 實驗並確認結果 | 避免以 test fold 調參；正式數據尚未產生 |
 
 ## 可記錄的協助類型
 

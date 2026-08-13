@@ -51,6 +51,9 @@
 | Training pipeline | `src/train.py` | 模型訓練與測試 | 已確認 | smoke run | 產生 metrics 與 checkpoint |
 | Evaluation pipeline | `src/evaluate.py` | 重跑評估與圖表 | 已確認 | smoke run evaluation | 產生 evaluation metrics |
 | Smoke run configs | `configs/cnn_smoke.yaml`、`configs/transformer_smoke.yaml` | 本機快速驗證 | 已確認 | smoke run | 使用真實資料子集 |
+| Spectrogram augmentation module | `src/data/augmentation.py` | CNN 訓練階段即時資料增強 | 已確認 | unit tests + smoke run | 支援 shift、stretch、gain、noise、SpecAugment、Mixup、CutMix |
+| CNN augmentation ablation configs | `configs/cnn_aug_control.yaml`、`configs/cnn_aug_light.yaml`、`configs/cnn_aug_balanced.yaml`、`configs/cnn_aug_strong.yaml` | 比較增強強度 | 待正式執行 | validation-only selection | 不需重新 preprocessing |
+| CNN augmentation runner | `scripts/run_cnn_augmentation_ablation.py` | 依序訓練、validation 排名並測試勝出設定 | 已確認 | CLI + smoke pipeline | 避免用 test fold 選參數 |
 
 ## 資料
 
@@ -68,6 +71,8 @@
 | CNN smoke result | `results/cnn_baseline_smoke_fold10/` | CNN pipeline 驗證 | 已確認 | `src.train` | 子集 smoke run，非正式分數 |
 | Transformer smoke result | `results/transformer_baseline_smoke_fold10/` | Transformer pipeline 驗證 | 已確認 | `src.train` | 子集 smoke run，非正式分數 |
 | Transformer fold 10 result | `results/transformer_baseline_fold10/` | 正式主模型結果 | 已確認 | `src.train`、`src.evaluate` | test accuracy 0.6547，macro F1 0.6644 |
+| CNN augmentation smoke result | `results/cnn_aug_smoke_fold10/` | 驗證完整 augmentation training pipeline | 已確認 | `src.train` | 256/128/128 子集、1 epoch，非正式分數且不提交 |
+| CNN augmentation fold 10 ablation | `results/cnn_augmentation_ablation_fold10.csv` | 選擇 augmentation profile | 待執行 | validation Macro F1 | 僅勝出設定可做 test evaluation |
 | 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用

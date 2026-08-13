@@ -248,6 +248,14 @@ python3 -m unittest discover -s tests
 python3 scripts/check_project_status.py
 ```
 
+CNN spectrogram augmentation fold 10 ablation：
+
+```bash
+python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
+```
+
+此流程依序執行 control、light、balanced、strong 四組設定。排名只使用 validation Macro F1，並自動對勝出設定執行一次 fold 10 test evaluation。資料增強在線上套用於 cached Mel-spectrogram，不需要重新 preprocessing。正式結果尚待 Colab 執行。
+
 ## 維護規則
 
 - 每次新增或修改程式、設定、資料處理流程、實驗結果、圖表或論文草稿時，都同步更新本文件。

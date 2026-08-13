@@ -44,6 +44,40 @@ results/<run_name>_10fold_summary.json
 results/<run_name>_10fold_summary.csv
 ```
 
+## CNN 頻譜資料增強實驗
+
+資料增強在訓練時直接套用於已快取的 normalized Mel-spectrogram tensor，因此不需要重新執行 preprocessing。Validation 與 test 資料不做增強。
+
+完整 fold 10 ablation 會依序執行無增強控制組、輕度、平衡及強度四組設定，以 validation Macro F1 排名，最後只對勝出設定執行一次 test evaluation：
+
+```bash
+python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
+```
+
+若 Colab 中已有完整訓練輸出，只重新排名而不重訓或測試：
+
+```bash
+python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --summarize-only --no-evaluate-best
+```
+
+主要輸出：
+
+```text
+results/cnn_aug_<profile>_fold10/history.csv
+results/cnn_augmentation_ablation_fold10.csv
+results/<winning_run>_fold10/evaluation_metrics.json
+figures/<winning_run>_fold10_evaluation_confusion_matrix.png
+```
+
+四組設定只改變資料增強強度，模型、optimizer、class weighting、class-aware sampling、epoch 與 seed 保持一致。這可避免把 augmentation 效果與其他超參數改動混在一起。正式 10-fold 實驗應在選定單一設定後另建 final config，且將 `evaluation.run_test` 設為 `true`。
+
+快速驗證增強流程：
+
+```bash
+python3 -m unittest tests.test_augmentation -v
+python3 -m src.train --config configs/cnn_aug_smoke.yaml --fold 10
+```
+
 ## Google Colab CNN baseline
 
 若本機 CPU 訓練 CNN 太慢，可使用下列 notebook 在 Colab GPU 上執行正式 CNN fold 10：

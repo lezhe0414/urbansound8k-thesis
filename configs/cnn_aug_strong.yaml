@@ -1,0 +1,71 @@
+run_name: cnn_aug_strong
+seed: 42
+
+data:
+  processed_dir: data/processed/urbansound8k_mels
+  num_classes: 10
+  val_fold_offset: 1
+
+model:
+  name: cnn
+  in_channels: 1
+  num_classes: 10
+  dropout: 0.35
+  spatial_dropout: 0.05
+
+training:
+  batch_size: 32
+  epochs: 10
+  learning_rate: 0.00045
+  weight_decay: 0.001
+  label_smoothing: 0.03
+  class_weighting:
+    enabled: true
+    power: 0.5
+  class_aware_sampling:
+    enabled: true
+    power: 0.5
+  scheduler:
+    name: cosine
+    min_learning_rate: 0.00001
+  augmentation:
+    enabled: true
+    time_shift:
+      probability: 0.70
+      max_frames: 24
+    frequency_shift:
+      probability: 0.30
+      max_bins: 3
+    time_stretch:
+      probability: 0.35
+      min_rate: 0.85
+      max_rate: 1.15
+    gain:
+      probability: 0.45
+      min_scale: 0.80
+      max_scale: 1.20
+    noise:
+      probability: 0.40
+      std: 0.030
+    spec_augment:
+      probability: 0.70
+      frequency_mask_param: 12
+      time_mask_param: 28
+      num_frequency_masks: 2
+      num_time_masks: 2
+  batch_mix:
+    enabled: true
+    mode: random
+    probability: 0.55
+    mixup_probability: 0.65
+    mixup_alpha: 0.30
+    cutmix_alpha: 1.00
+  num_workers: 0
+  device: auto
+
+outputs:
+  results_dir: results
+  figures_dir: figures
+
+evaluation:
+  run_test: false
