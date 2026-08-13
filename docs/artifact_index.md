@@ -57,7 +57,8 @@
 | CNN controlled search runner | `scripts/run_cnn_controlled_search.py` | 初始四組比較、單一變因迭代、失敗重試、進度紀錄與 Drive 備份 | 已確認 | unit tests + plan-only | 唯一設定鎖定後才允許一次 test |
 | CNN final augmentation config | `configs/cnn_aug_final.yaml` | 以鎖定設定執行正式 10-fold cross-validation | 已確認 | 與勝出 resolved config 核對 | 不得再依 test 或 fold 結果調參 |
 | EMA model-weight utility | `src/utils/ema.py` | 維護訓練權重的指數移動平均副本 | 已確認 | `tests/test_ema.py` | 第一次更新直接同步；分別保存最佳 online 與 EMA checkpoint |
-| CNN EMA candidate config | `configs/cnn_aug_ema.yaml` | 在相同訓練中比較 online 與 EMA validation Macro F1 | 待確認 | validation-only run | `evaluation.run_test: false`；不修改既有 final config |
+| CNN EMA candidate config | `configs/cnn_aug_ema.yaml` | 在相同訓練中比較 online 與 EMA validation Macro F1 | 已確認 | validation-only run | EMA 僅比 online 高約 0.00089，正式設定不採用 |
+| CNN 3-seed ensemble runner | `src/ensemble.py` | 訓練三個固定 seeds 並平均 softmax probabilities | 已確認 | 22 unit tests + Colab run | EMA 與個別 seed test 強制關閉；支援鎖定後一次 ensemble test |
 
 ## 資料
 
@@ -78,7 +79,8 @@
 | CNN augmentation smoke result | `results/cnn_aug_smoke_fold10/` | 驗證完整 augmentation training pipeline | 已確認 | `src.train` | 256/128/128 子集、1 epoch，非正式分數且不提交 |
 | CNN augmentation fold 10 ablation | Google Drive controlled-search backup | 選擇 augmentation profile | 已確認 | validation Macro F1 | 已由 controlled search 的 initial phase 完成 |
 | CNN controlled augmentation search | `docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md` | 記錄四組初始比較、九輪單一變因迭代與唯一一次 test | 已確認 | Colab results + Drive backup | 最佳 validation Macro F1 0.7924；fold 10 test Macro F1 0.8536 |
-| CNN EMA validation comparison | `results/cnn_aug_ema_fold10/` | 比較同次訓練的 online 與 EMA 權重 | 待補 | `validation_metrics.json` | 只能使用 validation Macro F1；不得執行 test |
+| CNN EMA validation comparison | Google Drive EMA backup | 比較同次訓練的 online 與 EMA 權重 | 已確認 | `validation_metrics.json` | EMA F1 0.76515、online F1 0.76426；不採用 EMA |
+| CNN 3-seed ensemble | `docs/experiments/2026-08-13-cnn-seed-ensemble.md` | 評估固定 seeds 42、123、2026 的 probability ensemble | 已確認 | Colab results + Drive backup | validation F1 0.7699；test F1 0.8501；未超越鎖定單一 CNN，故不採用 |
 | 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用

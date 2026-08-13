@@ -123,7 +123,7 @@ python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 
 ## 程式任務規格：CNN Spectrogram Data Augmentation Ablation
 
-- 狀態：程式完成，待 Colab 正式實驗
+- 狀態：程式與 Colab 正式實驗均完成；受控搜尋結果已鎖定
 - 更新日期：2026-08-13
 - 目的：在不更改 CNN 架構與 preprocessing 的條件下，量化不同資料增強強度對 validation Macro F1 的影響。
 - 輸入：已快取的 normalized Mel-spectrogram、UrbanSound8K 官方 fold、augmentation YAML config。
@@ -150,7 +150,7 @@ python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
 
 ## 程式任務規格：CNN 3-seed Probability Ensemble
 
-- 狀態：程式完成，待 Colab 正式實驗
+- 狀態：程式與 Colab 正式實驗均完成；結果不支持採用 ensemble
 - 更新日期：2026-08-13
 - 基礎設定：`configs/cnn_aug_final.yaml`
 - Seeds：42、123、2026
@@ -168,3 +168,5 @@ python3 -m src.ensemble --config configs/cnn_aug_final.yaml --fold 10 --seeds 42
 ```
 
 驗證證據：`tests/test_seed_ensemble.py` 檢查 EMA 與個別 test 強制關閉、三個 seed 必須互異，以及 probability arithmetic mean 的正確性。
+
+正式結果：ensemble validation Macro F1 為 `0.7699`，低於受控搜尋鎖定單一 CNN 的 `0.7924`；唯一一次 fold 10 test Macro F1 為 `0.8501`，亦略低於單一 CNN 的 `0.8536`。完整紀錄見 `docs/experiments/2026-08-13-cnn-seed-ensemble.md`。

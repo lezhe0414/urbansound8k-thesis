@@ -203,7 +203,7 @@ CNN fold 10 evaluation 已達約 0.81--0.83 accuracy 與 0.82--0.84 Macro F1，�
 ## DEC-005：在 10-fold 前進行一次 validation-only EMA 比較
 
 - 日期：2026-08-13
-- 狀態：進行中
+- 狀態：已決定
 - 相關文件：`src/utils/ema.py`、`configs/cnn_aug_ema.yaml`
 - 相關會議：無；使用者後續實驗決策
 
@@ -213,7 +213,7 @@ CNN fold 10 evaluation 已達約 0.81--0.83 accuracy 與 0.82--0.84 Macro F1，�
 
 #### 決策
 
-保留 `configs/cnn_aug_final.yaml` 不變，新增 validation-only EMA 候選設定。一次訓練同時保留 online 權重及其 EMA 副本，每個 epoch 同時評估兩者；`val_f1_macro` 代表 EMA 並保存至 `best_model.pt`，最佳 online Macro F1 另存至 `best_online_model.pt`。EMA 候選禁止執行 fold 10 test。
+保留 `configs/cnn_aug_final.yaml` 不變，新增 validation-only EMA 候選設定。一次訓練同時保留 online 權重及其 EMA 副本，每個 epoch 同時評估兩者；`val_f1_macro` 代表 EMA 並保存至 `best_model.pt`，最佳 online Macro F1 另存至 `best_online_model.pt`。EMA 候選禁止執行 fold 10 test。實驗完成後，EMA 最佳 Macro F1 為 0.76515，online 最佳 Macro F1 為 0.76426，差異僅 0.00089，因此正式設定關閉 EMA。
 
 #### 理由
 
@@ -224,11 +224,46 @@ EMA 平滑 stochastic augmentation、Mixup 與 mini-batch 更新造成的短期�
 - 對論文：若 EMA 有效，需清楚報告 decay、選模指標及額外 validation 成本。
 - 對程式：checkpoint 保持 `model_state` 相容，並標記 `checkpoint_source`；EMA run 額外保存 online 權重及指標。
 - 對評估：不得再次使用已看過的 fold 10 test；EMA 決策只依 validation Macro F1。
-- 對時程：3-seed ensemble 延後，避免目前增加三倍訓練與推論成本。
+- 對時程：EMA 未帶來實質改善，後續已改執行固定 3-seed ensemble 作穩定性檢查。
 
 #### 後續行動
 
-- [ ] 在 Colab 執行 `configs/cnn_aug_ema.yaml` validation-only run。
-- [ ] 比較同次 run 的 online 與 EMA validation Macro F1。
-- [ ] 鎖定勝出權重策略後執行正式 10-fold。
-- [ ] 時間允許時，以固定三個 seed 平均預測機率，不挑選單一最佳 seed。
+- [x] 在 Colab 執行 `configs/cnn_aug_ema.yaml` validation-only run。
+- [x] 比較同次 run 的 online 與 EMA validation Macro F1。
+- [x] 鎖定 online 權重策略，正式設定關閉 EMA。
+- [x] 以固定三個 seed 平均預測機率，不挑選單一最佳 seed。
+
+---
+
+## DEC-006：不採用 3-seed ensemble 作為主要 CNN 設定
+
+- 日期：2026-08-13
+- 狀態：已決定
+- 相關文件：`src/ensemble.py`、`configs/cnn_aug_final.yaml`、`docs/experiments/2026-08-13-cnn-seed-ensemble.md`
+- 相關會議：無；使用者後續實驗決策
+
+#### 背景
+
+EMA 的 validation 改善僅 0.00089，因此改以 seeds 42、123、2026 訓練三個相同 CNN。各模型只依 validation Macro F1 保存最佳 checkpoint，ensemble 使用三者 softmax probability 的算術平均，EMA 與個別 seed test 均關閉。
+
+#### 決策
+
+3-seed ensemble 實驗完成但不作為主要設定。正式 10-fold 仍使用已鎖定的單一 CNN `configs/cnn_aug_final.yaml`，且 EMA 關閉。
+
+#### 理由
+
+Ensemble validation Macro F1 為 0.7699，低於鎖定單一 CNN 的 0.7924，也低於最佳單一 seed 42 的 0.7868。此 validation 結果已足以否決採用 ensemble。鎖定後唯一一次 fold 10 test Macro F1 為 0.8501，也略低於單一 CNN 的 0.8536，但 test 結果只作確認，不作選模依據。
+
+#### 影響
+
+- 對論文：可將 ensemble 列為沒有改善的穩定性實驗，避免只呈現正面結果。
+- 對程式：保留 `src/ensemble.py` 供重現，不刪除已驗證功能。
+- 對評估：不再根據 fold 10 調整 ensemble 權重、seed 或超參數。
+- 對時程：算力集中到固定單一 CNN 的正式 10-fold cross-validation。
+
+#### 後續行動
+
+- [x] 完成三個固定 seeds 的 validation-only training。
+- [x] 完成 validation probability ensemble 比較。
+- [x] 鎖定後執行唯一一次 ensemble fold 10 test。
+- [ ] 使用固定單一 CNN 設定執行正式 10-fold cross-validation。

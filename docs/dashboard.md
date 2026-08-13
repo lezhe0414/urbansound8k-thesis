@@ -8,16 +8,15 @@
 
 Project definition 已確認方向為「Sound Event Detection Using Machine Learning Techniques」。核心技術路線是將音訊轉成 Mel-spectrogram 等頻譜圖，再以 CNN 進行聲音事件分類。可用公開資料集包含 UrbanSound8K 或 ESC-50，工具以 Python、PyTorch、Librosa、NumPy、Matplotlib 為主。
 
-端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。相較歷史 Macro F1 `0.8413` 約提高 `0.0123`，但仍需固定設定的 10-fold mean/std 才能判斷泛化是否穩定。
+端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。EMA 與固定 3-seed probability ensemble 亦已完成，但 ensemble validation Macro F1 `0.7699` 未超越單一 CNN，因此主要設定維持 EMA 關閉且不採用 ensemble。仍需固定設定的 10-fold mean/std 才能判斷泛化是否穩定。
 
 ## 立即執行方向
 
-1. 先以 `configs/cnn_aug_ema.yaml` 執行一次 validation-only EMA 比較；同一次訓練同時記錄 online 與 EMA validation Macro F1。
-2. 不得再次查看 fold 10 test；只有 EMA validation Macro F1 高於同次訓練的 online 權重才保留 EMA。
-3. EMA 決策完成後鎖定唯一設定，在 Colab 執行正式 10-fold cross-validation並輸出 mean/std 與 per-class 指標。
-4. CNN 作為主要模型；從零訓練 Transformer 作為架構比較；pretrained AST 作為 transfer-learning 延伸。
-5. 3-seed probability ensemble 已記錄為時間允許時的延伸，不列入目前必要流程。
-6. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
+1. 使用 `configs/cnn_aug_final.yaml`、EMA 關閉的固定單一 CNN，在 Colab 執行正式 10-fold cross-validation 並輸出 mean/std 與 per-class 指標。
+2. 不得再依 fold 10、ensemble test 或 10-fold 結果調整超參數。
+3. CNN 作為主要模型；從零訓練 Transformer 作為架構比較；pretrained AST 作為 transfer-learning 延伸。
+4. EMA 與 3-seed ensemble 作為已完成但沒有改善的延伸實驗，保留重現程式與誠實結果。
+5. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
 
 ## 最高風險
 
@@ -36,11 +35,10 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 
 下一步 AI Agent 應依序執行：
 
-1. 跑 `configs/cnn_aug_ema.yaml` 的 validation-only 比較，不執行 test。
-2. 依同次 run 的 validation Macro F1 決定使用 online 或 EMA checkpoint。
-3. 跑固定勝出設定的 10-fold cross-validation。
-4. 整理 mean/std、每類 F1 與 aggregate confusion matrix。
-5. 更新論文 Results、Discussion 與 limitations，避免把單一 fold 改善描述成確定結論。
+1. 跑固定單一 CNN 設定的 10-fold cross-validation。
+2. 整理 mean/std、每類 F1 與 aggregate confusion matrix。
+3. 將單一 CNN、EMA、3-seed ensemble、Transformer 與 AST 的結果整理成公平比較。
+4. 更新論文 Results、Discussion 與 limitations，避免把單一 fold 改善描述成確定結論。
 
 文獻與寫作同步更新：
 
@@ -97,6 +95,6 @@ b1f8459 Add thesis risk register
 - 風險與交付管理：已建立。
 - 正式論文內容：方向已確認，正文尚未開始。
 - 實際程式碼：MVP 已完成。
-- 實驗結果：smoke run 已完成，Transformer fold 10 正式結果已完成，CNN 正式長訓練待補。
+- 實驗結果：CNN fold 10、受控 augmentation、EMA、3-seed ensemble 與 Transformer fold 10 均已完成；CNN 正式 10-fold 待補。
 
 目前不可將整體目標標記為完成，因為仍需完成正式實驗、圖表解讀與 8 頁論文。

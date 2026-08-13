@@ -34,7 +34,9 @@
 4. 唯一最佳設定的單次 fold 10 test：Accuracy `0.8471`、Macro F1 `0.8536`。
 5. 歷史 CNN fold 10 Macro F1 約 `0.8413`；本次差異約 `+0.0123`，尚需 10-fold 統計驗證。
 6. 從零訓練 Spectrogram Transformer 表現低於 CNN，因此保留為比較模型，不再用 fold 10 反覆調參。
-7. EMA 訓練支援與 validation-only 候選設定已建立；尚未產生 EMA 正式結果，不能先宣稱有效。
+7. EMA validation-only 比較已完成：EMA Macro F1 只比同次 online 權重高約 `0.00089`，不足以支持採用，正式設定關閉 EMA。
+8. 固定 3-seed probability ensemble 已完成：validation Macro F1 `0.7699`，低於鎖定單一 CNN 的 `0.7924`；因此完成但不採用。
+9. 鎖定後唯一一次 ensemble fold 10 test Accuracy 為 `0.8411`、Macro F1 為 `0.8501`，亦略低於單一 CNN，但此 test 只作確認，不作選模依據。
 
 ## 已建立內容
 
@@ -115,14 +117,14 @@
 
 ## 下一步
 
-最有效的下一步是先完成一次不接觸 test set 的 EMA 比較，再進入最終統計驗證：
+EMA 與 ensemble 延伸實驗均已完成。最有效的下一步是直接進入固定設定的最終統計驗證：
 
-1. 在 Colab 用 `configs/cnn_aug_ema.yaml` 執行 fold 10 對應的 validation-only run；設定中的 `evaluation.run_test` 已關閉。
-2. 比較同次訓練的 online 與 EMA validation Macro F1，只在 EMA 較高時採用 EMA checkpoint。
-3. 鎖定勝出權重策略後執行固定設定的 10-fold cross-validation，報告 mean、standard deviation 與每類表現。
-4. 不再依 fold 10 test 或任何 10-fold 結果改動超參數。
-5. 3-seed ensemble 留作時間允許時的延伸，不影響目前 EMA 與 10-fold 流程。
+1. 在 Colab 使用 `configs/cnn_aug_final.yaml`、EMA 關閉的單一 CNN 執行固定設定 10-fold cross-validation。
+2. 報告 Macro F1、Accuracy 的 mean、standard deviation 與每類表現。
+3. 不再依 fold 10 test、ensemble test 或任何 10-fold 結果改動超參數。
+4. 在論文中將 EMA 與 3-seed ensemble 說明為未帶來改善的延伸實驗。
+5. 整理 CNN、Transformer 與 pretrained AST 的比較範圍和限制。
 
 ## 目前完成度判斷
 
-專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋與單次 fold 10 test 已完成；EMA 程式已完成但實驗尚未執行。整體目標尚未完成，因為 EMA validation 決策、固定設定的 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。
+專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA 比較、3-seed ensemble 與鎖定後的 fold 10 test 均已完成。整體目標尚未完成，因為固定單一 CNN 的 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。

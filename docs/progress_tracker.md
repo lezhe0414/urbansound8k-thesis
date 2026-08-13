@@ -6,7 +6,7 @@
 
 ## 目前結論
 
-MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。EMA 權重支援已完成，下一步只在 validation 上比較 online 與 EMA 權重。
+MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。EMA validation 比較與固定 3-seed probability ensemble 亦已完成，但都沒有超越已鎖定的單一 CNN，因此正式設定維持 EMA 關閉且不採用 ensemble。
 
 整個論文專案尚未完成，因為固定 CNN 設定的正式 10-fold cross-validation、結果解讀與最終 8 頁論文仍待完成。
 
@@ -98,7 +98,7 @@ CNN baseline 將 Mel-spectrogram 當成單通道影像。輸入 shape 同樣是 
 | Adaptive average pooling | `[32, 256, 1, 1]` | 壓成固定長度 feature |
 | Classification head | `[32, 10]` | 10 個 UrbanSound8K 類別 logits |
 
-目前 CNN 已完成 smoke run，但正式長訓練因本機 CPU 上速度偏慢而尚未完成。
+CNN 已在 Colab GPU 完成正式 fold 10 長訓練、受控 augmentation 搜尋、EMA 與 3-seed ensemble 實驗；本機 CPU 僅保留 smoke run 用途。
 
 ## 已做到
 
@@ -114,6 +114,7 @@ CNN baseline 將 Mel-spectrogram 當成單通道影像。輸入 shape 同樣是 
 | Preprocessing script | 完成 | `src/preprocess.py` | 可重複產生 Mel-spectrogram |
 | Training script | 完成 | `src/train.py` | 可輸出 checkpoint、history、metrics、confusion matrix |
 | EMA checkpoint support | 完成 | `src/utils/ema.py`、`configs/cnn_aug_ema.yaml` | 同次訓練記錄 online/EMA validation 指標；test 預設關閉 |
+| 3-seed ensemble support | 完成 | `src/ensemble.py`、`tests/test_seed_ensemble.py` | EMA 與個別 seed test 強制關閉；平均三個 softmax probabilities |
 | Evaluation script | 完成 | `src/evaluate.py` | 可重讀 checkpoint 重新評估 |
 | Colab CNN baseline notebook | 完成 | `notebooks/2026-07-02-colab-cnn-baseline.ipynb` | 用英文註解記錄 GitHub clone、資料下載、preprocess、CNN 訓練、評估與結果打包流程 |
 | Colab CNN + Transformer notebook | 完成 | `notebooks/2026-07-08-colab-cnn-transformer-fold10.ipynb` | 使用 Google Drive cache，支援 CNN baseline 與 Spectrogram Transformer fold 10 訓練、評估、metrics 與結果打包 |
@@ -140,6 +141,16 @@ CNN baseline 將 Mel-spectrogram 當成單通道影像。輸入 shape 同樣是 
 | 相較歷史 test Macro F1 0.8413 | +0.0123 |
 
 所有設定選擇只使用 validation Macro F1。Fold 10 test 在唯一設定鎖定後僅執行一次，不能再用於調參。下一步是用固定設定執行 10-fold cross-validation。
+
+### EMA 與 3-seed ensemble 結果
+
+| 實驗 | Validation Macro F1 | Fold 10 test Macro F1 | 決策 |
+| --- | ---: | ---: | --- |
+| 鎖定單一 CNN | 0.7924 | 0.8536 | 保留為正式設定 |
+| EMA | 0.7652 | 未執行 | 相較同次 online 僅 +0.00089，不採用 |
+| 3-seed probability ensemble | 0.7699 | 0.8501 | validation 與 test 均未超越單一 CNN，不採用 |
+
+3-seed 使用 seeds 42、123、2026；各 seed 只依 validation Macro F1 保存 checkpoint，個別模型不讀取 test。完整紀錄見 `docs/experiments/2026-08-13-cnn-seed-ensemble.md`。Ensemble fold 10 test 僅在方法鎖定後執行一次，不能再用於調參。
 
 ### Transformer fold 10 正式結果
 
@@ -174,11 +185,10 @@ Smoke run 只用少量資料與 1 epoch 檢查 pipeline 是否能完整執行。
 
 | 項目 | 狀態 | 原因 / 風險 | 下一步 |
 | --- | --- | --- | --- |
-| CNN baseline 正式長訓練 | 未完成 | 本機 CPU 上 CNN 訓練偏慢 | 建議用 Colab/GPU 或調整模型/epochs 後再跑 |
 | 10-fold cross validation | 未完成 | MVP 先跑 fold 10 | 後續可跑 `--fold all` 或多 fold 平均 |
-| EMA validation comparison | 未完成 | 程式與設定剛完成 | 在 Colab 執行一次 validation-only run，不得評估 fold 10 test |
-| 3-seed ensemble | 延後 | 目前時間不足，需三次訓練與三模型推論 | 已記錄；時間允許時平均三個固定 seed 的預測機率 |
-| CNN vs Transformer 正式比較表 | 未完成 | CNN 正式分數尚缺 | 補 CNN 正式訓練後整理表格 |
+| EMA validation comparison | 完成 | 改善僅約 0.00089 | 正式設定關閉 EMA |
+| 3-seed ensemble | 完成 | validation Macro F1 0.7699，未超越單一 CNN | 保留負結果與重現程式，不採用於正式 10-fold |
+| CNN vs Transformer 正式比較表 | 進行中 | 單一 fold 結果已具備，缺 10-fold CNN 統計 | 完成 10-fold 後整理最終表格 |
 | 結果圖表解讀 | 未完成 | 目前只有 confusion matrix 與 metrics | 寫出哪些類別容易混淆、可能原因 |
 | 文獻整理 | 未完成 | 還沒整理核心 citation | 補 UrbanSound8K、CNN spectrogram、Transformer/AST 相關文獻 |
 | 方法章草稿 | 未完成 | 需要把 pipeline 寫成論文語言 | 先寫 Mel-spectrogram + model comparison 方法 |
@@ -188,11 +198,11 @@ Smoke run 只用少量資料與 1 epoch 檢查 pipeline 是否能完整執行。
 
 ## 下一步優先順序
 
-1. 在 Colab 執行 EMA validation-only 比較，選模仍只看 validation Macro F1。
-2. 保留 online 或 EMA 中的勝出權重策略，然後鎖定設定。
-3. 以鎖定設定執行正式 10-fold cross-validation。
-4. 整理 confusion matrix 與 metrics 成論文可用圖表與表格。
-5. 開始撰寫方法章與結果段落；3-seed ensemble 留作時間允許時的延伸。
+1. 以 `configs/cnn_aug_final.yaml`、EMA 關閉的固定單一 CNN 執行正式 10-fold cross-validation。
+2. 整理 mean/std、per-class F1 與 aggregate confusion matrix。
+3. 將單一 CNN、3-seed ensemble、從零訓練 Transformer 與 pretrained AST 的角色公平寫入 Results 與 Discussion。
+4. 不再依 fold 10 test 改動 seed、ensemble 權重或超參數。
+5. 整理 confusion matrix 與 metrics 成論文可用圖表與表格。
 
 ## 常用命令
 
@@ -231,6 +241,12 @@ python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 ```bash
 python3 -m src.train --config configs/cnn_baseline.yaml --fold all
 python3 -m src.train --config configs/transformer_baseline.yaml --fold all
+```
+
+CNN 論文主結果應改用已鎖定且 EMA 關閉的設定：
+
+```bash
+python3 -m src.train --config configs/cnn_aug_final.yaml --fold all
 ```
 
 說明：`--fold all` 會依序跑 fold 1 到 fold 10，並輸出 `results/<run_name>_10fold_summary.json` 與 `results/<run_name>_10fold_summary.csv`，包含 accuracy、macro precision、macro recall、macro F1、test loss 的平均與標準差。
@@ -272,6 +288,14 @@ python3 -m src.train --config configs/cnn_aug_ema.yaml --fold 10
 ```
 
 此命令仍使用 fold 1 作 validation，但 `evaluation.run_test: false`，所以不會再次評估 fold 10 test。EMA decay 固定為 `0.995`。`validation_metrics.json` 會同時列出最佳 online 的 `best_online_val_f1_macro` 與最佳 EMA 的 `val_f1_macro`；`best_online_model.pt` 保留一般權重的最佳 epoch，`best_model.pt` 保留 EMA 的最佳 epoch。
+
+3-seed probability ensemble：
+
+```bash
+python3 -m src.ensemble --config configs/cnn_aug_final.yaml --fold 10 --seeds 42 123 2026
+```
+
+此實驗已完成，validation Macro F1 為 0.7699，因此不採用為主要設定。若已有完整結果，程式可用 `--skip-existing` 驗證鎖定設定，但不得重複使用 test 結果作調參。
 
 CNN spectrogram augmentation fold 10 ablation：
 
