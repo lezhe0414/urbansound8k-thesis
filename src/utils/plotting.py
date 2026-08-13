@@ -41,3 +41,37 @@ def save_confusion_matrix(matrix: np.ndarray, class_names: list[str], output_pat
     fig.tight_layout()
     fig.savefig(output_path, dpi=160)
     plt.close(fig)
+
+
+def save_training_history(history: list[dict], output_path: str | Path, title: str) -> None:
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError as exc:  # pragma: no cover - exercised only without deps
+        raise RuntimeError("matplotlib is required. Install dependencies with `pip install -r requirements.txt`.") from exc
+
+    if not history:
+        raise ValueError("Training history must contain at least one epoch.")
+
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    epochs = [int(row["epoch"]) for row in history]
+
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+    axes[0].plot(epochs, [float(row["train_loss"]) for row in history], label="Train")
+    axes[0].plot(epochs, [float(row["val_loss"]) for row in history], label="Validation")
+    axes[0].set_title("Loss")
+    axes[0].set_xlabel("Epoch")
+    axes[0].legend()
+
+    axes[1].plot(epochs, [float(row["train_f1_macro"]) for row in history], label="Train Macro F1")
+    axes[1].plot(epochs, [float(row["val_f1_macro"]) for row in history], label="Validation Macro F1")
+    axes[1].plot(epochs, [float(row["val_accuracy"]) for row in history], label="Validation Accuracy")
+    axes[1].set_title("Classification metrics")
+    axes[1].set_xlabel("Epoch")
+    axes[1].set_ylim(0.0, 1.0)
+    axes[1].legend(fontsize=8)
+
+    fig.suptitle(title)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=160)
+    plt.close(fig)

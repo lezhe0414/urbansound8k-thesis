@@ -254,7 +254,7 @@ CNN spectrogram augmentation fold 10 ablation：
 python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
 ```
 
-此流程依序執行 control、light、balanced、strong 四組設定。排名只使用 validation Macro F1，並自動對勝出設定執行一次 fold 10 test evaluation。資料增強在線上套用於 cached Mel-spectrogram，不需要重新 preprocessing。正式結果尚待 Colab 執行。
+此流程依序執行 control、light、balanced、strong 四組設定，排名只使用 validation Macro F1，預設不執行 test。`scripts/run_cnn_controlled_search.py` 會在初始比較後，只以勝出設定逐輪調整單一類別的變因；每輪即時寫入 CSV/Markdown 並備份。只有唯一設定鎖定後，才可明確要求一次 fold 10 test evaluation。資料增強在線上套用於 cached Mel-spectrogram，不需要重新 preprocessing。正式結果尚待 Colab 執行。
 
 ## 維護規則
 

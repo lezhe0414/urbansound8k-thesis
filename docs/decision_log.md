@@ -159,3 +159,7 @@ CNN fold 10 evaluation 已達約 0.81--0.83 accuracy 與 0.82--0.84 Macro F1，�
 - [ ] 在 Colab 跑四組 fold 10 validation ablation。
 - [ ] 保存 validation 排名與勝出設定的 test evaluation artifacts。
 - [ ] 根據結果建立單一 final config，再做 seed ensemble 或 10-fold。
+
+#### 受控迭代補充
+
+正式執行採用最多十輪的 greedy controlled search。每輪從目前 validation Macro F1 最佳設定複製，只調整一類變因；改善才保留，否則退回。連續五輪未改善即停止。每組 run 使用唯一名稱並立即記錄及備份，fold 10 test 在唯一設定鎖定前保持不可見，Accuracy 僅作輔助說明。

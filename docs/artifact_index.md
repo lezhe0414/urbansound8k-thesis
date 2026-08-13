@@ -53,7 +53,8 @@
 | Smoke run configs | `configs/cnn_smoke.yaml`、`configs/transformer_smoke.yaml` | 本機快速驗證 | 已確認 | smoke run | 使用真實資料子集 |
 | Spectrogram augmentation module | `src/data/augmentation.py` | CNN 訓練階段即時資料增強 | 已確認 | unit tests + smoke run | 支援 shift、stretch、gain、noise、SpecAugment、Mixup、CutMix |
 | CNN augmentation ablation configs | `configs/cnn_aug_control.yaml`、`configs/cnn_aug_light.yaml`、`configs/cnn_aug_balanced.yaml`、`configs/cnn_aug_strong.yaml` | 比較增強強度 | 待正式執行 | validation-only selection | 不需重新 preprocessing |
-| CNN augmentation runner | `scripts/run_cnn_augmentation_ablation.py` | 依序訓練、validation 排名並測試勝出設定 | 已確認 | CLI + smoke pipeline | 避免用 test fold 選參數 |
+| CNN augmentation runner | `scripts/run_cnn_augmentation_ablation.py` | 依序訓練並用 validation Macro F1 排名 | 已確認 | CLI + smoke pipeline | 預設不執行 test |
+| CNN controlled search runner | `scripts/run_cnn_controlled_search.py` | 初始四組比較、單一變因迭代、失敗重試、進度紀錄與 Drive 備份 | 已確認 | unit tests + plan-only | 唯一設定鎖定後才允許一次 test |
 
 ## 資料
 

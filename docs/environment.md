@@ -48,7 +48,7 @@ results/<run_name>_10fold_summary.csv
 
 資料增強在訓練時直接套用於已快取的 normalized Mel-spectrogram tensor，因此不需要重新執行 preprocessing。Validation 與 test 資料不做增強。
 
-完整 fold 10 ablation 會依序執行無增強控制組、輕度、平衡及強度四組設定，以 validation Macro F1 排名，最後只對勝出設定執行一次 test evaluation：
+完整 fold 10 ablation 會依序執行無增強控制組、輕度、平衡及強度四組設定，並只以 validation Macro F1 排名。預設不執行 test evaluation：
 
 ```bash
 python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
@@ -57,7 +57,7 @@ python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
 若 Colab 中已有完整訓練輸出，只重新排名而不重訓或測試：
 
 ```bash
-python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --summarize-only --no-evaluate-best
+python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --summarize-only
 ```
 
 主要輸出：
@@ -65,11 +65,23 @@ python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --summarize-only --no
 ```text
 results/cnn_aug_<profile>_fold10/history.csv
 results/cnn_augmentation_ablation_fold10.csv
-results/<winning_run>_fold10/evaluation_metrics.json
-figures/<winning_run>_fold10_evaluation_confusion_matrix.png
+results/<run>_fold10/validation_metrics.json
+figures/<run>_fold10_training_history.png
 ```
 
 四組設定只改變資料增強強度，模型、optimizer、class weighting、class-aware sampling、epoch 與 seed 保持一致。這可避免把 augmentation 效果與其他超參數改動混在一起。正式 10-fold 實驗應在選定單一設定後另建 final config，且將 `evaluation.run_test` 設為 `true`。
+
+受控自動迭代會先執行四組初始比較，再以勝出設定為基礎逐輪只改一類變因。每輪失敗最多重試一次，連續五輪未改善或完成十輪後停止。每個完成的 run 會立即備份到指定位置；只有加入 `--final-test` 時，才在鎖定唯一設定後執行一次 fold 10 test：
+
+```bash
+python3 -u scripts/run_cnn_controlled_search.py \
+  --fold 10 \
+  --max-rounds 10 \
+  --patience 5 \
+  --backup-root /content/drive/MyDrive/urbansound8k_data \
+  --skip-existing \
+  --final-test
+```
 
 快速驗證增強流程：
 

@@ -130,7 +130,7 @@ python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 - 方法：逐樣本時間位移、頻率位移、時間伸縮、強度縮放、Gaussian noise、time/frequency masking，以及逐樣本 Mixup 或 spectrogram CutMix。
 - 控制：control、light、balanced、strong 四組使用相同 seed、模型、optimizer、sampling 與 epoch，只改 augmentation。
 - 模型選擇：只依 validation Macro F1 選擇設定；fold 10 test 不用於選參數，僅評估勝出設定一次。
-- 輸出：各組 history/checkpoint、validation 排名 CSV、勝出設定的 test metrics 與 confusion matrix。
+- 輸出：各組設定檔、history、validation metrics、checkpoint、training history 圖、逐輪 CSV/Markdown 紀錄，以及唯一勝出設定的 test metrics 與 confusion matrix。
 
 執行方式：
 
@@ -138,7 +138,10 @@ python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
 ```
 
+正式受控流程使用 `scripts/run_cnn_controlled_search.py`。初始四組完成後只延伸當前最佳設定；每輪只改一類變因，未改善即退回，並以 validation Macro F1 連續五輪未改善作為提早停止條件。Test evaluation 預設關閉，必須明確加入 `--final-test`，且只會在唯一設定鎖定後執行一次。
+
 驗證證據：
 
 - `tests/test_augmentation.py` 驗證形狀、有限值、零填充位移、Mixup/CutMix、舊設定相容性與參數錯誤處理。
+- `tests/test_controlled_search.py` 驗證初始四組控制條件一致、選模只依 validation Macro F1，以及所有預定迭代可產生有效變更。
 - `configs/cnn_aug_smoke.yaml` 已用真實 processed data 完成 1 epoch end-to-end smoke run。

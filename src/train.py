@@ -20,7 +20,7 @@ from src.data import (
 from src.models import build_model
 from src.utils.config import load_config
 from src.utils.metrics import classification_metrics, confusion_matrix_array, write_history_csv
-from src.utils.plotting import save_confusion_matrix
+from src.utils.plotting import save_confusion_matrix, save_training_history
 from src.utils.seed import set_seed
 
 
@@ -251,13 +251,30 @@ def train_one_fold(config: dict, fold: int) -> Path:
 
     torch.save({"model_state": model.state_dict(), "config": config, "fold": fold, "val_fold": val_fold}, run_dir / "last_model.pt")
     write_history_csv(history, run_dir / "history.csv")
+    best_history = max(history, key=lambda row: float(row["val_f1_macro"]))
+    validation_metrics = {
+        "best_epoch": int(best_history["epoch"]),
+        "train_accuracy": float(best_history["train_accuracy"]),
+        "train_f1_macro": float(best_history["train_f1_macro"]),
+        "train_loss": float(best_history["train_loss"]),
+        "val_accuracy": float(best_history["val_accuracy"]),
+        "val_f1_macro": float(best_history["val_f1_macro"]),
+        "val_loss": float(best_history["val_loss"]),
+    }
+    (run_dir / "validation_metrics.json").write_text(
+        json.dumps(validation_metrics, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     (run_dir / "config_resolved.json").write_text(
         json.dumps({"config": config, "fold": fold, "val_fold": val_fold}, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    history_path = figures_dir / f"{run_name}_fold{fold}_training_history.png"
+    save_training_history(history, history_path, title=f"{run_name} fold {fold}")
 
     if not run_test:
         print(f"Wrote tuning outputs to {run_dir}; test evaluation was intentionally skipped")
+        print(f"Wrote training history figure to {history_path}")
         return run_dir
 
     test_set = UrbanSound8KMelDataset(

@@ -103,9 +103,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument("--summarize-only", action="store_true")
     parser.add_argument(
-        "--no-evaluate-best",
+        "--evaluate-best",
         action="store_true",
-        help="Rank validation results without evaluating the winning profile on the test fold.",
+        help="Explicitly evaluate the winning profile on the test fold after validation ranking.",
     )
     return parser.parse_args()
 
@@ -138,7 +138,7 @@ def main() -> int:
     _, winning_config = _write_summary(root, config_paths, args.fold)
     winning_run_dir = _run_dir(root, winning_config, args.fold)
     print(f"Selected by validation Macro F1: {winning_run_dir.name}")
-    if not args.no_evaluate_best:
+    if args.evaluate_best:
         subprocess.run(
             [sys.executable, "-m", "src.evaluate", "--run-dir", str(winning_run_dir)],
             cwd=root,
