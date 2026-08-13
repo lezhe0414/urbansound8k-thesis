@@ -6,7 +6,7 @@
 
 ## 目前結論
 
-MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。
+MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。EMA 權重支援已完成，下一步只在 validation 上比較 online 與 EMA 權重。
 
 整個論文專案尚未完成，因為固定 CNN 設定的正式 10-fold cross-validation、結果解讀與最終 8 頁論文仍待完成。
 
@@ -113,6 +113,7 @@ CNN baseline 將 Mel-spectrogram 當成單通道影像。輸入 shape 同樣是 
 | Spectrogram Transformer 模型 | 完成 | `src/models/spectrogram_transformer.py` | 作為現代比較模型 |
 | Preprocessing script | 完成 | `src/preprocess.py` | 可重複產生 Mel-spectrogram |
 | Training script | 完成 | `src/train.py` | 可輸出 checkpoint、history、metrics、confusion matrix |
+| EMA checkpoint support | 完成 | `src/utils/ema.py`、`configs/cnn_aug_ema.yaml` | 同次訓練記錄 online/EMA validation 指標；test 預設關閉 |
 | Evaluation script | 完成 | `src/evaluate.py` | 可重讀 checkpoint 重新評估 |
 | Colab CNN baseline notebook | 完成 | `notebooks/2026-07-02-colab-cnn-baseline.ipynb` | 用英文註解記錄 GitHub clone、資料下載、preprocess、CNN 訓練、評估與結果打包流程 |
 | Colab CNN + Transformer notebook | 完成 | `notebooks/2026-07-08-colab-cnn-transformer-fold10.ipynb` | 使用 Google Drive cache，支援 CNN baseline 與 Spectrogram Transformer fold 10 訓練、評估、metrics 與結果打包 |
@@ -175,6 +176,8 @@ Smoke run 只用少量資料與 1 epoch 檢查 pipeline 是否能完整執行。
 | --- | --- | --- | --- |
 | CNN baseline 正式長訓練 | 未完成 | 本機 CPU 上 CNN 訓練偏慢 | 建議用 Colab/GPU 或調整模型/epochs 後再跑 |
 | 10-fold cross validation | 未完成 | MVP 先跑 fold 10 | 後續可跑 `--fold all` 或多 fold 平均 |
+| EMA validation comparison | 未完成 | 程式與設定剛完成 | 在 Colab 執行一次 validation-only run，不得評估 fold 10 test |
+| 3-seed ensemble | 延後 | 目前時間不足，需三次訓練與三模型推論 | 已記錄；時間允許時平均三個固定 seed 的預測機率 |
 | CNN vs Transformer 正式比較表 | 未完成 | CNN 正式分數尚缺 | 補 CNN 正式訓練後整理表格 |
 | 結果圖表解讀 | 未完成 | 目前只有 confusion matrix 與 metrics | 寫出哪些類別容易混淆、可能原因 |
 | 文獻整理 | 未完成 | 還沒整理核心 citation | 補 UrbanSound8K、CNN spectrogram、Transformer/AST 相關文獻 |
@@ -185,11 +188,11 @@ Smoke run 只用少量資料與 1 epoch 檢查 pipeline 是否能完整執行。
 
 ## 下一步優先順序
 
-1. 準備教授討論材料：說明目前 MVP、Transformer fold 10 結果、CNN 正式長訓練尚缺。
-2. 決定 CNN 正式訓練環境：本機繼續跑、縮小設定，或改用 Colab/GPU。
-3. 補 CNN baseline 正式結果，形成 CNN vs Transformer 對照。
+1. 在 Colab 執行 EMA validation-only 比較，選模仍只看 validation Macro F1。
+2. 保留 online 或 EMA 中的勝出權重策略，然後鎖定設定。
+3. 以鎖定設定執行正式 10-fold cross-validation。
 4. 整理 confusion matrix 與 metrics 成論文可用圖表與表格。
-5. 開始撰寫方法章與初步結果段落。
+5. 開始撰寫方法章與結果段落；3-seed ensemble 留作時間允許時的延伸。
 
 ## 常用命令
 
@@ -261,6 +264,14 @@ notebooks/2026-07-08-colab-cnn-transformer-fold10.ipynb
 python3 -m unittest discover -s tests
 python3 scripts/check_project_status.py
 ```
+
+EMA validation-only 比較：
+
+```bash
+python3 -m src.train --config configs/cnn_aug_ema.yaml --fold 10
+```
+
+此命令仍使用 fold 1 作 validation，但 `evaluation.run_test: false`，所以不會再次評估 fold 10 test。EMA decay 固定為 `0.995`。`validation_metrics.json` 會同時列出最佳 online 的 `best_online_val_f1_macro` 與最佳 EMA 的 `val_f1_macro`；`best_online_model.pt` 保留一般權重的最佳 epoch，`best_model.pt` 保留 EMA 的最佳 epoch。
 
 CNN spectrogram augmentation fold 10 ablation：
 

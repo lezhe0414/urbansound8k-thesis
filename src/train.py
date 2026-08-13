@@ -19,6 +19,7 @@ from src.data import (
 )
 from src.models import build_model
 from src.utils.config import load_config
+from src.utils.ema import ExponentialMovingAverage
 from src.utils.metrics import classification_metrics, confusion_matrix_array, write_history_csv
 from src.utils.plotting import save_confusion_matrix, save_training_history
 from src.utils.seed import set_seed
@@ -85,6 +86,7 @@ def _run_epoch(
     optimizer=None,
     augmenter: SpectrogramAugmenter | None = None,
     batch_mixer: SpectrogramBatchMixer | None = None,
+    model_ema: ExponentialMovingAverage | None = None,
 ) -> tuple[float, list[int], list[int]]:
     training = optimizer is not None
     model.train(training)
@@ -116,6 +118,8 @@ def _run_epoch(
             if training:
                 loss.backward()
                 optimizer.step()
+                if model_ema is not None:
+                    model_ema.update(model)
 
         total_loss += float(loss.item()) * inputs.size(0)
         predictions = logits.argmax(dim=1)
@@ -192,6 +196,13 @@ def train_one_fold(config: dict, fold: int) -> Path:
         lr=float(training_config.get("learning_rate", 0.001)),
         weight_decay=float(training_config.get("weight_decay", 0.0001)),
     )
+    ema_config = training_config.get("ema", {})
+    model_ema = None
+    if bool(ema_config.get("enabled", False)):
+        model_ema = ExponentialMovingAverage(
+            model,
+            decay=float(ema_config.get("decay", 0.999)),
+        )
     epochs = int(training_config.get("epochs", 10))
     augmenter = SpectrogramAugmenter(augmentation_config_from_training(training_config))
     batch_mixer = SpectrogramBatchMixer(batch_mix_config_from_training(training_config))
@@ -215,6 +226,8 @@ def train_one_fold(config: dict, fold: int) -> Path:
     history: list[dict] = []
     best_f1 = -1.0
     best_path = run_dir / "best_model.pt"
+    best_online_f1 = -1.0
+    best_online_path = run_dir / "best_online_model.pt"
     for epoch in range(1, epochs + 1):
         train_loss, train_true, train_pred = _run_epoch(
             model,
@@ -224,10 +237,19 @@ def train_one_fold(config: dict, fold: int) -> Path:
             optimizer,
             augmenter,
             batch_mixer,
+            model_ema,
         )
-        val_loss, val_true, val_pred = _run_epoch(model, val_loader, criterion, device)
         train_metrics = classification_metrics(train_true, train_pred, labels)
-        val_metrics = classification_metrics(val_true, val_pred, labels)
+        online_val_loss, online_val_true, online_val_pred = _run_epoch(model, val_loader, criterion, device)
+        online_val_metrics = classification_metrics(online_val_true, online_val_pred, labels)
+        if model_ema is not None:
+            val_loss, val_true, val_pred = _run_epoch(model_ema.model, val_loader, criterion, device)
+            val_metrics = classification_metrics(val_true, val_pred, labels)
+            checkpoint_source = "ema"
+        else:
+            val_loss = online_val_loss
+            val_metrics = online_val_metrics
+            checkpoint_source = "online"
         row = {
             "epoch": epoch,
             "train_loss": train_loss,
@@ -237,19 +259,65 @@ def train_one_fold(config: dict, fold: int) -> Path:
             "train_f1_macro": train_metrics["f1_macro"],
             "val_f1_macro": val_metrics["f1_macro"],
             "learning_rate": optimizer.param_groups[0]["lr"],
+            "checkpoint_source": checkpoint_source,
         }
+        if model_ema is not None:
+            row.update(
+                {
+                    "online_val_loss": online_val_loss,
+                    "online_val_accuracy": online_val_metrics["accuracy"],
+                    "online_val_f1_macro": online_val_metrics["f1_macro"],
+                    "ema_decay": model_ema.decay,
+                }
+            )
         history.append(row)
         print(json.dumps(row, sort_keys=True))
+        if model_ema is not None and online_val_metrics["f1_macro"] > best_online_f1:
+            best_online_f1 = online_val_metrics["f1_macro"]
+            torch.save(
+                {
+                    "model_state": model.state_dict(),
+                    "config": config,
+                    "fold": fold,
+                    "val_fold": val_fold,
+                    "checkpoint_source": "online",
+                    "epoch": epoch,
+                },
+                best_online_path,
+            )
         if val_metrics["f1_macro"] > best_f1:
             best_f1 = val_metrics["f1_macro"]
-            torch.save({"model_state": model.state_dict(), "config": config, "fold": fold, "val_fold": val_fold}, best_path)
+            selected_model = model_ema.model if model_ema is not None else model
+            checkpoint = {
+                "model_state": selected_model.state_dict(),
+                "config": config,
+                "fold": fold,
+                "val_fold": val_fold,
+                "checkpoint_source": checkpoint_source,
+                "epoch": epoch,
+            }
+            if model_ema is not None:
+                checkpoint["online_model_state"] = model.state_dict()
+                checkpoint["ema_num_updates"] = model_ema.num_updates
+            torch.save(checkpoint, best_path)
         if scheduler is not None:
             if scheduler_name == "reduce_on_plateau":
                 scheduler.step(val_metrics["f1_macro"])
             else:
                 scheduler.step()
 
-    torch.save({"model_state": model.state_dict(), "config": config, "fold": fold, "val_fold": val_fold}, run_dir / "last_model.pt")
+    selected_model = model_ema.model if model_ema is not None else model
+    last_checkpoint = {
+        "model_state": selected_model.state_dict(),
+        "config": config,
+        "fold": fold,
+        "val_fold": val_fold,
+        "checkpoint_source": "ema" if model_ema is not None else "online",
+    }
+    if model_ema is not None:
+        last_checkpoint["online_model_state"] = model.state_dict()
+        last_checkpoint["ema_num_updates"] = model_ema.num_updates
+    torch.save(last_checkpoint, run_dir / "last_model.pt")
     write_history_csv(history, run_dir / "history.csv")
     best_history = max(history, key=lambda row: float(row["val_f1_macro"]))
     validation_metrics = {
@@ -260,7 +328,22 @@ def train_one_fold(config: dict, fold: int) -> Path:
         "val_accuracy": float(best_history["val_accuracy"]),
         "val_f1_macro": float(best_history["val_f1_macro"]),
         "val_loss": float(best_history["val_loss"]),
+        "checkpoint_source": str(best_history["checkpoint_source"]),
     }
+    if model_ema is not None:
+        best_online_history = max(history, key=lambda row: float(row["online_val_f1_macro"]))
+        validation_metrics.update(
+            {
+                "best_online_epoch": int(best_online_history["epoch"]),
+                "best_online_val_accuracy": float(best_online_history["online_val_accuracy"]),
+                "best_online_val_f1_macro": float(best_online_history["online_val_f1_macro"]),
+                "best_online_val_loss": float(best_online_history["online_val_loss"]),
+                "online_at_best_ema_val_accuracy": float(best_history["online_val_accuracy"]),
+                "online_at_best_ema_val_f1_macro": float(best_history["online_val_f1_macro"]),
+                "online_at_best_ema_val_loss": float(best_history["online_val_loss"]),
+                "ema_decay": float(best_history["ema_decay"]),
+            }
+        )
     (run_dir / "validation_metrics.json").write_text(
         json.dumps(validation_metrics, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",

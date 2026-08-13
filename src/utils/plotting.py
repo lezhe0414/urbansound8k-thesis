@@ -58,13 +58,29 @@ def save_training_history(history: list[dict], output_path: str | Path, title: s
 
     fig, axes = plt.subplots(1, 2, figsize=(11, 4))
     axes[0].plot(epochs, [float(row["train_loss"]) for row in history], label="Train")
-    axes[0].plot(epochs, [float(row["val_loss"]) for row in history], label="Validation")
+    validation_label = "EMA validation" if "online_val_loss" in history[0] else "Validation"
+    axes[0].plot(epochs, [float(row["val_loss"]) for row in history], label=validation_label)
+    if "online_val_loss" in history[0]:
+        axes[0].plot(
+            epochs,
+            [float(row["online_val_loss"]) for row in history],
+            label="Online validation",
+            linestyle="--",
+        )
     axes[0].set_title("Loss")
     axes[0].set_xlabel("Epoch")
     axes[0].legend()
 
     axes[1].plot(epochs, [float(row["train_f1_macro"]) for row in history], label="Train Macro F1")
-    axes[1].plot(epochs, [float(row["val_f1_macro"]) for row in history], label="Validation Macro F1")
+    f1_label = "EMA Validation Macro F1" if "online_val_f1_macro" in history[0] else "Validation Macro F1"
+    axes[1].plot(epochs, [float(row["val_f1_macro"]) for row in history], label=f1_label)
+    if "online_val_f1_macro" in history[0]:
+        axes[1].plot(
+            epochs,
+            [float(row["online_val_f1_macro"]) for row in history],
+            label="Online Validation Macro F1",
+            linestyle="--",
+        )
     axes[1].plot(epochs, [float(row["val_accuracy"]) for row in history], label="Validation Accuracy")
     axes[1].set_title("Classification metrics")
     axes[1].set_xlabel("Epoch")

@@ -27,8 +27,10 @@ REQUIRED_FILES = [
     "docs/professor_update_template.md",
     "docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md",
     "configs/cnn_aug_final.yaml",
+    "configs/cnn_aug_ema.yaml",
     "references/literature_notes.md",
     "src/README.md",
+    "src/utils/ema.py",
 ]
 
 PLACEHOLDER_MARKERS = [
@@ -39,16 +41,16 @@ PLACEHOLDER_MARKERS = [
 ]
 
 NEXT_ACTIONS = [
-    "使用鎖定的 configs/cnn_aug_final.yaml 執行正式 10-fold cross-validation。",
-    "整理 Macro F1、Accuracy、precision、recall 的 mean/std 與每類表現。",
-    "不得再依 fold 10 test 或 10-fold 結果調整 CNN 超參數。",
-    "將受控搜尋方法、停止條件與單一 fold 限制寫入論文。",
+    "使用 configs/cnn_aug_ema.yaml 執行一次 validation-only EMA 比較。",
+    "比較同次 run 的最佳 online 與 EMA validation Macro F1，不得再次執行 fold 10 test。",
+    "鎖定勝出權重策略後執行正式 10-fold cross-validation。",
+    "時間允許時再執行已記錄的 3-seed probability ensemble。",
 ]
 
 STATUS_SUMMARY = (
     "setup files present; UrbanSound8K downloaded and preprocessed; "
-    "CNN controlled augmentation search completed; final CNN config locked; "
-    "10-fold cross-validation pending"
+    "CNN controlled augmentation search completed; EMA support implemented; "
+    "EMA validation comparison and 10-fold cross-validation pending"
 )
 
 

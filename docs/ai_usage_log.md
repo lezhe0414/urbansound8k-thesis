@@ -21,6 +21,7 @@
 | 2026-08-13 | 設計並實作 CNN Mel-spectrogram data augmentation ablation，包括逐樣本增強、Mixup/CutMix、validation-only model selection、測試與 Colab 執行流程 | `src/data/augmentation.py`、`src/train.py`、`configs/cnn_aug_*.yaml`、`scripts/run_cnn_augmentation_ablation.py`、`tests/test_augmentation.py` | 待使用者於 Colab 執行四組正式 fold 10 實驗並確認結果 | 避免以 test fold 調參；正式數據尚未產生 |
 | 2026-08-13 | 將 CNN augmentation ablation 擴充為受控、自動復原的 validation-only 搜尋流程，加入唯一 run name、逐輪紀錄、一次重試、早停、training history 圖及 Google Drive 即時備份 | `scripts/run_cnn_controlled_search.py`、`src/train.py`、`src/utils/plotting.py`、`tests/test_controlled_search.py`、相關流程文件 | 待 Colab 正式實驗完成後由使用者確認結果 | Test 僅在唯一最佳設定鎖定後評估一次 |
 | 2026-08-13 | 操作 Colab 完成 CNN 受控資料增強搜尋，依 validation Macro F1 比較四組初始設定與九輪單一變因迭代，鎖定唯一設定後執行一次 fold 10 test，並核對 Google Drive 備份 | `docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md`；Drive 搜尋 artifacts | 使用者需確認是否以鎖定設定執行正式 10-fold | 沒有重新 preprocessing；沒有用 test 結果調參 |
+| 2026-08-13 | 實作 CNN EMA 權重追蹤、online/EMA validation 同次比較、checkpoint metadata 與測試，並記錄延後的 3-seed ensemble | `src/utils/ema.py`、`src/train.py`、`configs/cnn_aug_ema.yaml`、`tests/test_ema.py`、狀態與決策文件 | 待使用者在 Colab 執行 validation-only EMA 實驗 | 不改動既有 final config；不再次執行 fold 10 test |
 
 ## 可記錄的協助類型
 

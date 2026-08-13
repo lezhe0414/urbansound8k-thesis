@@ -197,3 +197,38 @@ CNN fold 10 evaluation 已達約 0.81--0.83 accuracy 與 0.82--0.84 Macro F1，�
 - [x] 將唯一最佳 resolved config 保存為可重複執行的 final config。
 - [ ] 以固定 final config 執行 10-fold cross-validation。
 - [ ] 整理 Macro F1、Accuracy mean/std 與 aggregate confusion matrix。
+
+---
+
+## DEC-005：在 10-fold 前進行一次 validation-only EMA 比較
+
+- 日期：2026-08-13
+- 狀態：進行中
+- 相關文件：`src/utils/ema.py`、`configs/cnn_aug_ema.yaml`
+- 相關會議：無；使用者後續實驗決策
+
+#### 背景
+
+受控 augmentation 搜尋已降低模型在增強訓練指標與 validation 指標之間的差距。使用者希望在算力有限的前提下繼續提高 Macro F1，並優先嘗試比 3-seed ensemble 成本低的 EMA 權重。
+
+#### 決策
+
+保留 `configs/cnn_aug_final.yaml` 不變，新增 validation-only EMA 候選設定。一次訓練同時保留 online 權重及其 EMA 副本，每個 epoch 同時評估兩者；`val_f1_macro` 代表 EMA 並保存至 `best_model.pt`，最佳 online Macro F1 另存至 `best_online_model.pt`。EMA 候選禁止執行 fold 10 test。
+
+#### 理由
+
+EMA 平滑 stochastic augmentation、Mixup 與 mini-batch 更新造成的短期參數波動，只增加一套權重與一次 validation forward pass，不需要三次完整訓練。同次訓練比較可避免把不同 seed 的自然波動誤認為 EMA 效果。候選 decay 固定為 `0.995`；以每 epoch 約 220 個 updates 計算，其有效平滑範圍約涵蓋最近 200 次更新，較適合目前只有 10 epochs 的短訓練，避免把過早期、尚未收斂的權重保留太久。
+
+#### 影響
+
+- 對論文：若 EMA 有效，需清楚報告 decay、選模指標及額外 validation 成本。
+- 對程式：checkpoint 保持 `model_state` 相容，並標記 `checkpoint_source`；EMA run 額外保存 online 權重及指標。
+- 對評估：不得再次使用已看過的 fold 10 test；EMA 決策只依 validation Macro F1。
+- 對時程：3-seed ensemble 延後，避免目前增加三倍訓練與推論成本。
+
+#### 後續行動
+
+- [ ] 在 Colab 執行 `configs/cnn_aug_ema.yaml` validation-only run。
+- [ ] 比較同次 run 的 online 與 EMA validation Macro F1。
+- [ ] 鎖定勝出權重策略後執行正式 10-fold。
+- [ ] 時間允許時，以固定三個 seed 平均預測機率，不挑選單一最佳 seed。

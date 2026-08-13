@@ -12,11 +12,12 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 
 ## 立即執行方向
 
-1. 鎖定 `configs/cnn_aug_final.yaml`，不得再依 fold 10 test 調參。
-2. 在 Colab 執行正式 10-fold cross-validation，輸出 mean/std 與 per-class 指標。
-3. CNN 作為主要模型；從零訓練 Transformer 作為架構比較；pretrained AST 作為 transfer-learning 延伸。
-4. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
-5. 將受控搜尋方法、停止條件與單一 fold 限制如實寫入論文。
+1. 先以 `configs/cnn_aug_ema.yaml` 執行一次 validation-only EMA 比較；同一次訓練同時記錄 online 與 EMA validation Macro F1。
+2. 不得再次查看 fold 10 test；只有 EMA validation Macro F1 高於同次訓練的 online 權重才保留 EMA。
+3. EMA 決策完成後鎖定唯一設定，在 Colab 執行正式 10-fold cross-validation並輸出 mean/std 與 per-class 指標。
+4. CNN 作為主要模型；從零訓練 Transformer 作為架構比較；pretrained AST 作為 transfer-learning 延伸。
+5. 3-seed probability ensemble 已記錄為時間允許時的延伸，不列入目前必要流程。
+6. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
 
 ## 最高風險
 
@@ -35,10 +36,11 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 
 下一步 AI Agent 應依序執行：
 
-1. 跑固定 `configs/cnn_aug_final.yaml` 的 10-fold cross-validation。
-2. 整理 mean/std、每類 F1 與 aggregate confusion matrix。
-3. 更新論文 Results、Discussion 與 limitations，避免把單一 fold 改善描述成確定結論。
-4. 完成 pretrained AST 的快速可行性測試，再決定是否納入最終比較表。
+1. 跑 `configs/cnn_aug_ema.yaml` 的 validation-only 比較，不執行 test。
+2. 依同次 run 的 validation Macro F1 決定使用 online 或 EMA checkpoint。
+3. 跑固定勝出設定的 10-fold cross-validation。
+4. 整理 mean/std、每類 F1 與 aggregate confusion matrix。
+5. 更新論文 Results、Discussion 與 limitations，避免把單一 fold 改善描述成確定結論。
 
 文獻與寫作同步更新：
 
