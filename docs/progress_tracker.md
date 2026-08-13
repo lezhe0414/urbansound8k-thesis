@@ -1,14 +1,14 @@
 # MVP 進度追蹤
 
-更新日期：2026-07-08
+更新日期：2026-08-13
 
 這份文件用來集中追蹤 UrbanSound8K 聲音分類 MVP 的已完成、未完成與下一步。之後每次程式、資料、實驗、圖表或論文草稿有重要更新時，都要同步更新本文件。
 
 ## 目前結論
 
-MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。Spectrogram Transformer fold 10 已完成正式 10 epochs 訓練。
+MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。
 
-整個論文專案尚未完成，因為 CNN baseline 正式長訓練、結果解讀、文獻整理與 8 頁論文 PDF 仍待補。
+整個論文專案尚未完成，因為固定 CNN 設定的正式 10-fold cross-validation、結果解讀與最終 8 頁論文仍待完成。
 
 ## 實作流程圖
 
@@ -125,6 +125,20 @@ CNN baseline 將 Mel-spectrogram 當成單通道影像。輸入 shape 同樣是 
 | Git commit | 完成 | `acda41d`、`7325b43` | 程式與狀態文件已提交 |
 
 ## 已取得結果
+
+### CNN 受控資料增強搜尋
+
+完整紀錄：`docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md`
+
+| 指標 | 數值 |
+| --- | ---: |
+| 最佳 validation Macro F1 | 0.7924 |
+| 對應 validation Accuracy | 0.7709 |
+| Fold 10 test Accuracy | 0.8471 |
+| Fold 10 test Macro F1 | 0.8536 |
+| 相較歷史 test Macro F1 0.8413 | +0.0123 |
+
+所有設定選擇只使用 validation Macro F1。Fold 10 test 在唯一設定鎖定後僅執行一次，不能再用於調參。下一步是用固定設定執行 10-fold cross-validation。
 
 ### Transformer fold 10 正式結果
 

@@ -52,9 +52,10 @@
 | Evaluation pipeline | `src/evaluate.py` | 重跑評估與圖表 | 已確認 | smoke run evaluation | 產生 evaluation metrics |
 | Smoke run configs | `configs/cnn_smoke.yaml`、`configs/transformer_smoke.yaml` | 本機快速驗證 | 已確認 | smoke run | 使用真實資料子集 |
 | Spectrogram augmentation module | `src/data/augmentation.py` | CNN 訓練階段即時資料增強 | 已確認 | unit tests + smoke run | 支援 shift、stretch、gain、noise、SpecAugment、Mixup、CutMix |
-| CNN augmentation ablation configs | `configs/cnn_aug_control.yaml`、`configs/cnn_aug_light.yaml`、`configs/cnn_aug_balanced.yaml`、`configs/cnn_aug_strong.yaml` | 比較增強強度 | 待正式執行 | validation-only selection | 不需重新 preprocessing |
+| CNN augmentation ablation configs | `configs/cnn_aug_control.yaml`、`configs/cnn_aug_light.yaml`、`configs/cnn_aug_balanced.yaml`、`configs/cnn_aug_strong.yaml` | 比較增強強度 | 已確認 | validation-only selection | Strong profile 勝出；不需重新 preprocessing |
 | CNN augmentation runner | `scripts/run_cnn_augmentation_ablation.py` | 依序訓練並用 validation Macro F1 排名 | 已確認 | CLI + smoke pipeline | 預設不執行 test |
 | CNN controlled search runner | `scripts/run_cnn_controlled_search.py` | 初始四組比較、單一變因迭代、失敗重試、進度紀錄與 Drive 備份 | 已確認 | unit tests + plan-only | 唯一設定鎖定後才允許一次 test |
+| CNN final augmentation config | `configs/cnn_aug_final.yaml` | 以鎖定設定執行正式 10-fold cross-validation | 已確認 | 與勝出 resolved config 核對 | 不得再依 test 或 fold 結果調參 |
 
 ## 資料
 
@@ -73,7 +74,8 @@
 | Transformer smoke result | `results/transformer_baseline_smoke_fold10/` | Transformer pipeline 驗證 | 已確認 | `src.train` | 子集 smoke run，非正式分數 |
 | Transformer fold 10 result | `results/transformer_baseline_fold10/` | 正式主模型結果 | 已確認 | `src.train`、`src.evaluate` | test accuracy 0.6547，macro F1 0.6644 |
 | CNN augmentation smoke result | `results/cnn_aug_smoke_fold10/` | 驗證完整 augmentation training pipeline | 已確認 | `src.train` | 256/128/128 子集、1 epoch，非正式分數且不提交 |
-| CNN augmentation fold 10 ablation | `results/cnn_augmentation_ablation_fold10.csv` | 選擇 augmentation profile | 待執行 | validation Macro F1 | 僅勝出設定可做 test evaluation |
+| CNN augmentation fold 10 ablation | Google Drive controlled-search backup | 選擇 augmentation profile | 已確認 | validation Macro F1 | 已由 controlled search 的 initial phase 完成 |
+| CNN controlled augmentation search | `docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md` | 記錄四組初始比較、九輪單一變因迭代與唯一一次 test | 已確認 | Colab results + Drive backup | 最佳 validation Macro F1 0.7924；fold 10 test Macro F1 0.8536 |
 | 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用

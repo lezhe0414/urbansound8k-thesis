@@ -1,6 +1,6 @@
 # 專案目前狀態
 
-更新日期：2026-06-29
+更新日期：2026-08-13
 
 ## 專案目的
 
@@ -24,16 +24,16 @@
 
 ## 目前判斷
 
-目前不是完成狀態。專案管理骨架已完成，論文方向已確認，UrbanSound8K 已下載並驗證，Mel-spectrogram preprocessing 已完成，CNN baseline 與 Spectrogram Transformer 的 smoke run 已可輸出 metrics、checkpoint 與 confusion matrix；Spectrogram Transformer 已完成 fold 10 正式訓練與評估。
+目前不是完成狀態。UrbanSound8K 的端到端 pipeline、CNN、從零訓練 Spectrogram Transformer、即時 spectrogram augmentation 與受控搜尋流程均已完成。CNN 受控搜尋只依 validation Macro F1 選模，鎖定唯一設定後才執行一次 fold 10 test。
 
-因為進度已落後原 timeplan，目前策略是先保住可展示、可重複執行的端到端 pipeline，再視本機速度或 Colab/GPU 資源補正式長訓練結果：
+目前最重要的實驗進度如下：
 
 1. 已下載 UrbanSound8K 到 `data/raw/UrbanSound8K_soundata/`，共 8732 個音訊檔，並已通過 `soundata.validate()`。
 2. 已執行 Mel-spectrogram preprocessing，輸出到 `data/processed/urbansound8k_mels/`。
-3. 已跑 CNN baseline smoke run：`results/cnn_baseline_smoke_fold10/`，圖表在 `figures/cnn_baseline_smoke_fold10_confusion_matrix.png`。
-4. 已跑 Spectrogram Transformer smoke run：`results/transformer_baseline_smoke_fold10/`，圖表在 `figures/transformer_baseline_smoke_fold10_confusion_matrix.png`。
-5. Spectrogram Transformer fold 10 正式結果：test accuracy `0.6547`、macro precision `0.6879`、macro recall `0.6711`、macro F1 `0.6644`。
-6. 下一步是補 CNN baseline 正式長訓練，建議改用 Colab/GPU 或較快環境。
+3. CNN 受控 augmentation 搜尋完成：最佳 validation Macro F1 `0.7924`、validation Accuracy `0.7709`。
+4. 唯一最佳設定的單次 fold 10 test：Accuracy `0.8471`、Macro F1 `0.8536`。
+5. 歷史 CNN fold 10 Macro F1 約 `0.8413`；本次差異約 `+0.0123`，尚需 10-fold 統計驗證。
+6. 從零訓練 Spectrogram Transformer 表現低於 CNN，因此保留為比較模型，不再用 fold 10 反覆調參。
 
 ## 已建立內容
 
@@ -114,13 +114,13 @@
 
 ## 下一步
 
-最有效的下一步是把目前 smoke 結果整理成討論材料，並決定正式訓練資源：
+最有效的下一步是用已鎖定設定完成最終統計驗證：
 
-1. 檢查 `results/transformer_baseline_fold10/metrics.json` 與 `figures/transformer_baseline_fold10_confusion_matrix.png`。
-2. 在 Colab/GPU 或較快環境補跑正式 `configs/cnn_baseline.yaml`。
-3. 將模型選型、資料處理流程、Transformer 初步結果和「CNN baseline + Transformer comparison」策略帶去和教授討論。
-4. 開始撰寫方法章與初步結果段落。
+1. 在 Colab 用 `configs/cnn_aug_final.yaml` 執行固定設定的 10-fold cross-validation。
+2. 報告 Macro F1、Accuracy、precision、recall 的 mean 與 standard deviation，並整理每類表現。
+3. 不再依 fold 10 test 或任何 10-fold 結果改動超參數。
+4. 將 CNN、從零訓練 Transformer 與 pretrained AST 的角色及限制寫入結果與討論。
 
 ## 目前完成度判斷
 
-專案基礎設施、MVP 程式碼、資料下載、資料處理、smoke 實驗與 Transformer fold 10 正式結果已完成；整體目標尚未完成，因為 CNN baseline 正式結果、文獻整理、圖表解讀與 8 頁論文仍需完成。
+專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋與單次 fold 10 test 已完成；整體目標尚未完成，因為固定設定的 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。

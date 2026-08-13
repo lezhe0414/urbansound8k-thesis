@@ -163,3 +163,37 @@ CNN fold 10 evaluation 已達約 0.81--0.83 accuracy 與 0.82--0.84 Macro F1，�
 #### 受控迭代補充
 
 正式執行採用最多十輪的 greedy controlled search。每輪從目前 validation Macro F1 最佳設定複製，只調整一類變因；改善才保留，否則退回。連續五輪未改善即停止。每組 run 使用唯一名稱並立即記錄及備份，fold 10 test 在唯一設定鎖定前保持不可見，Accuracy 僅作輔助說明。
+
+---
+
+## DEC-004：鎖定 CNN Mixup 設定並轉入 10-fold 最終驗證
+
+- 日期：2026-08-13
+- 狀態：已決定
+- 相關文件：`docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md`
+- 相關會議：2026-08-07 supervisor meeting
+
+#### 背景
+
+受控搜尋完成四組初始比較與九輪單一變因迭代。Strong profile 為初始勝出設定；將其 frequency mask 調整為 9 並將 Mixup probability 調整為 0.45 後，validation Macro F1 由 0.7800 提升至 0.7924。後續五輪均未改善。
+
+#### 決策
+
+鎖定 `cnn_aug_cnn_aug_20260813_1903_iter04_mixup_probability` 為 CNN 最終候選設定，不再根據 fold 10 test 或後續 fold 結果調參。下一階段僅用固定設定執行正式 10-fold cross-validation。
+
+#### 理由
+
+選模完全依 validation Macro F1，符合預先定義的停止條件，且唯一一次 fold 10 test Macro F1 為 0.8536，較歷史結果 0.8413 高約 0.0123。單一 fold 尚不足以證明可泛化提升，因此需要 10-fold mean 與 standard deviation。
+
+#### 影響
+
+- 對論文：可誠實報告受控搜尋方法、有效與無效變因，以及單一 fold 的限制。
+- 對程式：保留現有 runner 與設定，不再增加 fold 10 調參輪次。
+- 對資料：原始音訊與 `.npz` cache 均未修改。
+- 對時程：下一個主要算力工作為固定設定的 10-fold cross-validation。
+
+#### 後續行動
+
+- [x] 將唯一最佳 resolved config 保存為可重複執行的 final config。
+- [ ] 以固定 final config 執行 10-fold cross-validation。
+- [ ] 整理 Macro F1、Accuracy mean/std 與 aggregate confusion matrix。

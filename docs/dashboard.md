@@ -1,6 +1,6 @@
 # 專案儀表板
 
-更新日期：2026-06-29
+更新日期：2026-08-13
 
 ## 目前階段
 
@@ -8,15 +8,15 @@
 
 Project definition 已確認方向為「Sound Event Detection Using Machine Learning Techniques」。核心技術路線是將音訊轉成 Mel-spectrogram 等頻譜圖，再以 CNN 進行聲音事件分類。可用公開資料集包含 UrbanSound8K 或 ESC-50，工具以 Python、PyTorch、Librosa、NumPy、Matplotlib 為主。
 
-目前進度仍落後於原時程，但端到端 pipeline 已能運作：UrbanSound8K 已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 的 smoke run 已輸出 metrics 與 confusion matrix；Spectrogram Transformer fold 10 已完成正式訓練，test accuracy 約 `0.655`、macro F1 約 `0.664`。下一步應優先補 CNN baseline 正式結果，必要時改用 Colab/GPU，而不是再擴大模型範圍。
+端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。相較歷史 Macro F1 `0.8413` 約提高 `0.0123`，但仍需固定設定的 10-fold mean/std 才能判斷泛化是否穩定。
 
 ## 立即執行方向
 
-1. 保留 CNN baseline，不把 CNN 從論文中拿掉。
-2. 使用 Spectrogram Transformer 作為現代比較模型，和 CNN baseline 形成清楚對照。
-3. 用 `configs/*_smoke.yaml` 展示 pipeline 已跑通；已完成 `configs/transformer_baseline.yaml` 正式結果，接著補 `configs/cnn_baseline.yaml`。
-4. 將每次實驗結果保存到 `results/`，圖表保存到 `figures/`。
-5. 需要向教授確認：是否接受將 Transformer 作為 CNN baseline 之外的比較模型。
+1. 鎖定 `configs/cnn_aug_final.yaml`，不得再依 fold 10 test 調參。
+2. 在 Colab 執行正式 10-fold cross-validation，輸出 mean/std 與 per-class 指標。
+3. CNN 作為主要模型；從零訓練 Transformer 作為架構比較；pretrained AST 作為 transfer-learning 延伸。
+4. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
+5. 將受控搜尋方法、停止條件與單一 fold 限制如實寫入論文。
 
 ## 最高風險
 
@@ -35,11 +35,10 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 
 下一步 AI Agent 應依序執行：
 
-1. 跑正式 CNN baseline 訓練，必要時改用 Colab/GPU。
-2. 整理 Transformer metrics 與 confusion matrix，準備教授討論。
-3. 若 CNN 來不及正式長訓練，明確標示 CNN 目前是 baseline architecture/smoke result，Transformer 是已完成正式 fold 10 結果。
-4. 撰寫方法章草稿，說明 audio-to-spectrogram 與模型比較。
-5. 準備週五教授討論重點。
+1. 跑固定 `configs/cnn_aug_final.yaml` 的 10-fold cross-validation。
+2. 整理 mean/std、每類 F1 與 aggregate confusion matrix。
+3. 更新論文 Results、Discussion 與 limitations，避免把單一 fold 改善描述成確定結論。
+4. 完成 pretrained AST 的快速可行性測試，再決定是否納入最終比較表。
 
 文獻與寫作同步更新：
 
