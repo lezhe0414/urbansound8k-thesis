@@ -28,6 +28,7 @@ REQUIRED_FILES = [
     "docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md",
     "configs/cnn_aug_final.yaml",
     "configs/cnn_aug_ema.yaml",
+    "src/ensemble.py",
     "references/literature_notes.md",
     "src/README.md",
     "src/utils/ema.py",
@@ -41,16 +42,15 @@ PLACEHOLDER_MARKERS = [
 ]
 
 NEXT_ACTIONS = [
-    "使用 configs/cnn_aug_ema.yaml 執行一次 validation-only EMA 比較。",
-    "比較同次 run 的最佳 online 與 EMA validation Macro F1，不得再次執行 fold 10 test。",
-    "鎖定勝出權重策略後執行正式 10-fold cross-validation。",
-    "時間允許時再執行已記錄的 3-seed probability ensemble。",
+    "使用 src.ensemble 執行 seeds 42、123、2026 的 validation-only probability ensemble。",
+    "確認固定 ensemble protocol 後，才加入 --run-test 執行唯一一次 fold 10 test。",
+    "完成 seed ensemble 後執行正式 10-fold cross-validation。",
 ]
 
 STATUS_SUMMARY = (
     "setup files present; UrbanSound8K downloaded and preprocessed; "
-    "CNN controlled augmentation search completed; EMA support implemented; "
-    "EMA validation comparison and 10-fold cross-validation pending"
+    "CNN controlled augmentation search completed; EMA validation comparison completed; "
+    "3-seed probability ensemble implemented; ensemble run and 10-fold cross-validation pending"
 )
 
 

@@ -39,8 +39,8 @@
 
 - [ ] 決定第一個可驗證的實驗目標。
 - [ ] 決定評估指標或比較基準。
-- [ ] 執行 `configs/cnn_aug_ema.yaml` validation-only 實驗，比較同次訓練的 online 與 EMA Macro F1。
-- [ ] 時間允許時執行固定設定的 3-seed ensemble；使用三個 seed 的預測機率平均，不挑選單一最佳 seed。
+- [x] 執行 `configs/cnn_aug_ema.yaml` validation-only 實驗；EMA Macro F1 僅提高約 0.00089，因此正式流程不採用 EMA。
+- [ ] 執行固定設定的 3-seed ensemble；使用 seeds 42、123、2026 的預測機率平均，不挑選單一最佳 seed。
 
 ## 教授回饋
 

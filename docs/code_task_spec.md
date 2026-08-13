@@ -145,3 +145,26 @@ python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
 - `tests/test_augmentation.py` 驗證形狀、有限值、零填充位移、Mixup/CutMix、舊設定相容性與參數錯誤處理。
 - `tests/test_controlled_search.py` 驗證初始四組控制條件一致、選模只依 validation Macro F1，以及所有預定迭代可產生有效變更。
 - `configs/cnn_aug_smoke.yaml` 已用真實 processed data 完成 1 epoch end-to-end smoke run。
+
+---
+
+## 程式任務規格：CNN 3-seed Probability Ensemble
+
+- 狀態：程式完成，待 Colab 正式實驗
+- 更新日期：2026-08-13
+- 基礎設定：`configs/cnn_aug_final.yaml`
+- Seeds：42、123、2026
+- EMA：明確關閉
+- 個別模型選擇：各 seed 只依 validation Macro F1 保存最佳 checkpoint。
+- Ensemble：平均三個模型的 softmax probability，不選擇單一最佳 seed。
+- Test 規範：個別 seed 禁止 test evaluation；`--run-test` 只允許對已鎖定的 ensemble 執行一次，若 metrics 已存在則拒絕重跑。
+- 輸出：每個 seed 的 validation run、seed summary、ensemble validation/test metrics、預測機率與 confusion matrix。
+
+執行方式：
+
+```text
+python3 -m src.ensemble --config configs/cnn_aug_final.yaml --fold 10 --seeds 42 123 2026
+python3 -m src.ensemble --config configs/cnn_aug_final.yaml --fold 10 --seeds 42 123 2026 --skip-existing --run-test
+```
+
+驗證證據：`tests/test_seed_ensemble.py` 檢查 EMA 與個別 test 強制關閉、三個 seed 必須互異，以及 probability arithmetic mean 的正確性。
