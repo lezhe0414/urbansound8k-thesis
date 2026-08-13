@@ -96,6 +96,21 @@ class SpectrogramAugmentationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             SpectrogramAugmenter({"noise": {"probability": 1.5, "std": 0.1}})
 
+    def test_probability_scale_can_disable_stochastic_regularization(self) -> None:
+        augmenter = SpectrogramAugmenter({"noise": {"probability": 1.0, "std": 1.0}})
+        augmenter.set_probability_scale(0.0)
+        self.assertTrue(torch.equal(augmenter(self.inputs), self.inputs))
+
+        mixer = SpectrogramBatchMixer(
+            {"enabled": True, "mode": "mixup", "probability": 1.0, "mixup_alpha": 0.4}
+        )
+        mixer.set_probability_scale(0.0)
+        self.assertEqual(mixer(self.inputs, self.targets).method, "none")
+
+    def test_invalid_probability_scale_is_rejected(self) -> None:
+        with self.assertRaises(ValueError):
+            SpectrogramAugmenter().set_probability_scale(-0.1)
+
 
 if __name__ == "__main__":
     unittest.main()

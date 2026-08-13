@@ -32,7 +32,13 @@ def evaluate_run(run_dir: Path, checkpoint_name: str = "best_model.pt") -> dict[
     class_names = _class_names(processed_dir)
     device = _device(str(config["training"].get("device", "auto")))
 
-    test_set = UrbanSound8KMelDataset(processed_dir, split="test", test_fold=fold, val_fold=val_fold)
+    test_set = UrbanSound8KMelDataset(
+        processed_dir,
+        split="test",
+        test_fold=fold,
+        val_fold=val_fold,
+        feature_representation=str(config["data"].get("feature_representation", "mel")),
+    )
     test_loader = DataLoader(
         test_set,
         batch_size=int(config["training"].get("batch_size", 32)),

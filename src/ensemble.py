@@ -151,6 +151,7 @@ def _evaluate_ensemble_split(
         val_fold=val_fold,
         max_samples=max_samples,
         preload=bool(data_config.get("preload", False)),
+        feature_representation=str(data_config.get("feature_representation", "mel")),
     )
     loader = DataLoader(
         dataset,

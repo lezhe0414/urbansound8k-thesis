@@ -59,6 +59,10 @@
 | EMA model-weight utility | `src/utils/ema.py` | 維護訓練權重的指數移動平均副本 | 已確認 | `tests/test_ema.py` | 第一次更新直接同步；分別保存最佳 online 與 EMA checkpoint |
 | CNN EMA candidate config | `configs/cnn_aug_ema.yaml` | 在相同訓練中比較 online 與 EMA validation Macro F1 | 已確認 | validation-only run | EMA 僅比 online 高約 0.00089，正式設定不採用 |
 | CNN 3-seed ensemble runner | `src/ensemble.py` | 訓練三個固定 seeds 並平均 softmax probabilities | 已確認 | 22 unit tests + Colab run | EMA 與個別 seed test 強制關閉；支援鎖定後一次 ensemble test |
+| CNN dynamic feature channels | `src/data/urbansound8k.py` | 動態組合 Mel、delta、delta-delta 三通道 | 待 GPU 驗證 | unit tests + breakthrough candidate | 不修改既有 `.npz` cache，不需重新 preprocessing |
+| CNN augmentation cooldown | `src/utils/schedules.py`、`src/train.py` | 後期逐步降低 augmentation/Mixup 機率 | 待 GPU 驗證 | unit tests + history regularization scale | 只作用於訓練 batch |
+| SE attention CNN | `src/models/cnn.py` | 高容量 channel-attention CNN 候選 | 待 GPU 驗證 | model shape test | 獨立突破分支，不取代目前最佳設定 |
+| CNN breakthrough runner | `scripts/run_cnn_breakthrough_search.py` | 比較五候選於 folds 1、4、7 的平均 validation Macro F1 | 待 GPU 執行 | validation-only protocol tests | fold 10 鎖定；逐 run 寫入 progress 與 Drive backup |
 
 ## 資料
 
@@ -81,6 +85,7 @@
 | CNN controlled augmentation search | `docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md` | 記錄四組初始比較、九輪單一變因迭代與唯一一次 test | 已確認 | Colab results + Drive backup | 最佳 validation Macro F1 0.7924；fold 10 test Macro F1 0.8536 |
 | CNN EMA validation comparison | Google Drive EMA backup | 比較同次訓練的 online 與 EMA 權重 | 已確認 | `validation_metrics.json` | EMA F1 0.76515、online F1 0.76426；不採用 EMA |
 | CNN 3-seed ensemble | `docs/experiments/2026-08-13-cnn-seed-ensemble.md` | 評估固定 seeds 42、123、2026 的 probability ensemble | 已確認 | Colab results + Drive backup | validation F1 0.7699；test F1 0.8501；未超越鎖定單一 CNN，故不採用 |
+| CNN breakthrough protocol | `docs/experiments/2026-08-13-cnn-breakthrough-protocol.md` | 記錄 0.90 攻擊目標、多 fold validation 與五個候選 | 已確認 | 文件與 protocol tests | GPU 結果待補；未改善不合併回 main |
 | 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用

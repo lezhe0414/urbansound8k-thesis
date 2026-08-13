@@ -7,7 +7,7 @@ from src.data.augmentation import (
     augmentation_config_from_training,
     batch_mix_config_from_training,
 )
-from src.data.urbansound8k import UrbanSound8KMelDataset
+from src.data.urbansound8k import UrbanSound8KMelDataset, build_feature_channels, temporal_delta
 
 __all__ = [
     "MixedBatch",
@@ -16,4 +16,6 @@ __all__ = [
     "UrbanSound8KMelDataset",
     "augmentation_config_from_training",
     "batch_mix_config_from_training",
+    "build_feature_channels",
+    "temporal_delta",
 ]

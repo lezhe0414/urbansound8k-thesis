@@ -45,6 +45,7 @@ class SpectrogramAugmenter:
     def __init__(self, config: dict | None = None) -> None:
         self.config = dict(config or {})
         self.enabled = bool(self.config.get("enabled", True))
+        self.probability_scale = 1.0
         self._validate()
 
     def _validate(self) -> None:
@@ -67,9 +68,13 @@ class SpectrogramAugmenter:
         if noise_std < 0.0:
             raise ValueError("noise std must be non-negative.")
 
-    @staticmethod
-    def _applies(config: dict, device: torch.device) -> bool:
-        probability = _probability(config)
+    def set_probability_scale(self, value: float) -> None:
+        if not 0.0 <= value <= 1.0:
+            raise ValueError(f"Probability scale must be in [0, 1], got {value}.")
+        self.probability_scale = float(value)
+
+    def _applies(self, config: dict, device: torch.device) -> bool:
+        probability = _probability(config) * self.probability_scale
         return probability > 0.0 and bool(torch.rand((), device=device) < probability)
 
     @staticmethod
@@ -215,6 +220,7 @@ class SpectrogramBatchMixer:
         self.config = dict(config or {})
         self.enabled = bool(self.config.get("enabled", False))
         self.probability = _probability(self.config, default=1.0)
+        self.probability_scale = 1.0
         self.mode = str(self.config.get("mode", "mixup")).lower()
         if self.mode not in {"mixup", "cutmix", "random"}:
             raise ValueError("batch_mix mode must be mixup, cutmix, or random.")
@@ -226,6 +232,11 @@ class SpectrogramBatchMixer:
         )
         if self.mixup_alpha <= 0.0 or self.cutmix_alpha <= 0.0:
             raise ValueError("Mixup and CutMix alpha values must be positive.")
+
+    def set_probability_scale(self, value: float) -> None:
+        if not 0.0 <= value <= 1.0:
+            raise ValueError(f"Probability scale must be in [0, 1], got {value}.")
+        self.probability_scale = float(value)
 
     @staticmethod
     def _beta(alpha: float, size: int, device: torch.device) -> torch.Tensor:
@@ -271,9 +282,10 @@ class SpectrogramBatchMixer:
             lambdas=torch.ones(inputs.shape[0], device=inputs.device),
             method="none",
         )
-        if not self.enabled or inputs.shape[0] < 2 or self.probability <= 0.0:
+        effective_probability = self.probability * self.probability_scale
+        if not self.enabled or inputs.shape[0] < 2 or effective_probability <= 0.0:
             return no_mix
-        if bool(torch.rand((), device=inputs.device) > self.probability):
+        if bool(torch.rand((), device=inputs.device) > effective_probability):
             return no_mix
 
         method = self.mode

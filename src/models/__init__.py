@@ -1,6 +1,6 @@
 """Model factory for spectrogram classifiers."""
 
-from src.models.cnn import SpectrogramCNN, SpectrogramResNetCNN
+from src.models.cnn import SpectrogramCNN, SpectrogramResNetCNN, SpectrogramSECNN
 from src.models.pretrained_ast import PretrainedASTClassifier
 from src.models.spectrogram_transformer import SpectrogramTransformer
 
@@ -13,6 +13,8 @@ def build_model(config: dict):
         return SpectrogramCNN(**model_config)
     if name == "resnet_cnn":
         return SpectrogramResNetCNN(**model_config)
+    if name == "se_cnn":
+        return SpectrogramSECNN(**model_config)
     if name == "pretrained_ast":
         return PretrainedASTClassifier(**model_config)
     if name == "spectrogram_transformer":
@@ -25,6 +27,7 @@ __all__ = [
     "PretrainedASTClassifier",
     "SpectrogramCNN",
     "SpectrogramResNetCNN",
+    "SpectrogramSECNN",
     "SpectrogramTransformer",
     "build_model",
 ]

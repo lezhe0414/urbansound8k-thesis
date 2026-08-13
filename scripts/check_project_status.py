@@ -27,9 +27,12 @@ REQUIRED_FILES = [
     "docs/professor_update_template.md",
     "docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md",
     "docs/experiments/2026-08-13-cnn-seed-ensemble.md",
+    "docs/experiments/2026-08-13-cnn-breakthrough-protocol.md",
     "configs/cnn_aug_final.yaml",
     "configs/cnn_aug_ema.yaml",
     "src/ensemble.py",
+    "scripts/run_cnn_breakthrough_search.py",
+    "src/utils/schedules.py",
     "references/literature_notes.md",
     "src/README.md",
     "src/utils/ema.py",
@@ -43,15 +46,15 @@ PLACEHOLDER_MARKERS = [
 ]
 
 NEXT_ACTIONS = [
-    "使用 configs/cnn_aug_final.yaml、EMA 關閉的單一 CNN 執行正式 10-fold cross-validation。",
-    "整理 10-fold Macro F1、Accuracy mean/std、per-class F1 與 aggregate confusion matrix。",
-    "在論文中記錄 EMA 與 3-seed ensemble 未超越鎖定單一 CNN 的負結果。",
+    "在 codex/cnn-breakthrough-90 分支執行五候選、三 development-fold validation study。",
+    "只依平均 validation Macro F1 判斷候選；fold 10 在搜尋期間封存。",
+    "沒有跨 folds 穩定改善則不合併，回到 main 的固定 CNN 執行正式 10-fold。",
 ]
 
 STATUS_SUMMARY = (
     "setup files present; UrbanSound8K downloaded and preprocessed; "
     "CNN controlled augmentation search completed; EMA validation comparison completed; "
-    "3-seed probability ensemble completed and not selected; fixed-config 10-fold cross-validation pending"
+    "3-seed probability ensemble completed and not selected; validation-only CNN breakthrough study pending"
 )
 
 

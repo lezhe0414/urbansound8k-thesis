@@ -50,6 +50,74 @@ class SpectrogramCNN(nn.Module):
         return self.classifier(x)
 
 
+class SqueezeExcitation(nn.Module):
+    """Channel attention that recalibrates learned spectrogram feature maps."""
+
+    def __init__(self, channels: int, reduction: int = 8) -> None:
+        super().__init__()
+        hidden_channels = max(channels // reduction, 4)
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.gate = nn.Sequential(
+            nn.Conv2d(channels, hidden_channels, kernel_size=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(hidden_channels, channels, kernel_size=1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x * self.gate(self.pool(x))
+
+
+class SEConvBlock(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int, spatial_dropout: float, reduction: int) -> None:
+        super().__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.SiLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.SiLU(inplace=True),
+            SqueezeExcitation(out_channels, reduction=reduction),
+            nn.Dropout2d(spatial_dropout) if spatial_dropout > 0.0 else nn.Identity(),
+            nn.MaxPool2d(kernel_size=2),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.features(x)
+
+
+class SpectrogramSECNN(nn.Module):
+    """Compact CNN with channel attention for higher-capacity controlled experiments."""
+
+    def __init__(
+        self,
+        in_channels: int = 1,
+        num_classes: int = 10,
+        dropout: float = 0.35,
+        spatial_dropout: float = 0.05,
+        attention_reduction: int = 8,
+        base_channels: int = 32,
+    ) -> None:
+        super().__init__()
+        widths = [base_channels, base_channels * 2, base_channels * 4, base_channels * 8]
+        blocks = []
+        current_channels = in_channels
+        for width in widths:
+            blocks.append(SEConvBlock(current_channels, width, spatial_dropout, attention_reduction))
+            current_channels = width
+        self.features = nn.Sequential(*blocks)
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Dropout(dropout),
+            nn.Linear(widths[-1], num_classes),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.classifier(self.pool(self.features(x)))
+
+
 class ResidualBlock(nn.Module):
     """Small residual block for spectrogram CNN experiments."""
 

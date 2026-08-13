@@ -9,6 +9,36 @@ import pandas as pd
 
 
 SplitName = Literal["train", "val", "test"]
+FeatureRepresentation = Literal["mel", "mel_delta_delta"]
+
+
+def temporal_delta(values: np.ndarray, width: int = 2) -> np.ndarray:
+    """Compute regression deltas along time without changing the cached Mel data."""
+    if values.ndim != 2:
+        raise ValueError(f"Expected a 2D Mel-spectrogram, got shape {values.shape}.")
+    if width < 1:
+        raise ValueError("Delta width must be at least 1.")
+
+    time_steps = values.shape[-1]
+    padded = np.pad(values, ((0, 0), (width, width)), mode="edge")
+    delta = np.zeros_like(values, dtype=np.float32)
+    denominator = 2.0 * sum(offset * offset for offset in range(1, width + 1))
+    for offset in range(1, width + 1):
+        future = padded[:, width + offset : width + offset + time_steps]
+        past = padded[:, width - offset : width - offset + time_steps]
+        delta += offset * (future - past)
+    return (delta / denominator).astype(np.float32, copy=False)
+
+
+def build_feature_channels(mel: np.ndarray, representation: FeatureRepresentation) -> np.ndarray:
+    """Create model input channels from one normalized Mel-spectrogram."""
+    if representation == "mel":
+        return mel[np.newaxis, ...].astype(np.float32, copy=False)
+    if representation == "mel_delta_delta":
+        delta = temporal_delta(mel)
+        delta_delta = temporal_delta(delta)
+        return np.stack((mel, delta, delta_delta), axis=0).astype(np.float32, copy=False)
+    raise ValueError(f"Unsupported feature representation: {representation}")
 
 
 @dataclass(frozen=True)
@@ -31,6 +61,7 @@ class UrbanSound8KMelDataset:
         val_fold: int | None = None,
         max_samples: int | None = None,
         preload: bool = False,
+        feature_representation: FeatureRepresentation = "mel",
     ) -> None:
         try:
             import torch
@@ -41,6 +72,9 @@ class UrbanSound8KMelDataset:
         self.split = split
         self.test_fold = int(test_fold)
         self.val_fold = int(val_fold) if val_fold is not None else self._default_val_fold(self.test_fold)
+        if feature_representation not in {"mel", "mel_delta_delta"}:
+            raise ValueError(f"Unsupported feature representation: {feature_representation}")
+        self.feature_representation = feature_representation
         self._torch = torch
 
         metadata_path = self.processed_dir / "metadata.csv"
@@ -112,6 +146,7 @@ class UrbanSound8KMelDataset:
             class_id = item.class_id
         else:
             mel, class_id = self._cache[index]
-        x = self._torch.from_numpy(mel).unsqueeze(0)
+        channels = build_feature_channels(mel, self.feature_representation)
+        x = self._torch.from_numpy(channels)
         y = self._torch.tensor(class_id, dtype=self._torch.long)
         return x, y

@@ -198,11 +198,11 @@ Smoke run 只用少量資料與 1 epoch 檢查 pipeline 是否能完整執行。
 
 ## 下一步優先順序
 
-1. 以 `configs/cnn_aug_final.yaml`、EMA 關閉的固定單一 CNN 執行正式 10-fold cross-validation。
-2. 整理 mean/std、per-class F1 與 aggregate confusion matrix。
-3. 將單一 CNN、3-seed ensemble、從零訓練 Transformer 與 pretrained AST 的角色公平寫入 Results 與 Discussion。
-4. 不再依 fold 10 test 改動 seed、ensemble 權重或超參數。
-5. 整理 confusion matrix 與 metrics 成論文可用圖表與表格。
+1. 在獨立分支執行 CNN breakthrough validation study；fold 10 全程封存。
+2. 依 folds 1、4、7 平均 validation Macro F1 判斷是否有候選值得取代既有設定。
+3. 沒有穩定改善則回到 `main`，以 `configs/cnn_aug_final.yaml` 執行正式 10-fold cross-validation。
+4. 整理 mean/std、per-class F1 與 aggregate confusion matrix。
+5. 將單一 CNN、突破候選、3-seed ensemble、從零訓練 Transformer 與 pretrained AST 的角色公平寫入 Results 與 Discussion。
 
 ## 常用命令
 
@@ -304,6 +304,17 @@ python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
 ```
 
 此流程依序執行 control、light、balanced、strong 四組設定，排名只使用 validation Macro F1，預設不執行 test。`scripts/run_cnn_controlled_search.py` 會在初始比較後，只以勝出設定逐輪調整單一類別的變因；每輪即時寫入 CSV/Markdown 並備份。只有唯一設定鎖定後，才可明確要求一次 fold 10 test evaluation。資料增強在線上套用於 cached Mel-spectrogram，不需要重新 preprocessing。正式結果尚待 Colab 執行。
+
+CNN breakthrough validation study：
+
+```bash
+python3 scripts/run_cnn_breakthrough_search.py --plan-only
+python3 scripts/run_cnn_breakthrough_search.py \
+  --search-id 20260813_breakthrough_v1 \
+  --backup-root /content/drive/MyDrive/urbansound8k_data/experiment_artifacts
+```
+
+此研究分支比較五個較大幅度的候選，每個候選只在 development validation folds 1、4、7 上比較，主指標為平均 Macro F1。fold 10 從 training/validation 排除且不執行 test；沒有穩定改善就不合併回 `main`。
 
 ## 維護規則
 

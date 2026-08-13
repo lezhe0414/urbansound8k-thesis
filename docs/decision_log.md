@@ -267,3 +267,40 @@ Ensemble validation Macro F1 為 0.7699，低於鎖定單一 CNN 的 0.7924，�
 - [x] 完成 validation probability ensemble 比較。
 - [x] 鎖定後執行唯一一次 ensemble fold 10 test。
 - [ ] 使用固定單一 CNN 設定執行正式 10-fold cross-validation。
+
+---
+
+## DEC-007：以獨立分支執行 validation-only CNN 突破實驗
+
+- 日期：2026-08-13
+- 狀態：已決定，待 GPU 實驗
+- 分支：`codex/cnn-breakthrough-90`
+- 相關文件：`docs/experiments/2026-08-13-cnn-breakthrough-protocol.md`
+
+#### 背景
+
+使用者希望大膽測試 CNN Macro F1 是否可接近 `0.90`。既有 augmentation、EMA、seed ensemble 與一般超參數調整已接近平台期，因此只繼續微調 learning rate 或 dropout 的資訊價值有限。
+
+#### 決策
+
+保留 `main` 與 `configs/cnn_aug_final.yaml` 作為穩定基準；新的高風險候選只在獨立分支實作。候選使用 folds 1、4、7 的平均 validation Macro F1 排名，fold 10 全程封存且不作候選評估。
+
+第一階段比較 control、Mel/delta/delta-delta、augmentation cooldown、single class balancing 與 SE attention CNN。只有跨 development folds 穩定改善的候選才可晉級。
+
+#### 理由
+
+多 fold validation 可降低單一 fold 或 seed 偶然性；獨立分支可避免尚未驗證的架構污染論文主線。這也允許進行幅度較大的表示與架構改動，同時維持 test set 隔離。
+
+#### 影響
+
+- 對論文：可將此流程描述為獨立 development study，結果不論正負都應誠實報告。
+- 對程式：新增三通道動態特徵、regularization cooldown、SE CNN 與多 fold runner。
+- 對評估：fold 10 不再用於本分支的候選選擇。
+- 對版本：沒有穩定改善就不合併回 `main`。
+
+#### 後續行動
+
+- [x] 建立獨立實驗分支與候選設定。
+- [x] 建立 folds 1、4、7 validation-only runner。
+- [ ] 在 Colab GPU 執行五個候選共 15 個 runs。
+- [ ] 只依平均 validation Macro F1 決定是否進行第二階段。

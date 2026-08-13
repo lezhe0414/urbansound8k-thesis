@@ -10,7 +10,7 @@ try:
     import pandas as pd
     import torch  # noqa: F401
 
-    from src.data import UrbanSound8KMelDataset
+    from src.data import UrbanSound8KMelDataset, build_feature_channels, temporal_delta
 except Exception as exc:  # pragma: no cover - dependency availability controls skip
     IMPORT_ERROR = exc
 else:
@@ -19,6 +19,15 @@ else:
 
 @unittest.skipIf(IMPORT_ERROR is not None, f"PyTorch unavailable: {IMPORT_ERROR}")
 class ProcessedDatasetTests(unittest.TestCase):
+    def test_delta_channels_preserve_shape_and_capture_time_slope(self) -> None:
+        mel = np.tile(np.arange(12, dtype=np.float32), (4, 1))
+        delta = temporal_delta(mel, width=2)
+        channels = build_feature_channels(mel, "mel_delta_delta")
+
+        self.assertEqual(channels.shape, (3, 4, 12))
+        self.assertTrue(np.allclose(delta[:, 2:-2], 1.0))
+        self.assertTrue(np.isfinite(channels).all())
+
     def test_fold_split_and_tensor_shape(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -48,6 +57,15 @@ class ProcessedDatasetTests(unittest.TestCase):
             self.assertEqual(len(limited), 3)
             x, _ = limited[0]
             self.assertEqual(tuple(x.shape), (1, 128, 173))
+
+            delta_dataset = UrbanSound8KMelDataset(
+                root,
+                split="test",
+                test_fold=10,
+                feature_representation="mel_delta_delta",
+            )
+            x, _ = delta_dataset[0]
+            self.assertEqual(tuple(x.shape), (3, 128, 173))
 
 
 if __name__ == "__main__":

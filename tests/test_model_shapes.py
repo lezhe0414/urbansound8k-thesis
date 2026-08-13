@@ -6,7 +6,7 @@ import unittest
 try:
     import torch
 
-    from src.models.cnn import SpectrogramCNN
+    from src.models.cnn import SpectrogramCNN, SpectrogramSECNN
     from src.models.spectrogram_transformer import SpectrogramTransformer
 except Exception as exc:  # pragma: no cover - dependency availability controls skip
     torch = None
@@ -20,6 +20,11 @@ class ModelShapeTests(unittest.TestCase):
     def test_cnn_output_shape(self) -> None:
         model = SpectrogramCNN(num_classes=10)
         output = model(torch.randn(2, 1, 128, 173))
+        self.assertEqual(tuple(output.shape), (2, 10))
+
+    def test_se_cnn_output_shape_with_delta_channels(self) -> None:
+        model = SpectrogramSECNN(in_channels=3, num_classes=10)
+        output = model(torch.randn(2, 3, 128, 173))
         self.assertEqual(tuple(output.shape), (2, 10))
 
     def test_transformer_output_shape(self) -> None:

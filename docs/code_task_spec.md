@@ -170,3 +170,26 @@ python3 -m src.ensemble --config configs/cnn_aug_final.yaml --fold 10 --seeds 42
 驗證證據：`tests/test_seed_ensemble.py` 檢查 EMA 與個別 test 強制關閉、三個 seed 必須互異，以及 probability arithmetic mean 的正確性。
 
 正式結果：ensemble validation Macro F1 為 `0.7699`，低於受控搜尋鎖定單一 CNN 的 `0.7924`；唯一一次 fold 10 test Macro F1 為 `0.8501`，亦略低於單一 CNN 的 `0.8536`。完整紀錄見 `docs/experiments/2026-08-13-cnn-seed-ensemble.md`。
+
+---
+
+## 程式任務規格：CNN Breakthrough Multi-fold Development Search
+
+- 狀態：程式完成；Colab GPU 實驗待執行
+- 分支：`codex/cnn-breakthrough-90`
+- 主要指標：folds 1、4、7 的平均 validation Macro F1
+- Locked test：fold 10；搜尋期間禁止評估
+- 候選：control、Mel/delta/delta-delta、augmentation cooldown、single balancing、SE CNN
+- 可重現性：每個 run 使用唯一名稱，保存 resolved config、history、validation metrics、checkpoint 與圖表。
+- 中斷恢復：每個 fold 完成後立即寫 progress CSV/JSON 並備份至 Drive；既有結果只在 resolved config 完全一致時才可重用。
+
+執行方式：
+
+```text
+python3 scripts/run_cnn_breakthrough_search.py --plan-only
+python3 scripts/run_cnn_breakthrough_search.py \
+  --search-id 20260813_breakthrough_v1 \
+  --backup-root /content/drive/MyDrive/urbansound8k_data/experiment_artifacts
+```
+
+完成標準：15 個 validation-only runs 完成；輸出 per-fold 結果與候選排名；確認沒有產生 test `metrics.json`；只依平均 validation Macro F1 決定下一步。

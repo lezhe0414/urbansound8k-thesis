@@ -22,6 +22,7 @@ from src.utils.config import load_config
 from src.utils.ema import ExponentialMovingAverage
 from src.utils.metrics import classification_metrics, confusion_matrix_array, write_history_csv
 from src.utils.plotting import save_confusion_matrix, save_training_history
+from src.utils.schedules import regularization_scale
 from src.utils.seed import set_seed
 
 
@@ -151,6 +152,7 @@ def train_one_fold(config: dict, fold: int) -> Path:
     max_train_samples = data_config.get("max_train_samples")
     max_val_samples = data_config.get("max_val_samples")
     max_test_samples = data_config.get("max_test_samples")
+    feature_representation = str(data_config.get("feature_representation", "mel"))
     run_test = bool(config.get("evaluation", {}).get("run_test", True))
 
     train_set = UrbanSound8KMelDataset(
@@ -160,6 +162,7 @@ def train_one_fold(config: dict, fold: int) -> Path:
         val_fold=val_fold,
         max_samples=max_train_samples,
         preload=preload,
+        feature_representation=feature_representation,
     )
     val_set = UrbanSound8KMelDataset(
         processed_dir,
@@ -168,6 +171,7 @@ def train_one_fold(config: dict, fold: int) -> Path:
         val_fold=val_fold,
         max_samples=max_val_samples,
         preload=preload,
+        feature_representation=feature_representation,
     )
     train_sampler = _class_aware_sampler(train_set, labels, training_config.get("class_aware_sampling", {}))
     train_loader = DataLoader(
@@ -229,6 +233,13 @@ def train_one_fold(config: dict, fold: int) -> Path:
     best_online_f1 = -1.0
     best_online_path = run_dir / "best_online_model.pt"
     for epoch in range(1, epochs + 1):
+        regularization_strength = regularization_scale(
+            training_config.get("regularization_schedule", {}),
+            epoch,
+            epochs,
+        )
+        augmenter.set_probability_scale(regularization_strength)
+        batch_mixer.set_probability_scale(regularization_strength)
         train_loss, train_true, train_pred = _run_epoch(
             model,
             train_loader,
@@ -259,6 +270,7 @@ def train_one_fold(config: dict, fold: int) -> Path:
             "train_f1_macro": train_metrics["f1_macro"],
             "val_f1_macro": val_metrics["f1_macro"],
             "learning_rate": optimizer.param_groups[0]["lr"],
+            "regularization_scale": regularization_strength,
             "checkpoint_source": checkpoint_source,
         }
         if model_ema is not None:
@@ -367,6 +379,7 @@ def train_one_fold(config: dict, fold: int) -> Path:
         val_fold=val_fold,
         max_samples=max_test_samples,
         preload=preload,
+        feature_representation=feature_representation,
     )
     test_loader = DataLoader(
         test_set,
