@@ -273,7 +273,7 @@ Ensemble validation Macro F1 為 0.7699，低於鎖定單一 CNN 的 0.7924，�
 ## DEC-007：以獨立分支執行 validation-only CNN 突破實驗
 
 - 日期：2026-08-13
-- 狀態：已決定，待 GPU 實驗
+- 狀態：已完成；候選不晉級且不合併回 `main`
 - 分支：`codex/cnn-breakthrough-90`
 - 相關文件：`docs/experiments/2026-08-13-cnn-breakthrough-protocol.md`
 
@@ -286,6 +286,8 @@ Ensemble validation Macro F1 為 0.7699，低於鎖定單一 CNN 的 0.7924，�
 保留 `main` 與 `configs/cnn_aug_final.yaml` 作為穩定基準；新的高風險候選只在獨立分支實作。候選使用 folds 1、4、7 的平均 validation Macro F1 排名，fold 10 全程封存且不作候選評估。
 
 第一階段比較 control、Mel/delta/delta-delta、augmentation cooldown、single class balancing 與 SE attention CNN。只有跨 development folds 穩定改善的候選才可晉級。
+
+實際完成 15 個 validation-only runs。Cooldown 的平均 Macro F1 為 `0.7821`，control 為 `0.7818`；名義改善只有 `0.00025`，且 cooldown 的標準差 `0.0104` 高於 control 的 `0.0044`。Delta channels、single balancing 與 SE CNN 的平均值亦低於 control。因此沒有候選符合晉級條件。
 
 #### 理由
 
@@ -302,5 +304,7 @@ Ensemble validation Macro F1 為 0.7699，低於鎖定單一 CNN 的 0.7924，�
 
 - [x] 建立獨立實驗分支與候選設定。
 - [x] 建立 folds 1、4、7 validation-only runner。
-- [ ] 在 Colab GPU 執行五個候選共 15 個 runs。
-- [ ] 只依平均 validation Macro F1 決定是否進行第二階段。
+- [x] 在 Colab GPU 執行五個候選共 15 個 runs。
+- [x] 只依平均 validation Macro F1 決定不進行第二階段。
+- [x] 確認 fold 10 test 未執行，且分支不合併回 `main`。
+- [ ] 回到 `main`，以鎖定設定執行正式 10-fold cross-validation。

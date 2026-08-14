@@ -24,6 +24,7 @@
 | 2026-08-13 | 實作 CNN EMA 權重追蹤、online/EMA validation 同次比較、checkpoint metadata 與測試，並記錄延後的 3-seed ensemble | `src/utils/ema.py`、`src/train.py`、`configs/cnn_aug_ema.yaml`、`tests/test_ema.py`、狀態與決策文件 | 待使用者在 Colab 執行 validation-only EMA 實驗 | 不改動既有 final config；不再次執行 fold 10 test |
 | 2026-08-13 | 操作 Colab 完成 EMA validation 比較與固定 3-seed probability ensemble，核對鎖定協定、整理 validation/test 指標並備份 artifacts 至 Google Drive | `src/ensemble.py`、`configs/cnn_aug_final.yaml`、`docs/experiments/2026-08-13-cnn-seed-ensemble.md`；Drive ensemble artifacts | 使用者需確認是否直接進入固定單一 CNN 的正式 10-fold | EMA 與 ensemble 均未超越鎖定單一 CNN；大型結果不提交 GitHub |
 | 2026-08-13 | 設計 CNN 突破性 validation study，實作 Mel/delta/delta-delta 三通道、增強 cooldown、single balancing、SE attention CNN 與跨三個 development folds 的安全 runner | `codex/cnn-breakthrough-90`、`configs/cnn_breakthrough_*.yaml`、`scripts/run_cnn_breakthrough_search.py`、`docs/experiments/2026-08-13-cnn-breakthrough-protocol.md` | 待使用者檢視 GPU 實驗結果 | 0.90 為攻擊目標而非保證；fold 10 在搜尋期間完全封存 |
+| 2026-08-14 | 操作 Colab 完成 CNN 突破性三-fold development study，執行五個候選共 15 次 validation-only runs，核對排名、穩定性、test 隔離與 Google Drive 備份 | `docs/experiments/2026-08-13-cnn-breakthrough-protocol.md`；Drive `cnn_breakthrough_20260813_breakthrough_v1` | 使用者需確認返回 `main` 執行正式 10-fold 的時機 | Cooldown 只比 control 高 0.00025 且波動較大；未執行 fold 10 test，分支不合併 |
 
 ## 可記錄的協助類型
 

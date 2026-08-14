@@ -1,6 +1,6 @@
 # 專案儀表板
 
-更新日期：2026-08-13
+更新日期：2026-08-14
 
 ## 目前階段
 
@@ -8,13 +8,15 @@
 
 Project definition 已確認方向為「Sound Event Detection Using Machine Learning Techniques」。核心技術路線是將音訊轉成 Mel-spectrogram 等頻譜圖，再以 CNN 進行聲音事件分類。可用公開資料集包含 UrbanSound8K 或 ESC-50，工具以 Python、PyTorch、Librosa、NumPy、Matplotlib 為主。
 
-端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。EMA 與固定 3-seed probability ensemble 亦已完成，但 ensemble validation Macro F1 `0.7699` 未超越單一 CNN。使用者另開 `codex/cnn-breakthrough-90` 分支進行高風險、validation-only 的突破實驗；穩定主線仍維持 EMA 關閉且不採用 ensemble。
+端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。EMA 與固定 3-seed probability ensemble 亦已完成，但均未超越單一 CNN。
+
+`codex/cnn-breakthrough-90` 的高風險 validation-only study 亦已完成：五個候選在 folds 1、4、7 共執行 15 次。Cooldown 名義上以平均 Macro F1 `0.7821` 排名第一，但只比 control `0.7818` 高 `0.00025`，標準差反而由 `0.0044` 增至 `0.0104`，不足以視為穩健改善。此分支不合併回 `main`，fold 10 test 全程未評估。
 
 ## 立即執行方向
 
-1. 在 `codex/cnn-breakthrough-90` 執行五個候選、三個 development validation folds 的比較。
-2. 只依平均 validation Macro F1 選候選；fold 10 完全封存。
-3. 沒有穩定改善就不合併，改回 `main` 的 `configs/cnn_aug_final.yaml` 執行正式 10-fold。
+1. 回到 `main`，使用已鎖定且 EMA 關閉的 `configs/cnn_aug_final.yaml`。
+2. 不再調整 CNN 設定，直接執行正式 10-fold cross-validation。
+3. 整理 mean/std、per-class F1 與 aggregate confusion matrix，作為論文主要 CNN 結果。
 4. CNN 作為主要模型；從零訓練 Transformer 作為架構比較；pretrained AST 作為 transfer-learning 延伸。
 5. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
 
@@ -35,9 +37,9 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 
 下一步 AI Agent 應依序執行：
 
-1. 執行 breakthrough 分支的多 fold validation 比較。
-2. 判斷是否有跨 folds 穩定超越 control 的候選；沒有則停止此路線。
-3. 鎖定主模型後執行正式 10-fold cross-validation，整理 mean/std、每類 F1 與 aggregate confusion matrix。
+1. 保留 breakthrough 分支作負結果與重現紀錄，不合併候選程式到主線。
+2. 以 `main` 的鎖定主模型執行正式 10-fold cross-validation，整理 mean/std、每類 F1 與 aggregate confusion matrix。
+3. 比較單一 fold 與 10-fold 統計，檢查先前改善是否能跨 folds 泛化。
 4. 將單一 CNN、突破候選、EMA、3-seed ensemble、Transformer 與 AST 的結果整理成公平比較。
 5. 更新論文 Results、Discussion 與 limitations，避免把單一 fold 改善描述成確定結論。
 
@@ -96,6 +98,6 @@ b1f8459 Add thesis risk register
 - 風險與交付管理：已建立。
 - 正式論文內容：方向已確認，正文尚未開始。
 - 實際程式碼：MVP 已完成。
-- 實驗結果：CNN fold 10、受控 augmentation、EMA、3-seed ensemble 與 Transformer fold 10 均已完成；CNN 正式 10-fold 待補。
+- 實驗結果：CNN fold 10、受控 augmentation、EMA、3-seed ensemble、突破性三-fold development study 與 Transformer fold 10 均已完成；CNN 正式 10-fold 待補。
 
 目前不可將整體目標標記為完成，因為仍需完成正式實驗、圖表解讀與 8 頁論文。

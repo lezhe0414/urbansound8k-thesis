@@ -46,15 +46,16 @@ PLACEHOLDER_MARKERS = [
 ]
 
 NEXT_ACTIONS = [
-    "在 codex/cnn-breakthrough-90 分支執行五候選、三 development-fold validation study。",
-    "只依平均 validation Macro F1 判斷候選；fold 10 在搜尋期間封存。",
-    "沒有跨 folds 穩定改善則不合併，回到 main 的固定 CNN 執行正式 10-fold。",
+    "保留 codex/cnn-breakthrough-90 作負結果紀錄，不合併候選到 main。",
+    "回到 main，使用鎖定的 configs/cnn_aug_final.yaml 執行正式 10-fold。",
+    "整理 mean/std、per-class F1 與 aggregate confusion matrix。",
 ]
 
 STATUS_SUMMARY = (
     "setup files present; UrbanSound8K downloaded and preprocessed; "
     "CNN controlled augmentation search completed; EMA validation comparison completed; "
-    "3-seed probability ensemble completed and not selected; validation-only CNN breakthrough study pending"
+    "3-seed probability ensemble completed and not selected; validation-only CNN breakthrough study "
+    "completed with no candidate promoted; formal fixed-config 10-fold pending"
 )
 
 

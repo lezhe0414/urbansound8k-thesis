@@ -1,12 +1,12 @@
 # MVP 進度追蹤
 
-更新日期：2026-08-13
+更新日期：2026-08-14
 
 這份文件用來集中追蹤 UrbanSound8K 聲音分類 MVP 的已完成、未完成與下一步。之後每次程式、資料、實驗、圖表或論文草稿有重要更新時，都要同步更新本文件。
 
 ## 目前結論
 
-MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。EMA validation 比較與固定 3-seed probability ensemble 亦已完成，但都沒有超越已鎖定的單一 CNN，因此正式設定維持 EMA 關閉且不採用 ensemble。
+MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。EMA validation、固定 3-seed probability ensemble 與突破性三-fold development study 亦已完成，但都沒有提供足以取代已鎖定單一 CNN 的穩健改善，因此正式設定維持 EMA 關閉且不採用 ensemble 或突破候選。
 
 整個論文專案尚未完成，因為固定 CNN 設定的正式 10-fold cross-validation、結果解讀與最終 8 頁論文仍待完成。
 
@@ -115,6 +115,7 @@ CNN 已在 Colab GPU 完成正式 fold 10 長訓練、受控 augmentation 搜尋
 | Training script | 完成 | `src/train.py` | 可輸出 checkpoint、history、metrics、confusion matrix |
 | EMA checkpoint support | 完成 | `src/utils/ema.py`、`configs/cnn_aug_ema.yaml` | 同次訓練記錄 online/EMA validation 指標；test 預設關閉 |
 | 3-seed ensemble support | 完成 | `src/ensemble.py`、`tests/test_seed_ensemble.py` | EMA 與個別 seed test 強制關閉；平均三個 softmax probabilities |
+| CNN breakthrough validation study | 完成 | `docs/experiments/2026-08-13-cnn-breakthrough-protocol.md` | 15 validation-only runs；cooldown 僅 +0.00025 且波動較大，不晉級 |
 | Evaluation script | 完成 | `src/evaluate.py` | 可重讀 checkpoint 重新評估 |
 | Colab CNN baseline notebook | 完成 | `notebooks/2026-07-02-colab-cnn-baseline.ipynb` | 用英文註解記錄 GitHub clone、資料下載、preprocess、CNN 訓練、評估與結果打包流程 |
 | Colab CNN + Transformer notebook | 完成 | `notebooks/2026-07-08-colab-cnn-transformer-fold10.ipynb` | 使用 Google Drive cache，支援 CNN baseline 與 Spectrogram Transformer fold 10 訓練、評估、metrics 與結果打包 |
@@ -198,11 +199,10 @@ Smoke run 只用少量資料與 1 epoch 檢查 pipeline 是否能完整執行。
 
 ## 下一步優先順序
 
-1. 在獨立分支執行 CNN breakthrough validation study；fold 10 全程封存。
-2. 依 folds 1、4、7 平均 validation Macro F1 判斷是否有候選值得取代既有設定。
-3. 沒有穩定改善則回到 `main`，以 `configs/cnn_aug_final.yaml` 執行正式 10-fold cross-validation。
-4. 整理 mean/std、per-class F1 與 aggregate confusion matrix。
-5. 將單一 CNN、突破候選、3-seed ensemble、從零訓練 Transformer 與 pretrained AST 的角色公平寫入 Results 與 Discussion。
+1. 回到 `main`，以不再調整的 `configs/cnn_aug_final.yaml` 執行正式 10-fold cross-validation。
+2. 整理 mean/std、per-class F1 與 aggregate confusion matrix。
+3. 比較單一 fold 與 10-fold 統計，判斷 augmentation 改善能否跨 folds 泛化。
+4. 將單一 CNN、突破候選、3-seed ensemble、從零訓練 Transformer 與 pretrained AST 的角色公平寫入 Results 與 Discussion。
 
 ## 常用命令
 
@@ -314,7 +314,7 @@ python3 scripts/run_cnn_breakthrough_search.py \
   --backup-root /content/drive/MyDrive/urbansound8k_data/experiment_artifacts
 ```
 
-此研究分支比較五個較大幅度的候選，每個候選只在 development validation folds 1、4、7 上比較，主指標為平均 Macro F1。fold 10 從 training/validation 排除且不執行 test；沒有穩定改善就不合併回 `main`。
+此研究已完成五個較大幅度候選、三個 development folds 共 15 次 validation-only runs。Cooldown 平均 Macro F1 `0.7821`，control `0.7818`，名義差距僅 `+0.00025` 且 cooldown 標準差較高；其餘候選平均值均低於 control。因此沒有候選晉級或合併回 `main`。Fold 10 從 training/validation 排除且未執行 test。完整結果與 Drive 備份位置見 protocol 文件。
 
 ## 維護規則
 

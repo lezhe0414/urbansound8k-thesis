@@ -1,6 +1,6 @@
 # 專案目前狀態
 
-更新日期：2026-08-13
+更新日期：2026-08-14
 
 ## 專案目的
 
@@ -37,7 +37,7 @@
 7. EMA validation-only 比較已完成：EMA Macro F1 只比同次 online 權重高約 `0.00089`，不足以支持採用，正式設定關閉 EMA。
 8. 固定 3-seed probability ensemble 已完成：validation Macro F1 `0.7699`，低於鎖定單一 CNN 的 `0.7924`；因此完成但不採用。
 9. 鎖定後唯一一次 ensemble fold 10 test Accuracy 為 `0.8411`、Macro F1 為 `0.8501`，亦略低於單一 CNN，但此 test 只作確認，不作選模依據。
-10. 已建立 `codex/cnn-breakthrough-90` 獨立分支；五個新候選只以 folds 1、4、7 的平均 validation Macro F1 比較，fold 10 封存。
+10. `codex/cnn-breakthrough-90` 已完成五個候選、三個 development folds 共 15 次 validation-only runs。Cooldown 平均 Macro F1 `0.7821`，control `0.7818`，差距僅 `+0.00025` 且 cooldown 波動較大，因此沒有候選晉級或合併回 `main`；fold 10 test 未評估。
 
 ## 已建立內容
 
@@ -120,14 +120,13 @@
 
 ## 下一步
 
-EMA 與 ensemble 延伸實驗均已完成。使用者決定在進入正式 10-fold 前做一次獨立 breakthrough study：
+EMA、ensemble 與 breakthrough 延伸實驗均已完成。下一步回到穩定主線：
 
-1. 在 Colab 執行五個候選各三個 development validation folds。
-2. 報告平均 Macro F1、標準差、Accuracy 與每 fold 結果；不評估 fold 10。
-3. 只有穩定超越 control 的候選才可晉級，否則不合併回 `main`。
-4. 實驗結束後使用唯一鎖定設定執行正式 10-fold cross-validation。
-5. 在論文中誠實說明 EMA、ensemble 與突破候選的正負結果。
+1. 切回 `main` 並使用 `configs/cnn_aug_final.yaml`，不再根據單一 fold 改設定。
+2. 執行正式 10-fold cross-validation。
+3. 報告 Macro F1、Accuracy、precision、recall 的 mean/std、per-class F1 與 aggregate confusion matrix。
+4. 在論文中誠實說明 EMA、ensemble 與突破候選的正負結果。
 
 ## 目前完成度判斷
 
-專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA 比較、3-seed ensemble 與鎖定後的 fold 10 test 均已完成。突破候選程式已建立但 GPU 結果尚未產生。整體目標尚未完成，因為 breakthrough validation、固定設定 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。
+專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA 比較、3-seed ensemble、突破性三-fold development study 與鎖定後的 fold 10 test 均已完成。整體目標尚未完成，因為固定設定 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。
