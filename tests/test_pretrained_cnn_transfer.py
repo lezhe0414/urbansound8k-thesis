@@ -108,6 +108,21 @@ class PretrainedCNNConfigTests(unittest.TestCase):
         self.assertEqual(linear["model"]["stage"], "linear_probe")
         self.assertEqual(partial["model"]["stage"], "partial_finetune")
 
+    def test_mn20_neighbor_changes_only_unfreeze_depth_and_run_name(self) -> None:
+        try:
+            import yaml
+        except ImportError as exc:
+            self.skipTest(f"PyYAML unavailable: {exc}")
+        reference = yaml.safe_load((ROOT / "configs" / "pretrained_cnn_mn20_partial.yaml").read_text())
+        neighbor = yaml.safe_load(
+            (ROOT / "configs" / "pretrained_cnn_mn20_partial_last2.yaml").read_text()
+        )
+        self.assertEqual(reference["model"]["partial_last_blocks"], 3)
+        self.assertEqual(neighbor["model"]["partial_last_blocks"], 2)
+        reference["run_name"] = neighbor["run_name"]
+        reference["model"]["partial_last_blocks"] = 2
+        self.assertEqual(reference, neighbor)
+
 
 try:
     import numpy as np
