@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
 import json
 import sys
 from pathlib import Path
@@ -16,12 +18,36 @@ if str(ROOT) not in sys.path:
 from src.data.urbansound8k_waveform import load_resampled_waveform
 
 
+def _cache_record(
+    row: dict,
+    *,
+    raw_dir: Path,
+    out_dir: Path,
+    sample_rate: int,
+    target_samples: int,
+) -> dict:
+    fold = int(row["fold"])
+    source_file = str(row["slice_file_name"])
+    source_path = raw_dir / "audio" / f"fold{fold}" / source_file
+    waveform = load_resampled_waveform(source_path, sample_rate, target_samples)
+    output_path = out_dir / f"fold{fold}" / f"{Path(source_file).stem}.npy"
+    np.save(output_path, waveform, allow_pickle=False)
+    return {
+        "slice_file_name": source_file,
+        "fold": fold,
+        "classID": int(row["classID"]),
+        "class": str(row["class"]),
+        "path": str(output_path.relative_to(out_dir)),
+    }
+
+
 def build_cache(
     raw_dir: Path,
     out_dir: Path,
     sample_rate: int,
     clip_duration_seconds: float,
     limit: int | None = None,
+    workers: int = 1,
 ) -> Path:
     metadata_path = raw_dir / "metadata" / "UrbanSound8K.csv"
     if not metadata_path.exists():
@@ -36,27 +62,30 @@ def build_cache(
     if limit is not None:
         metadata = metadata.head(int(limit))
     target_samples = int(round(sample_rate * clip_duration_seconds))
-    rows: list[dict] = []
+    records = metadata.to_dict("records")
     out_dir.mkdir(parents=True, exist_ok=True)
+    for fold in sorted({int(row["fold"]) for row in records}):
+        (out_dir / f"fold{fold}").mkdir(parents=True, exist_ok=True)
 
-    for row in tqdm(metadata.to_dict("records"), desc="Caching 32 kHz waveforms"):
-        fold = int(row["fold"])
-        source_file = str(row["slice_file_name"])
-        source_path = raw_dir / "audio" / f"fold{fold}" / source_file
-        waveform = load_resampled_waveform(source_path, sample_rate, target_samples)
-        fold_dir = out_dir / f"fold{fold}"
-        fold_dir.mkdir(parents=True, exist_ok=True)
-        output_path = fold_dir / f"{Path(source_file).stem}.npy"
-        np.save(output_path, waveform, allow_pickle=False)
-        rows.append(
-            {
-                "slice_file_name": source_file,
-                "fold": fold,
-                "classID": int(row["classID"]),
-                "class": str(row["class"]),
-                "path": str(output_path.relative_to(out_dir)),
-            }
-        )
+    cache_record = partial(
+        _cache_record,
+        raw_dir=raw_dir,
+        out_dir=out_dir,
+        sample_rate=sample_rate,
+        target_samples=target_samples,
+    )
+
+    if workers <= 1:
+        rows = [cache_record(row) for row in tqdm(records, desc="Caching 32 kHz waveforms")]
+    else:
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            rows = list(
+                tqdm(
+                    executor.map(cache_record, records, chunksize=4),
+                    total=len(records),
+                    desc="Caching 32 kHz waveforms",
+                )
+            )
 
     pd.DataFrame(rows).to_csv(out_dir / "metadata.csv", index=False)
     manifest = {
@@ -82,6 +111,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sample-rate", type=int, default=32_000)
     parser.add_argument("--clip-duration-seconds", type=float, default=5.0)
     parser.add_argument("--limit", type=int)
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Parallel decoding processes. Keep 1 for the original deterministic sequential path.",
+    )
     return parser.parse_args()
 
 
@@ -93,6 +128,7 @@ def main() -> int:
         sample_rate=args.sample_rate,
         clip_duration_seconds=args.clip_duration_seconds,
         limit=args.limit,
+        workers=args.workers,
     )
     print(f"Wrote waveform cache to {path}")
     return 0
