@@ -81,12 +81,22 @@ def _run_epoch(
     optimizer: torch.optim.Optimizer | None = None,
     scaler=None,
     mixed_precision: bool = False,
+    mixup_config: dict | None = None,
 ) -> tuple[float, dict[str, float]]:
     training = optimizer is not None
     model.train(training)
+    mixup_config = dict(mixup_config or {})
+    mixup_enabled = training and bool(mixup_config.get("enabled", False))
+    mixup_probability = float(mixup_config.get("probability", 0.0))
+    mixup_alpha = float(mixup_config.get("alpha", 0.15))
+    if not 0.0 <= mixup_probability <= 1.0:
+        raise ValueError("training.mixup.probability must be between 0 and 1.")
+    if mixup_enabled and mixup_alpha <= 0.0:
+        raise ValueError("training.mixup.alpha must be positive when Mixup is enabled.")
     total_loss = 0.0
     y_true: list[int] = []
     y_pred: list[int] = []
+    mixup_applied_batches = 0
 
     for waveforms, targets in tqdm(loader, desc="train" if training else "validation", leave=False):
         waveforms = waveforms.to(device, non_blocking=True)
@@ -99,8 +109,26 @@ def _run_epoch(
                 dtype=torch.float16,
                 enabled=mixed_precision and device.type == "cuda",
             ):
-                logits = model(waveforms)
-                loss = criterion(logits, targets)
+                apply_mixup = mixup_enabled and bool(
+                    torch.rand((), device=device).item() < mixup_probability
+                )
+                if apply_mixup:
+                    mel = model.waveform_to_mel(waveforms)
+                    permutation = torch.randperm(mel.size(0), device=device)
+                    beta = torch.distributions.Beta(
+                        torch.tensor(mixup_alpha, device=device),
+                        torch.tensor(mixup_alpha, device=device),
+                    )
+                    mixup_lambda = float(beta.sample().item())
+                    mixed_mel = mixup_lambda * mel + (1.0 - mixup_lambda) * mel[permutation]
+                    logits = model.forward_mel(mixed_mel)
+                    loss = mixup_lambda * criterion(logits, targets) + (
+                        1.0 - mixup_lambda
+                    ) * criterion(logits, targets[permutation])
+                    mixup_applied_batches += 1
+                else:
+                    logits = model(waveforms)
+                    loss = criterion(logits, targets)
             if training:
                 if scaler is not None and scaler.is_enabled():
                     scaler.scale(loss).backward()
@@ -115,7 +143,29 @@ def _run_epoch(
         y_pred.extend(logits.detach().argmax(dim=1).cpu().tolist())
 
     metrics = classification_metrics(y_true, y_pred, labels)
+    metrics["mixup_applied_batches"] = float(mixup_applied_batches)
     return total_loss / max(len(loader.dataset), 1), metrics
+
+
+def _add_unfrozen_encoder_group(
+    model: PretrainedEfficientATClassifier,
+    optimizer: torch.optim.Optimizer,
+    encoder_lr: float,
+    head_lr: float,
+) -> None:
+    if any(group.get("group_name") == "encoder" for group in optimizer.param_groups):
+        raise RuntimeError("Optimizer already contains an encoder parameter group.")
+    encoder_group = next(
+        (
+            group
+            for group in model.optimizer_parameter_groups(encoder_lr=encoder_lr, head_lr=head_lr)
+            if group.get("group_name") == "encoder"
+        ),
+        None,
+    )
+    if encoder_group is None:
+        raise RuntimeError("Gradual unfreezing did not expose any encoder parameters.")
+    optimizer.add_param_group(encoder_group)
 
 
 def _backup_run(run_dir: Path, backup_root: Path | None, run_name: str) -> Path | None:
@@ -214,7 +264,18 @@ def train_validation_fold(
             initial_payload = torch.load(initial_checkpoint, map_location=device)
         model.load_state_dict(initial_payload["model_state"])
         model.set_training_stage(model.stage, partial_last_blocks=model.partial_last_blocks)
-    parameter_counts = model.parameter_counts()
+    epochs = int(training_config.get("epochs", 5))
+    gradual_config = dict(training_config.get("gradual_unfreezing") or {})
+    gradual_enabled = bool(gradual_config.get("enabled", False))
+    head_only_epochs = int(gradual_config.get("head_only_epochs", 0))
+    requested_stage = model.stage
+    if gradual_enabled:
+        if requested_stage != "partial_finetune":
+            raise ValueError("Gradual unfreezing requires model.stage=partial_finetune.")
+        if not 1 <= head_only_epochs < epochs:
+            raise ValueError("head_only_epochs must be at least 1 and smaller than training.epochs.")
+        model.set_training_stage("linear_probe", partial_last_blocks=model.partial_last_blocks)
+    initial_parameter_counts = model.parameter_counts()
     class_weights = _class_weights(train_set, labels, device, training_config.get("class_weighting", {}))
     criterion = nn.CrossEntropyLoss(
         weight=class_weights,
@@ -226,12 +287,13 @@ def train_validation_fold(
         model.optimizer_parameter_groups(encoder_lr=encoder_lr, head_lr=head_lr),
         weight_decay=float(training_config.get("weight_decay", 1e-4)),
     )
-    epochs = int(training_config.get("epochs", 5))
     mixed_precision = bool(training_config.get("mixed_precision", True))
     scaler = _grad_scaler(mixed_precision and device.type == "cuda")
     scheduler_name = str(training_config.get("scheduler", {}).get("name", "none")).lower()
     scheduler = None
     if scheduler_name == "cosine":
+        if gradual_enabled:
+            raise ValueError("Gradual unfreezing currently requires scheduler.name=none.")
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     elif scheduler_name != "none":
         raise ValueError(f"Unsupported pretrained CNN scheduler: {scheduler_name}")
@@ -242,6 +304,9 @@ def train_validation_fold(
     best_f1 = -1.0
     best_path = run_dir / "best_model.pt"
     for epoch in range(1, epochs + 1):
+        if gradual_enabled and epoch == head_only_epochs + 1:
+            model.set_training_stage("partial_finetune", partial_last_blocks=model.partial_last_blocks)
+            _add_unfrozen_encoder_group(model, optimizer, encoder_lr=encoder_lr, head_lr=head_lr)
         train_loss, train_metrics = _run_epoch(
             model,
             train_loader,
@@ -251,6 +316,7 @@ def train_validation_fold(
             optimizer=optimizer,
             scaler=scaler,
             mixed_precision=mixed_precision,
+            mixup_config=training_config.get("mixup", {}),
         )
         val_loss, val_metrics = _run_epoch(
             model,
@@ -268,6 +334,9 @@ def train_validation_fold(
             "val_loss": val_loss,
             "val_accuracy": val_metrics["accuracy"],
             "val_f1_macro": val_metrics["f1_macro"],
+            "training_stage": model.stage,
+            "trainable_parameters": model.parameter_counts()["trainable"],
+            "mixup_applied_batches": int(train_metrics["mixup_applied_batches"]),
             "encoder_learning_rate": next(
                 (group["lr"] for group in optimizer.param_groups if group.get("group_name") == "encoder"),
                 0.0,
@@ -289,6 +358,8 @@ def train_validation_fold(
                     "best_epoch": epoch,
                     "selected_by": "validation_macro_f1",
                     "checkpoint_sha256": model.checkpoint_sha256,
+                    "training_stage": model.stage,
+                    "partial_last_blocks": model.partial_last_blocks,
                 },
                 best_path,
             )
@@ -332,7 +403,8 @@ def train_validation_fold(
             "n_mels": model_config.get("n_mels", 128),
             "normalization": "(log_mel + 4.5) / 5",
         },
-        "parameter_counts": parameter_counts,
+        "initial_parameter_counts": initial_parameter_counts,
+        "parameter_counts": model.parameter_counts(),
         "development_validation_fold": val_fold,
         "sealed_test_fold": test_fold,
         "test_evaluated": False,
@@ -341,6 +413,17 @@ def train_validation_fold(
         "optimizer": "AdamW",
         "encoder_learning_rate": encoder_lr if model.stage == "partial_finetune" else 0.0,
         "head_learning_rate": head_lr,
+        "gradual_unfreezing": {
+            "enabled": gradual_enabled,
+            "head_only_epochs": head_only_epochs,
+            "final_stage": requested_stage,
+        },
+        "mixup": dict(training_config.get("mixup") or {}),
+        "frontend_augmentation": {
+            "enabled": bool(model_config.get("frontend_augmentation", False)),
+            "frequency_mask_param": int(model_config.get("frequency_mask_param", 0)),
+            "time_mask_param": int(model_config.get("time_mask_param", 0)),
+        },
         "start_time_utc": start_time,
         "end_time_utc": end_time,
         "duration_seconds": duration_seconds,

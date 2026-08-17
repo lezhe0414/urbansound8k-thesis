@@ -179,12 +179,19 @@ class PretrainedEfficientATClassifier(nn.Module):
                     module.eval()
         return self
 
-    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+    def waveform_to_mel(self, waveform: torch.Tensor) -> torch.Tensor:
         if waveform.ndim == 3 and waveform.size(1) == 1:
             waveform = waveform.squeeze(1)
         if waveform.ndim != 2:
             raise ValueError(f"Expected waveform shape [batch, samples], received {tuple(waveform.shape)}")
         with torch.autocast(device_type=waveform.device.type, enabled=False):
-            mel = self.frontend(waveform.float())
+            return self.frontend(waveform.float())
+
+    def forward_mel(self, mel: torch.Tensor) -> torch.Tensor:
+        if mel.ndim != 3:
+            raise ValueError(f"Expected log-Mel shape [batch, mel, time], received {tuple(mel.shape)}")
         logits, _ = self.backbone(mel.unsqueeze(1))
         return logits
+
+    def forward(self, waveform: torch.Tensor) -> torch.Tensor:
+        return self.forward_mel(self.waveform_to_mel(waveform))
