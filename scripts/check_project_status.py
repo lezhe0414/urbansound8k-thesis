@@ -32,6 +32,8 @@ REQUIRED_FILES = [
     "configs/cnn_aug_ema.yaml",
     "configs/pretrained_cnn_linear_probe.yaml",
     "configs/pretrained_cnn_partial_finetune.yaml",
+    "configs/pretrained_cnn_partial_finetune_lr2e5.yaml",
+    "configs/pretrained_cnn_partial_finetune_final_test.yaml",
     "src/ensemble.py",
     "src/models/pretrained_efficientat.py",
     "src/train_pretrained_cnn.py",
@@ -48,16 +50,17 @@ PLACEHOLDER_MARKERS = [
 ]
 
 NEXT_ACTIONS = [
-    "在 folds 1、4、7 執行 pretrained EfficientAT CNN linear probing，fold 10 保持封存。",
-    "只依三-fold validation Macro F1 mean/std 判斷是否進入 partial fine-tuning。",
-    "完成第三模型判斷後，再執行固定 from-scratch CNN 的正式 10-fold cross-validation。",
+    "使用已鎖定設定執行固定 from-scratch CNN 的正式 10-fold cross-validation。",
+    "時間允許時，使用已鎖定 EfficientAT 設定執行正式 10-fold cross-validation。",
+    "整理 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 的公平比較。",
 ]
 
 STATUS_SUMMARY = (
     "setup files present; UrbanSound8K downloaded and preprocessed; "
     "CNN controlled augmentation search completed; EMA validation comparison completed; "
     "3-seed probability ensemble completed and not selected; AudioSet-pretrained EfficientAT CNN "
-    "development validation pending; fixed-config 10-fold cross-validation pending"
+    "development selection and one sealed fold-10 evaluation completed; fixed-config 10-fold "
+    "cross-validation pending"
 )
 
 

@@ -1,7 +1,7 @@
 # AudioSet-pretrained CNN transfer-learning study
 
 更新日期：2026-08-17
-狀態：實作完成，development linear probing 待在 Colab A100 執行
+狀態：development 選模與唯一 fold 10 最終評估完成
 
 ## 研究目的
 
@@ -60,7 +60,7 @@ data/processed/urbansound8k_waveforms_32k_5s/
 | Linear-probe epochs | 5 |
 | Optimizer | AdamW |
 | Head learning rate | 3e-4 |
-| Encoder learning rate | 0 for linear probe; 1e-5 for partial fine-tuning |
+| Encoder learning rate | 0 for linear probe；1e-5 for partial fine-tuning v1；2e-5 for the only neighbouring candidate |
 | Weight decay | 1e-4 |
 | Class weighting / sampling | power 0.5 / power 0.5 |
 
@@ -118,19 +118,62 @@ python3 scripts/run_pretrained_cnn_transfer.py \
 
 | Validation fold | Best epoch | Macro F1 | Accuracy | Time | GPU |
 | --- | ---: | ---: | ---: | ---: | --- |
-| 1 | 待執行 | 待執行 | 待執行 | 待執行 | A100 preferred |
-| 4 | 待執行 | 待執行 | 待執行 | 待執行 | A100 preferred |
-| 7 | 待執行 | 待執行 | 待執行 | 待執行 | A100 preferred |
-| Mean ± std | - | 待執行 | 待執行 | - | - |
+| 1 | 3 | 0.8796 | 0.8625 | 29.9 s | A100 |
+| 4 | 5 | 0.8595 | 0.8646 | 24.0 s | A100 |
+| 7 | 4 | 0.8023 | 0.8126 | 24.3 s | A100 |
+| Mean ± std | - | 0.8471 ± 0.0327 | 0.8466 ± 0.0240 | - | - |
 
 ### Stage 2: partial fine-tuning
 
-尚未觸發；必須先依 Stage 1 的 development validation Macro F1 決定。
+Linear probing 超越相同 development protocol 的 control `0.7818`，因此依預先定義規則進入 partial fine-tuning。第一個設定只解凍最後兩個 convolutional modules，encoder/head learning rates 分別為 `1e-5`/`3e-4`。
+
+| Validation fold | Best epoch | Macro F1 | Accuracy | Time | GPU |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 1 | 3 | 0.8871 | 0.8660 | 41.5 s | A100 |
+| 4 | 3 | 0.8900 | 0.8970 | 36.9 s | A100 |
+| 7 | 5 | 0.8293 | 0.8496 | 36.2 s | A100 |
+| Mean ± std | - | 0.8688 ± 0.0280 | 0.8709 ± 0.0196 | - | - |
+
+Partial fine-tuning v1 比 linear probing 提高 `0.0217` Macro F1。依 protocol 最多再測一個鄰近設定；唯一改動是將 encoder learning rate 由 `1e-5` 提高至 `2e-5`，其餘條件固定。
+
+| Validation fold | Best epoch | Macro F1 | Accuracy | Time | GPU |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 1 | 2 | 0.8882 | 0.8694 | 41.8 s | A100 |
+| 4 | 5 | 0.8949 | 0.9010 | 36.3 s | A100 |
+| 7 | 5 | 0.8317 | 0.8496 | 36.1 s | A100 |
+| Mean ± std | - | 0.8716 ± 0.0283 | 0.8734 ± 0.0212 | - | - |
+
+鄰近設定比 v1 提高 `0.0028` Macro F1，並比 from-scratch CNN control 高 `0.0898`。因此只依 development mean Macro F1 鎖定 encoder/head learning rates `2e-5`/`3e-4`，不再建立其他候選。
+
+### Unique fold 10 final evaluation
+
+鎖定設定後只執行一次 fold 10 test。Validation fold 4 在 development 階段具有最高 Macro F1，故在查看 test 前預先選為 final run 的 validation fold；test 結果沒有用於任何後續調參。
+
+| Split | Accuracy | Macro F1 | Macro precision | Macro recall | Loss |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Validation fold 4 | 0.9010 | 0.8949 | - | - | 0.3145 |
+| Sealed fold 10 test | 0.8949 | 0.9041 | 0.9179 | 0.8996 | 0.3537 |
+
+Final run 的最佳 epoch 為 5。該 epoch 的 training Accuracy/Macro F1 為 `0.9482`/`0.9514`，相對 validation Macro F1 的差距約 `0.0565`，顯示仍有中度 generalisation gap，但沒有先前 from-scratch 訓練中接近飽和的嚴重過擬合。Test Macro F1 略高於 validation，且 test loss 接近 validation loss；因此沒有證據顯示 final checkpoint 在 fold 10 上崩潰。另一方面，fold 間 Macro F1 標準差仍約 `0.0283`，正式 10-fold cross-validation 仍是判斷穩健性的必要步驟。
+
+EfficientAT 在 encoder 完全凍結時已達 `0.8471` mean Macro F1，表示 AudioSet representation 對 UrbanSound8K 有明顯可轉移性，而不是 underfitting。Partial fine-tuning 再帶來穩定但較小的改善。
+
+### Artifacts
+
+所有 checkpoints、histories、validation metrics、final test metrics 及 confusion matrix 已備份至：
+
+```text
+/content/drive/MyDrive/urbansound8k_data/experiment_artifacts/pretrained_cnn_transfer/
+```
+
+最終 run name 為 `pretrained_cnn_mn10_partial_ft_lr2e5_final_test_v1`。大型 artifacts 未提交 GitHub。
 
 ## 公平論文描述原則
 
 - `0.7818` 是 from-scratch CNN 在相同三-fold development protocol 的 control mean，不是 fold 10 test。
 - pretrained CNN 的優劣只以三個 development folds 的 mean/std 判斷。
 - 不把 AudioSet 預訓練與 UrbanSound8K 從零訓練描述成相同資料條件；這個比較衡量的是 transfer learning 的價值。
-- 若 pretrained model 未超越 CNN，仍應報告其較小運算量、收斂速度、可能的 domain mismatch 與短音訊 zero-padding 限制。
-- Fold 10 只能在唯一最終設定鎖定後評估一次，不能用多個 test 候選挑最高分。
+- Pretrained model 超越 development control，但這不表示架構本身在相同訓練資料條件下優於 from-scratch CNN；改善包含大規模 AudioSet 預訓練的貢獻。
+- Fold 10 只在唯一最終設定鎖定後評估一次，沒有用多個 test 候選挑最高分。
+- 單一 fold 10 的 Macro F1 `0.9041` 是 final confirmation，不是 10-fold 泛化估計；正式結論應以後續固定設定的 10-fold mean/std 為準。
+- 應同時報告預訓練成本、domain transfer、5 秒 zero-padding，以及三個 development folds 的變異。

@@ -24,6 +24,7 @@
 | 2026-08-13 | 實作 CNN EMA 權重追蹤、online/EMA validation 同次比較、checkpoint metadata 與測試，並記錄延後的 3-seed ensemble | `src/utils/ema.py`、`src/train.py`、`configs/cnn_aug_ema.yaml`、`tests/test_ema.py`、狀態與決策文件 | 待使用者在 Colab 執行 validation-only EMA 實驗 | 不改動既有 final config；不再次執行 fold 10 test |
 | 2026-08-13 | 操作 Colab 完成 EMA validation 比較與固定 3-seed probability ensemble，核對鎖定協定、整理 validation/test 指標並備份 artifacts 至 Google Drive | `src/ensemble.py`、`configs/cnn_aug_final.yaml`、`docs/experiments/2026-08-13-cnn-seed-ensemble.md`；Drive ensemble artifacts | 使用者需確認是否直接進入固定單一 CNN 的正式 10-fold | EMA 與 ensemble 均未超越鎖定單一 CNN；大型結果不提交 GitHub |
 | 2026-08-17 | 選擇並整合 AudioSet-pretrained EfficientAT MN10，建立官方 32 kHz waveform frontend、獨立 cache、linear probing、partial fine-tuning、三-fold validation runner、測試與研究紀錄 | `src/models/pretrained_efficientat.py`、`src/data/urbansound8k_waveform.py`、`configs/pretrained_cnn_*.yaml`、`scripts/run_pretrained_cnn_transfer.py`、`docs/experiments/pretrained-cnn-transfer.md` | 待使用者確認 Colab development 結果與是否進入 partial fine-tuning | Fold 10 封存；原始資料與既有 Mel cache不修改；第三方來源與 MIT 授權已保留 |
+| 2026-08-17 | 操作 Colab A100 完成 EfficientAT linear probing、partial fine-tuning 與唯一鄰近設定，以 folds 1、4、7 mean validation Macro F1 鎖定模型後執行一次 fold 10 final evaluation，並核對 Drive artifacts | `docs/experiments/pretrained-cnn-transfer.md`、`configs/pretrained_cnn_partial_finetune_lr2e5.yaml`、`configs/pretrained_cnn_partial_finetune_final_test.yaml`；Drive transfer artifacts | 使用者需確認是否投入正式 10-fold | Development F1 `0.8716 ± 0.0283`；fold 10 test F1 `0.9041`；test 未參與選模 |
 
 ## 可記錄的協助類型
 

@@ -37,7 +37,8 @@
 7. EMA validation-only 比較已完成：EMA Macro F1 只比同次 online 權重高約 `0.00089`，不足以支持採用，正式設定關閉 EMA。
 8. 固定 3-seed probability ensemble 已完成：validation Macro F1 `0.7699`，低於鎖定單一 CNN 的 `0.7924`；因此完成但不採用。
 9. 鎖定後唯一一次 ensemble fold 10 test Accuracy 為 `0.8411`、Macro F1 為 `0.8501`，亦略低於單一 CNN，但此 test 只作確認，不作選模依據。
-10. 已在 `codex/pretrained-cnn-transfer` 實作 EfficientAT `mn10_as` 的官方 32 kHz waveform pipeline、linear probing、partial fine-tuning 與 folds 1、4、7 runner；正式 development 實驗待在 Colab A100 執行，fold 10 尚未接觸。
+10. EfficientAT `mn10_as` transfer-learning study 已完成：linear probing development Macro F1 `0.8471 ± 0.0327`；partial fine-tuning 最佳設定為 `0.8716 ± 0.0283`，比相同 protocol 的 control `0.7818` 高 `0.0898`。
+11. 唯一設定鎖定後只執行一次 fold 10 test，Accuracy `0.8949`、Macro F1 `0.9041`；test 不參與選模或後續調參。
 
 ## 已建立內容
 
@@ -118,14 +119,13 @@
 
 ## 下一步
 
-目前先完成第三模型的 validation-only transfer-learning 判斷，再進入固定設定的最終統計驗證：
+第三模型的 validation-only transfer-learning 判斷與唯一 fold 10 final confirmation 已完成。下一步是固定設定的正式統計驗證：
 
-1. 在 Colab A100 執行 `configs/pretrained_cnn_linear_probe.yaml` 的 folds 1、4、7。
-2. 只依三-fold validation Macro F1 mean/std 判斷是否進入 partial fine-tuning。
-3. 不得建立或評估任何 fold 10 candidate；唯一 transfer 設定鎖定前 test 保持封存。
-4. 完成第三模型判斷後，以 `configs/cnn_aug_final.yaml` 執行固定單一 CNN 10-fold。
-5. 整理 from-scratch CNN、from-scratch Transformer 與 AudioSet-pretrained CNN 的公平比較。
+1. 以 `configs/cnn_aug_final.yaml` 執行固定 from-scratch CNN 10-fold，不再依 fold 結果調參。
+2. 時間允許時，以已鎖定的 `configs/pretrained_cnn_partial_finetune_final_test.yaml` 方法執行 EfficientAT 正式 10-fold；每 fold 只使用其非 test folds 建立 validation split。
+3. 整理 from-scratch CNN、from-scratch Transformer 與 AudioSet-pretrained CNN 的公平比較，明確區分從零訓練與 AudioSet transfer learning。
+4. 將 10-fold mean/std、per-class F1 與 confusion matrix 納入論文結果及限制分析。
 
 ## 目前完成度判斷
 
-專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA 比較、3-seed ensemble 與鎖定後的 fold 10 test 均已完成。整體目標尚未完成，因為固定單一 CNN 的 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。
+專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA、3-seed ensemble、EfficientAT transfer-learning study 與各自鎖定後的一次性 fold 10 test 均已完成。整體目標尚未完成，因為固定設定的正式 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。

@@ -8,13 +8,13 @@
 
 Project definition 已確認方向為「Sound Event Detection Using Machine Learning Techniques」。核心技術路線是將音訊轉成 Mel-spectrogram 等頻譜圖，再以 CNN 進行聲音事件分類。可用公開資料集包含 UrbanSound8K 或 ESC-50，工具以 Python、PyTorch、Librosa、NumPy、Matplotlib 為主。
 
-端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。EMA 與固定 3-seed probability ensemble 亦已完成，但 ensemble validation Macro F1 `0.7699` 未超越單一 CNN，因此主要設定維持 EMA 關閉且不採用 ensemble。仍需固定設定的 10-fold mean/std 才能判斷泛化是否穩定。
+端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。EMA 與固定 3-seed probability ensemble 亦已完成，但未超越單一 CNN。AudioSet-pretrained EfficientAT 的三-fold development Macro F1 達 `0.8716 ± 0.0283`，鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8949`、Macro F1 為 `0.9041`。這個 test 只作 final confirmation；仍需固定設定的 10-fold mean/std 才能判斷泛化是否穩定。
 
 ## 立即執行方向
 
-1. 在獨立分支執行 EfficientAT `mn10_as` 的 folds 1、4、7 validation-only linear probing，fold 10 保持封存。
-2. 只在 pretrained CNN 有競爭力時執行最後兩個 blocks 的 partial fine-tuning；選模只看三-fold validation Macro F1 mean/std。
-3. CNN 作為主要模型；從零訓練 Transformer 作為架構比較；AudioSet-pretrained CNN 作為 transfer-learning 比較。
+1. 以鎖定的 `configs/cnn_aug_final.yaml` 執行 from-scratch CNN 正式 10-fold，不再調參。
+2. 時間允許時，以已鎖定的 EfficientAT partial fine-tuning 方法執行正式 10-fold。
+3. CNN 作為主要基準；從零訓練 Transformer 作為架構比較；AudioSet-pretrained CNN 作為 transfer-learning 比較。
 4. EMA 與 3-seed ensemble 作為已完成但沒有改善的延伸實驗，保留重現程式與誠實結果。
 5. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
 
@@ -35,10 +35,10 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 
 下一步 AI Agent 應依序執行：
 
-1. 完成 `docs/experiments/pretrained-cnn-transfer.md` 定義的三-fold linear probing。
-2. 依 validation Macro F1 判斷是否進入 partial fine-tuning，禁止使用 fold 10 作決策。
-3. 鎖定第三個模型後，再跑固定單一 CNN 的正式 10-fold cross-validation。
-4. 將 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 整理成公平比較。
+1. 執行固定單一 from-scratch CNN 的正式 10-fold cross-validation。
+2. 視時程執行固定 EfficientAT 設定的正式 10-fold cross-validation。
+3. 將 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 整理成公平比較。
+4. 在論文中清楚說明 pretrained 模型使用額外 AudioSet 資訊，不能把差異歸因於 CNN 架構 alone。
 
 文獻與寫作同步更新：
 

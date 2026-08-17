@@ -298,6 +298,41 @@ From-scratch CNN 已是主要基準，從零訓練 Spectrogram Transformer 則�
 
 #### 後續行動
 
-- [ ] 在 Colab A100 完成 folds 1、4、7 linear probing。
-- [ ] 依預先定義門檻決定是否執行 partial fine-tuning。
-- [ ] 若鎖定唯一設定，才執行一次 fold 10 test evaluation。
+- [x] 在 Colab A100 完成 folds 1、4、7 linear probing。
+- [x] 依預先定義門檻決定並完成 partial fine-tuning。
+- [x] 鎖定唯一設定後執行一次 fold 10 test evaluation。
+
+---
+
+## DEC-008：鎖定 EfficientAT encoder LR 2e-5 並完成唯一 fold 10 final evaluation
+
+- 日期：2026-08-17
+- 狀態：已決定
+- 相關文件：`configs/pretrained_cnn_partial_finetune_lr2e5.yaml`、`configs/pretrained_cnn_partial_finetune_final_test.yaml`、`docs/experiments/pretrained-cnn-transfer.md`
+- 相關會議：2026-08-07 supervisor meeting 後續研究規劃
+
+#### 背景
+
+EfficientAT linear probing 在 folds 1、4、7 達到 Macro F1 `0.8471 ± 0.0327`，高於相同 development protocol 的 from-scratch CNN control `0.7818`。Partial fine-tuning v1 使用 encoder/head learning rates `1e-5`/`3e-4`，提高至 `0.8688 ± 0.0280`。依 protocol 只允許再測一個鄰近設定。
+
+#### 決策
+
+鄰近設定只將 encoder learning rate 改為 `2e-5`，其餘條件固定，得到 development Macro F1 `0.8716 ± 0.0283` 及 Accuracy `0.8734 ± 0.0212`。因其 Macro F1 比 v1 高 `0.0028`，故只依 development 結果鎖定此設定。鎖定後以預先選定的 validation fold 4 執行一次 fold 10 test，Macro F1 `0.9041`、Accuracy `0.8949`；不再建立或評估其他 test candidates。
+
+#### 理由
+
+選模遵循預先定義的唯一主要指標，且 fold 10 在設定鎖定前完全封存。鄰近設定的改善幅度雖小，但三個 folds 的平均值均依相同 seed、epochs、資料切分及評估方式取得。一次性 test 只用於 final confirmation，未回饋到設定選擇。
+
+#### 影響
+
+- 對論文：EfficientAT 是 transfer-learning 第三模型，結果包含 AudioSet 預訓練的貢獻，不能描述成純架構公平比較。
+- 對評估：單一 fold 10 Macro F1 `0.9041` 不是 10-fold 泛化證明；fold 間變異仍需正式 10-fold 檢驗。
+- 對模型：from-scratch CNN 保留為主要基準，EfficientAT 是目前表現較高的 transfer-learning comparison。
+- 對時程：停止 pretrained CNN 超參數搜尋；下一步只執行固定設定的正式 cross-validation。
+
+#### 後續行動
+
+- [x] 將全部 development 與 final artifacts 備份到 Google Drive。
+- [x] 確認 fold 10 只評估一個鎖定設定。
+- [ ] 視時程執行固定 EfficientAT 設定的正式 10-fold cross-validation。
+- [ ] 在論文加入三模型公平比較與限制分析。
