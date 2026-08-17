@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import tempfile
 import unittest
 import wave
@@ -10,6 +11,18 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class PretrainedCNNConfigTests(unittest.TestCase):
+    def test_checkpoint_group_evaluation_names_confusion_matrix(self) -> None:
+        tree = ast.parse((ROOT / "src" / "evaluate_pretrained_cnn.py").read_text(encoding="utf-8"))
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "save_confusion_matrix"
+        ]
+        self.assertEqual(len(calls), 1)
+        self.assertIn("title", {keyword.arg for keyword in calls[0].keywords})
+
     def test_linear_probe_protocol_seals_fold_10(self) -> None:
         try:
             import yaml

@@ -119,7 +119,12 @@ def evaluate_checkpoint_group(
         predictions=predictions,
     )
     matrix = confusion_matrix_array(expected_targets.tolist(), predictions.tolist(), labels)
-    save_confusion_matrix(matrix, [str(label) for label in labels], output_dir / "confusion_matrix.png")
+    save_confusion_matrix(
+        matrix,
+        [str(label) for label in labels],
+        output_dir / "confusion_matrix.png",
+        title=f"{split} checkpoint ensemble",
+    )
     print(json.dumps(metrics, indent=2, sort_keys=True))
     return metrics
 
