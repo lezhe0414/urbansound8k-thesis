@@ -528,7 +528,7 @@ same-seed pair 的 Macro F1 分別為 `0.90128`、`0.89995`、`0.90099`，支持
 ## DEC-014：以 nested leave-one-fold-out logistic stacking 組合六個跨尺度模型
 
 - 日期：2026-08-17
-- 狀態：已預註冊；待 development-only 執行
+- 狀態：已完成；未採用
 - 相關文件：`docs/experiments/pretrained-cnn-stacking-breakthrough.md`
 - 相關會議：無；使用者要求在六模型 `0.90104` 結果上繼續嘗試
 
@@ -553,7 +553,18 @@ probability mean，才稱為改善。Fold 10 繼續封存；此 post-formal 結�
 
 #### 後續行動
 
-- [ ] 實作 feature alignment、nested regularisation selection 與 outer evaluation。
-- [ ] 核對 equal-average baseline 可重現 `0.90104`。
-- [ ] 保存 meta-model parameters、predictions、metrics 與 Drive backup。
-- [ ] 核對 `test_evaluated=false` 且沒有 fold-10 outputs。
+- [x] 實作 feature alignment、nested regularisation selection 與 outer evaluation。
+- [x] 核對 equal-average baseline 可重現 `0.90104`。
+- [x] 保存 meta-model parameters、predictions、metrics 與 Drive backup。
+- [x] 核對 `test_evaluated=false` 且沒有 fold-10 outputs。
+
+#### 結果與判讀
+
+Nested stacking 的 development Macro F1 為 `0.87438 ± 0.01625`、Accuracy 為
+`0.87589 ± 0.01248`；同一批 predictions 的等權平均分別為
+`0.90104 ± 0.00920` 與 `0.89732 ± 0.01416`。Macro F1 差異為 `-0.02666`，且
+folds 1、4、7 的 stacking F1 均未穩健超越等權平均，其中 fold 4 由 `0.91279`
+降至 `0.85877`。有限的 outer-training folds 與 60 維 meta-features 對 fold domain
+shift 不夠穩健，因此不採用 stacking，也不再以相同 development folds 搜尋其他
+meta-model 變體。六模型等權平均仍是 post-formal exploratory development 主結果；
+fold 10 保持封存，正式 10-fold 結論不變。

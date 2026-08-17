@@ -5,6 +5,7 @@
 ## 目前延伸任務：cross-scale nested stacking
 
 - 分支：`codex/pretrained-cnn-stacking-breakthrough`
+- 狀態：已完成；未採用。Nested stacking Macro F1 `0.87438 ± 0.01625`，低於等權平均 `0.90104 ± 0.00920`。
 - 來源模型：MN20 與 MN40，各使用固定 seeds 42、123、2026，共六個 checkpoints。
 - 主要指標：folds 1、4、7 的 mean validation Macro F1。
 - 外層評估：每次保留一個 development fold，只以另外兩個 folds 訓練 meta-model。

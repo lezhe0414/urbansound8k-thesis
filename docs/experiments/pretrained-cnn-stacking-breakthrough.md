@@ -1,7 +1,7 @@
 # Pretrained CNN nested stacking breakthrough study
 
 更新日期：2026-08-17  
-狀態：已預註冊；待 development-only 執行
+狀態：已完成；未採用
 
 ## 研究問題
 
@@ -58,3 +58,45 @@ python3 scripts/run_pretrained_cnn_stacking_study.py \
   --output-name <unique-run-name> \
   --backup-root <new-google-drive-artifact-directory>
 ```
+
+## 執行結果
+
+實驗使用 commit `c1e734c`，run name 為
+`pretrained_cnn_nested_stacking_c1e734c_20260817_150141`。同一批六模型 predictions
+成功重現等權平均基準 Macro F1 `0.90104 ± 0.00920`、Accuracy
+`0.89732 ± 0.01416`。Nested stacking 的 Macro F1 為
+`0.87438 ± 0.01625`、Accuracy 為 `0.87589 ± 0.01248`，相對基準差
+`-0.02666`，未達成功判準。
+
+| Outer fold | Selected C | Equal-average F1 | Stacking F1 | Equal-average accuracy | Stacking accuracy |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | 0.01 | 0.90001 | 0.89679 | 0.88202 | 0.89118 |
+| 4 | 0.10 | 0.91279 | 0.85877 | 0.91616 | 0.86061 |
+| 7 | 0.10 | 0.89032 | 0.86758 | 0.89379 | 0.87589 |
+
+Stacking 的 Macro Precision 為 `0.88171 ± 0.01019`，Macro Recall 為
+`0.87774 ± 0.02033`；等權平均分別為 `0.90654 ± 0.01249` 與
+`0.90251 ± 0.00483`。退步主要來自 fold 4，但三個 outer folds 均沒有穩健勝過
+等權平均。
+
+## 判讀與決策
+
+Meta-model 每次只能從兩個 development folds 學習，卻要估計 60 維模型信心特徵與
+十類決策邊界。UrbanSound8K 的 fold 間聲學分布差異使這個二階模型容易學到
+fold-specific confidence pattern；balanced class weighting 也沒有抵消此 domain shift。
+因此不再搜尋其他 `C`、member subset 或 stacking 變體，避免在三個 development folds
+上形成新的過擬合迴圈。
+
+六模型等權 probability ensemble `0.90104 ± 0.00920` 保留為論文中的 post-formal
+exploratory development result。正式 MN20 10-fold Macro F1 `0.87686 ± 0.04048` 仍是
+可作正式比較的結果，兩者不可混寫。Nested stacking 不執行 fold 10 test，也不取代
+任何已鎖定方法。
+
+## 完整性與 artifacts
+
+- `test_evaluated=false`；程式沒有 test CLI。
+- 搜尋輸出中沒有 fold 10 prediction path 或 fold 10 labels。
+- 18 份 member validation predictions 已產生並用於三個 outer folds。
+- Colab output：`results/pretrained_cnn_nested_stacking_c1e734c_20260817_150141/`。
+- Google Drive backup：`experiment_artifacts/pretrained_cnn_nested_stacking_c1e734c_20260817_150141/`。
+- GitHub 只保存程式、測試與文件；predictions、meta-model artifacts 和 figures 不提交。
