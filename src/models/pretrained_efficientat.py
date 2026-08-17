@@ -21,9 +21,19 @@ MN20_AUDIOSET_CHECKPOINT = (
     "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/"
     "mn20_as_mAP_478.pt"
 )
+MN30_AUDIOSET_CHECKPOINT = (
+    "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/"
+    "mn30_as_mAP_482.pt"
+)
+MN40_AUDIOSET_CHECKPOINT = (
+    "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/"
+    "mn40_as_mAP_484.pt"
+)
 EFFICIENTAT_VARIANTS = {
     "mn10_as": {"width_mult": 1.0, "checkpoint_url": MN10_AUDIOSET_CHECKPOINT},
     "mn20_as": {"width_mult": 2.0, "checkpoint_url": MN20_AUDIOSET_CHECKPOINT},
+    "mn30_as": {"width_mult": 3.0, "checkpoint_url": MN30_AUDIOSET_CHECKPOINT},
+    "mn40_as": {"width_mult": 4.0, "checkpoint_url": MN40_AUDIOSET_CHECKPOINT},
 }
 
 
@@ -46,7 +56,7 @@ def _load_state_dict(path: Path) -> dict[str, torch.Tensor]:
 
 
 class PretrainedEfficientATClassifier(nn.Module):
-    """EfficientAT MN10 AudioSet encoder with an UrbanSound8K classification head."""
+    """AudioSet-pretrained EfficientAT encoder with an UrbanSound8K head."""
 
     def __init__(
         self,
@@ -58,6 +68,7 @@ class PretrainedEfficientATClassifier(nn.Module):
         pretrained: bool = True,
         stage: str = "linear_probe",
         partial_last_blocks: int = 2,
+        freeze_encoder_batchnorm: bool = False,
         frontend_augmentation: bool = False,
         sample_rate: int = 32_000,
         win_length: int = 800,
@@ -82,6 +93,7 @@ class PretrainedEfficientATClassifier(nn.Module):
             variant_config["width_mult"] if width_mult is None else width_mult
         )
         self.model_cache_dir = Path(model_cache_dir)
+        self.freeze_encoder_batchnorm = bool(freeze_encoder_batchnorm)
         self.frontend_augmentation = bool(frontend_augmentation)
 
         self.frontend = AugmentMelSTFT(
@@ -121,7 +133,7 @@ class PretrainedEfficientATClassifier(nn.Module):
     def classification_head(self) -> nn.Linear:
         head = self.backbone.classifier[-1]
         if not isinstance(head, nn.Linear):
-            raise TypeError("EfficientAT MN10 MLP head did not end in a Linear layer.")
+            raise TypeError("EfficientAT MLP head did not end in a Linear layer.")
         return head
 
     def _download_checkpoint(self) -> Path:
@@ -140,7 +152,7 @@ class PretrainedEfficientATClassifier(nn.Module):
         expected_missing = {"classifier.5.weight", "classifier.5.bias"}
         if set(incompatible.missing_keys) != expected_missing or incompatible.unexpected_keys:
             raise RuntimeError(
-                "EfficientAT checkpoint did not match the pinned MN10 architecture: "
+                f"EfficientAT checkpoint did not match the pinned {self.variant} architecture: "
                 f"missing={incompatible.missing_keys}, unexpected={incompatible.unexpected_keys}"
             )
 
@@ -194,6 +206,10 @@ class PretrainedEfficientATClassifier(nn.Module):
                 parameters = list(module.parameters(recurse=True))
                 if parameters and not any(parameter.requires_grad for parameter in parameters):
                     module.eval()
+            if self.freeze_encoder_batchnorm:
+                for module in self.backbone.features.modules():
+                    if isinstance(module, nn.modules.batchnorm._BatchNorm):
+                        module.eval()
         return self
 
     def waveform_to_mel(self, waveform: torch.Tensor) -> torch.Tensor:

@@ -15,6 +15,40 @@ from src.utils.metrics import classification_metrics, confusion_matrix_array
 from src.utils.plotting import save_confusion_matrix
 
 
+ENSEMBLE_DATA_FIELDS = (
+    "raw_dir",
+    "waveform_cache_dir",
+    "require_waveform_cache",
+    "sample_rate",
+    "clip_duration_seconds",
+    "num_classes",
+    "sealed_test_fold",
+)
+ENSEMBLE_FRONTEND_FIELDS = (
+    "sample_rate",
+    "win_length",
+    "hop_size",
+    "n_fft",
+    "n_mels",
+    "fmin",
+    "fmax",
+)
+
+
+def _validate_ensemble_configs(configs: list[dict]) -> None:
+    """Require identical data/frontend contracts while allowing model-scale diversity."""
+    if not configs:
+        raise ValueError("At least one checkpoint config is required.")
+    reference = configs[0]
+    for index, config in enumerate(configs[1:], start=2):
+        for field in ENSEMBLE_DATA_FIELDS:
+            if config["data"].get(field) != reference["data"].get(field):
+                raise ValueError(f"Checkpoint {index} has incompatible data.{field}.")
+        for field in ENSEMBLE_FRONTEND_FIELDS:
+            if config["model"].get(field) != reference["model"].get(field):
+                raise ValueError(f"Checkpoint {index} has incompatible model.{field}.")
+
+
 def _load_checkpoint(path: Path, device: torch.device) -> dict:
     try:
         return torch.load(path, map_location=device, weights_only=False)
@@ -38,6 +72,7 @@ def evaluate_checkpoint_group(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     payloads = [_load_checkpoint(path, device) for path in checkpoint_paths]
     configs = [payload["config"] for payload in payloads]
+    _validate_ensemble_configs(configs)
     reference = configs[0]
     data_config = reference["data"]
     training_config = reference["training"]
@@ -88,8 +123,6 @@ def evaluate_checkpoint_group(
         variants.append(model.variant)
         seeds.append(int(config.get("seed", 42)))
 
-    if len(set(variants)) != 1:
-        raise ValueError("Probability ensembles require the same EfficientAT variant.")
     mean_probabilities = np.stack(probability_sets, axis=0).mean(axis=0)
     predictions = mean_probabilities.argmax(axis=1)
     assert expected_targets is not None
@@ -102,7 +135,8 @@ def evaluate_checkpoint_group(
             "checkpoint_count": len(checkpoint_paths),
             "checkpoints": [str(path) for path in checkpoint_paths],
             "seeds": seeds,
-            "model_variant": variants[0],
+            "model_variant": variants[0] if len(set(variants)) == 1 else "heterogeneous",
+            "model_variants": variants,
             "tta_offsets_samples": offsets,
             "selected_by": "development_validation_macro_f1" if split == "val" else "locked_formal_protocol",
         }

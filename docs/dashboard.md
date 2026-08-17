@@ -18,6 +18,7 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 4. EMA 與 3-seed ensemble 作為已完成但沒有改善的延伸實驗，保留重現程式與誠實結果。
 5. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
 6. MN20 post-formal study 已完成：保留 focal + 3-seed ensemble 作探索性改善，拒絕 checkpoint averaging；不得重新查看正式 test folds。
+7. `codex/pretrained-cnn-bold-breakthrough` 正在驗證官方 MN30/MN40、BatchNorm statistics freeze 與 cross-scale ensemble；只看 folds 1、4、7 validation，fold 10 不得執行。
 
 ## 最高風險
 

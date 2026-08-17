@@ -498,6 +498,7 @@ def train_validation_fold(
         "checkpoint_sha256": model.checkpoint_sha256,
         "upstream_commit": "a425fdce92572e602a1d5634799bd9f1f2efa806",
         "stage": model.stage,
+        "freeze_encoder_batchnorm": model.freeze_encoder_batchnorm,
         "initial_checkpoint": str(initial_checkpoint) if initial_checkpoint is not None else None,
         "preprocessing": {
             "sample_rate": dataset_kwargs["sample_rate"],

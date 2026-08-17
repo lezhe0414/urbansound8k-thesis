@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import copy
 import tempfile
 import unittest
 import wave
@@ -172,6 +173,38 @@ class PretrainedCNNConfigTests(unittest.TestCase):
         ce["training"]["loss"] = focal["training"]["loss"]
         self.assertEqual(ce, focal)
 
+    def test_bold_configs_are_development_only_and_control_bn_as_one_variable(self) -> None:
+        try:
+            import yaml
+        except ImportError as exc:
+            self.skipTest(f"PyYAML unavailable: {exc}")
+        names = [
+            "pretrained_cnn_bold_mn20_control.yaml",
+            "pretrained_cnn_bold_mn20_bnfreeze.yaml",
+            "pretrained_cnn_bold_mn30.yaml",
+            "pretrained_cnn_bold_mn40.yaml",
+        ]
+        configs = [yaml.safe_load((ROOT / "configs" / name).read_text()) for name in names]
+        self.assertEqual([config["model"]["variant"] for config in configs], [
+            "mn20_as",
+            "mn20_as",
+            "mn30_as",
+            "mn40_as",
+        ])
+        for config in configs:
+            self.assertEqual(config["data"]["development_folds"], [1, 4, 7])
+            self.assertEqual(config["data"]["sealed_test_fold"], 10)
+            self.assertFalse(config["evaluation"]["locked_for_test"])
+            self.assertEqual(config["training"]["loss"], {"name": "focal", "gamma": 1.5})
+            self.assertEqual(config["training"]["epochs"], 8)
+
+        control, bnfreeze = copy.deepcopy(configs[0]), copy.deepcopy(configs[1])
+        self.assertFalse(control["model"]["freeze_encoder_batchnorm"])
+        self.assertTrue(bnfreeze["model"]["freeze_encoder_batchnorm"])
+        control["run_name"] = bnfreeze["run_name"]
+        control["model"]["freeze_encoder_batchnorm"] = True
+        self.assertEqual(control, bnfreeze)
+
 
 try:
     import numpy as np
@@ -180,6 +213,7 @@ try:
 
     from src.data import UrbanSound8KWaveformDataset
     from src.checkpoint_averaging import average_state_dicts
+    from src.evaluate_pretrained_cnn import _validate_ensemble_configs
     from src.losses import FocalCrossEntropyLoss
     from src.models.pretrained_efficientat import PretrainedEfficientATClassifier
     from src.train_pretrained_cnn import _add_unfrozen_encoder_group
@@ -254,10 +288,67 @@ class PretrainedCNNTransferTests(unittest.TestCase):
         self.assertGreater(counts["trainable"], 12_810)
         self.assertGreater(counts["frozen"], 0)
 
-    def test_mn20_is_larger_than_mn10(self) -> None:
+    def test_official_variants_increase_in_parameter_count(self) -> None:
         mn10 = PretrainedEfficientATClassifier(pretrained=False, variant="mn10_as", stage="linear_probe")
         mn20 = PretrainedEfficientATClassifier(pretrained=False, variant="mn20_as", stage="linear_probe")
+        mn30 = PretrainedEfficientATClassifier(pretrained=False, variant="mn30_as", stage="linear_probe")
+        mn40 = PretrainedEfficientATClassifier(pretrained=False, variant="mn40_as", stage="linear_probe")
         self.assertGreater(mn20.parameter_counts()["total"], mn10.parameter_counts()["total"])
+        self.assertGreater(mn30.parameter_counts()["total"], mn20.parameter_counts()["total"])
+        self.assertGreater(mn40.parameter_counts()["total"], mn30.parameter_counts()["total"])
+
+    def test_batchnorm_statistics_can_be_frozen_during_partial_finetuning(self) -> None:
+        model = PretrainedEfficientATClassifier(
+            pretrained=False,
+            stage="partial_finetune",
+            partial_last_blocks=2,
+            freeze_encoder_batchnorm=True,
+        )
+        model.train()
+        batchnorm_modules = [
+            module
+            for module in model.backbone.features.modules()
+            if isinstance(module, torch.nn.modules.batchnorm._BatchNorm)
+        ]
+        self.assertTrue(batchnorm_modules)
+        self.assertTrue(all(not module.training for module in batchnorm_modules))
+        self.assertTrue(
+            any(
+                parameter.requires_grad
+                for module in batchnorm_modules
+                for parameter in module.parameters(recurse=False)
+            )
+        )
+
+    def test_cross_scale_ensemble_accepts_matching_frontends(self) -> None:
+        base = {
+            "data": {
+                "raw_dir": "data/raw",
+                "waveform_cache_dir": "data/cache",
+                "require_waveform_cache": True,
+                "sample_rate": 32_000,
+                "clip_duration_seconds": 5.0,
+                "num_classes": 10,
+                "sealed_test_fold": 10,
+            },
+            "model": {
+                "variant": "mn20_as",
+                "sample_rate": 32_000,
+                "win_length": 800,
+                "hop_size": 320,
+                "n_fft": 1024,
+                "n_mels": 128,
+                "fmin": 0.0,
+                "fmax": None,
+            },
+        }
+        larger = {"data": dict(base["data"]), "model": dict(base["model"])}
+        larger["model"]["variant"] = "mn40_as"
+        _validate_ensemble_configs([base, larger])
+
+        larger["model"]["sample_rate"] = 16_000
+        with self.assertRaisesRegex(ValueError, "model.sample_rate"):
+            _validate_ensemble_configs([base, larger])
 
     def test_frontend_and_backbone_can_be_called_separately_for_mixup(self) -> None:
         model = PretrainedEfficientATClassifier(
