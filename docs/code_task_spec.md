@@ -2,6 +2,19 @@
 
 這份文件定義目前最優先的程式任務：建立 sound event detection 的最小可交付 pipeline。目標是先符合 project definition 的 CNN baseline，再視時間加入 Transformer 比較。
 
+## 目前延伸任務：cross-scale nested stacking
+
+- 分支：`codex/pretrained-cnn-stacking-breakthrough`
+- 來源模型：MN20 與 MN40，各使用固定 seeds 42、123、2026，共六個 checkpoints。
+- 主要指標：folds 1、4、7 的 mean validation Macro F1。
+- 外層評估：每次保留一個 development fold，只以另外兩個 folds 訓練 meta-model。
+- 內層選擇：只在兩個 outer-training folds 內，以 reciprocal inner validation 從固定 `C = [0.01, 0.1, 1.0, 10.0]` 選擇 logistic-regression regularisation。
+- 固定條件：log-probability features、standardisation、balanced class weights、六個固定成員及相同 member order。
+- 比較基準：相同六模型的等權 softmax probability mean，Macro F1 `0.90104 ± 0.00920`。
+- 資料限制：fold 10 完全封存；raw audio、Mel cache、waveform cache 與來源 checkpoints 均不得修改。
+- 輸出：member predictions、inner-C scores、outer-fold metrics、stacked probabilities、meta-model parameters、summary、confusion matrices 與 Drive backup。
+- 詳細協定：`docs/experiments/pretrained-cnn-stacking-breakthrough.md`。
+
 ## 目前延伸任務：pretrained CNN recommended study
 
 - 分支：`codex/pretrained-cnn-recommended-study`

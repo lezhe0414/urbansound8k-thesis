@@ -522,3 +522,38 @@ MN20 + MN40 在固定 seed 42 達 Macro F1 `0.90128`，但只擴展 MN40 的三 
 same-seed pair 的 Macro F1 分別為 `0.90128`、`0.89995`、`0.90099`，支持跨尺度互補
 不是 seed 42 的單點異常。結論限於 post-formal development evidence；正式 10-fold
 方法及結果不變。
+
+---
+
+## DEC-014：以 nested leave-one-fold-out logistic stacking 組合六個跨尺度模型
+
+- 日期：2026-08-17
+- 狀態：已預註冊；待 development-only 執行
+- 相關文件：`docs/experiments/pretrained-cnn-stacking-breakthrough.md`
+- 相關會議：無；使用者要求在六模型 `0.90104` 結果上繼續嘗試
+
+#### 背景
+
+MN20 與 MN40 各三 seeds 的等權 probability ensemble 已跨三個 development folds
+維持約 `0.90` Macro F1。直接在相同 validation labels 上最佳化 ensemble weights 容易
+高估效果，因此需要把 meta-model fitting 與 outer evaluation 分離。
+
+#### 決策
+
+使用 folds 1、4、7 做 outer leave-one-fold-out stacking。每個 outer target fold 只用
+另外兩 folds 的六模型 log-probability features fitting logistic regression；固定 balanced
+class weights，並只在 outer-training folds 內以 reciprocal inner validation 選擇
+`C = [0.01, 0.1, 1.0, 10.0]`。不搜尋成員、feature transform 或 threshold。
+
+#### 成功判準
+
+Nested stacking 的 mean validation Macro F1 必須高於相同 predictions 的六模型等權
+probability mean，才稱為改善。Fold 10 繼續封存；此 post-formal 結果不改寫正式
+10-fold 結論。
+
+#### 後續行動
+
+- [ ] 實作 feature alignment、nested regularisation selection 與 outer evaluation。
+- [ ] 核對 equal-average baseline 可重現 `0.90104`。
+- [ ] 保存 meta-model parameters、predictions、metrics 與 Drive backup。
+- [ ] 核對 `test_evaluated=false` 且沒有 fold-10 outputs。
