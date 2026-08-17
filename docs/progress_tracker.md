@@ -1,12 +1,12 @@
 # MVP 進度追蹤
 
-更新日期：2026-08-13
+更新日期：2026-08-17
 
 這份文件用來集中追蹤 UrbanSound8K 聲音分類 MVP 的已完成、未完成與下一步。之後每次程式、資料、實驗、圖表或論文草稿有重要更新時，都要同步更新本文件。
 
 ## 目前結論
 
-MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。EMA validation 比較與固定 3-seed probability ensemble 亦已完成，但都沒有超越已鎖定的單一 CNN，因此正式設定維持 EMA 關閉且不採用 ensemble。
+MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。EMA validation 比較與固定 3-seed probability ensemble 亦已完成，但都沒有超越已鎖定的單一 CNN。AudioSet-pretrained EfficientAT v2 development study 另外在 folds 1、4、7 達到 Macro F1 `0.8844 ± 0.0165`；此結果尚未執行 v2 test，只能視為正式 10-fold 前的鎖定方法。
 
 整個論文專案尚未完成，因為固定 CNN 設定的正式 10-fold cross-validation、結果解讀與最終 8 頁論文仍待完成。
 
@@ -115,6 +115,7 @@ CNN 已在 Colab GPU 完成正式 fold 10 長訓練、受控 augmentation 搜尋
 | Training script | 完成 | `src/train.py` | 可輸出 checkpoint、history、metrics、confusion matrix |
 | EMA checkpoint support | 完成 | `src/utils/ema.py`、`configs/cnn_aug_ema.yaml` | 同次訓練記錄 online/EMA validation 指標；test 預設關閉 |
 | 3-seed ensemble support | 完成 | `src/ensemble.py`、`tests/test_seed_ensemble.py` | EMA 與個別 seed test 強制關閉；平均三個 softmax probabilities |
+| EfficientAT transfer-learning support | 完成 | `src/models/pretrained_efficientat.py`、`src/train_pretrained_cnn.py` | 官方 32 kHz frontend、linear probe、partial fine-tuning、Mixup、gradual unfreezing 與可設定解凍深度 |
 | Evaluation script | 完成 | `src/evaluate.py` | 可重讀 checkpoint 重新評估 |
 | Colab CNN baseline notebook | 完成 | `notebooks/2026-07-02-colab-cnn-baseline.ipynb` | 用英文註解記錄 GitHub clone、資料下載、preprocess、CNN 訓練、評估與結果打包流程 |
 | Colab CNN + Transformer notebook | 完成 | `notebooks/2026-07-08-colab-cnn-transformer-fold10.ipynb` | 使用 Google Drive cache，支援 CNN baseline 與 Spectrogram Transformer fold 10 訓練、評估、metrics 與結果打包 |
@@ -152,6 +153,19 @@ CNN 已在 Colab GPU 完成正式 fold 10 長訓練、受控 augmentation 搜尋
 
 3-seed 使用 seeds 42、123、2026；各 seed 只依 validation Macro F1 保存 checkpoint，個別模型不讀取 test。完整紀錄見 `docs/experiments/2026-08-13-cnn-seed-ensemble.md`。Ensemble fold 10 test 僅在方法鎖定後執行一次，不能再用於調參。
 
+### AudioSet-pretrained EfficientAT v2 development 結果
+
+完整紀錄：`docs/experiments/pretrained-cnn-transfer-v2.md`
+
+| 設定 | Validation Macro F1 mean ± std | Validation Accuracy mean ± std | 決策 |
+| --- | ---: | ---: | --- |
+| V1: 5 epochs, last 2 blocks | 0.8716 ± 0.0283 | 0.8734 ± 0.0212 | 歷史參考 |
+| V2: 8 epochs only | 0.8774 ± 0.0265 | 0.8777 ± 0.0222 | 延長訓練有效但非最終設定 |
+| V2: weak Mixup, last 2 blocks | 0.8786 ± 0.0203 | 0.8788 ± 0.0174 | A-D 勝出 |
+| V2: weak Mixup, last 3 blocks | **0.8844 ± 0.0165** | **0.8824 ± 0.0141** | 唯一勝出方法 |
+
+V2 只使用 folds 1、4、7 development validation，沒有執行新的 fold 10 test。V1 fold 10 Macro F1 `0.9041` 不能標示成 v2 test result。下一步是把 v2 方法參數完全固定後執行正式 10-fold；每個 test fold 都必須排除於 validation selection。
+
 ### Transformer fold 10 正式結果
 
 | 指標 | 數值 |
@@ -185,7 +199,7 @@ Smoke run 只用少量資料與 1 epoch 檢查 pipeline 是否能完整執行。
 
 | 項目 | 狀態 | 原因 / 風險 | 下一步 |
 | --- | --- | --- | --- |
-| 10-fold cross validation | 未完成 | MVP 先跑 fold 10 | 後續可跑 `--fold all` 或多 fold 平均 |
+| 10-fold cross validation | 未完成 | 先完成 development-only 選模 | From-scratch CNN 可跑 `--fold all`；EfficientAT 需 fixed-config split runner |
 | EMA validation comparison | 完成 | 改善僅約 0.00089 | 正式設定關閉 EMA |
 | 3-seed ensemble | 完成 | validation Macro F1 0.7699，未超越單一 CNN | 保留負結果與重現程式，不採用於正式 10-fold |
 | CNN vs Transformer 正式比較表 | 進行中 | 單一 fold 結果已具備，缺 10-fold CNN 統計 | 完成 10-fold 後整理最終表格 |
@@ -199,10 +213,10 @@ Smoke run 只用少量資料與 1 epoch 檢查 pipeline 是否能完整執行。
 ## 下一步優先順序
 
 1. 以 `configs/cnn_aug_final.yaml`、EMA 關閉的固定單一 CNN 執行正式 10-fold cross-validation。
-2. 整理 mean/std、per-class F1 與 aggregate confusion matrix。
-3. 將單一 CNN、3-seed ensemble、從零訓練 Transformer 與 pretrained AST 的角色公平寫入 Results 與 Discussion。
-4. 不再依 fold 10 test 改動 seed、ensemble 權重或超參數。
-5. 整理 confusion matrix 與 metrics 成論文可用圖表與表格。
+2. 以 `configs/pretrained_cnn_v2_mixup_last3.yaml` 的鎖定方法建立 EfficientAT fixed-config 10-fold runner；不得再調參。
+3. 整理 mean/std、per-class F1 與 aggregate confusion matrix。
+4. 將單一 CNN、3-seed ensemble、從零訓練 Transformer 與 AudioSet-pretrained EfficientAT 的角色公平寫入 Results 與 Discussion。
+5. 不再依 fold 10 test 改動 seed、ensemble 權重或超參數。
 
 ## 常用命令
 

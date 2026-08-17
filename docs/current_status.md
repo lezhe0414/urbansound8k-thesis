@@ -39,6 +39,7 @@
 9. 鎖定後唯一一次 ensemble fold 10 test Accuracy 為 `0.8411`、Macro F1 為 `0.8501`，亦略低於單一 CNN，但此 test 只作確認，不作選模依據。
 10. EfficientAT `mn10_as` transfer-learning study 已完成：linear probing development Macro F1 `0.8471 ± 0.0327`；partial fine-tuning 最佳設定為 `0.8716 ± 0.0283`，比相同 protocol 的 control `0.7818` 高 `0.0898`。
 11. 唯一設定鎖定後只執行一次 fold 10 test，Accuracy `0.8949`、Macro F1 `0.9041`；test 不參與選模或後續調參。
+12. EfficientAT v2 development-only study 已完成：8 epochs、weak Mixup (`alpha=0.15`, `p=0.5`) 與解凍最後 3 個 blocks 的唯一勝出設定達 Macro F1 `0.8844 ± 0.0165`、Accuracy `0.8824 ± 0.0141`。V2 沒有再次執行 fold 10；上述 v1 test 分數不能當作 v2 test result。
 
 ## 已建立內容
 
@@ -119,13 +120,13 @@
 
 ## 下一步
 
-第三模型的 validation-only transfer-learning 判斷與唯一 fold 10 final confirmation 已完成。下一步是固定設定的正式統計驗證：
+第三模型的 v2 validation-only 方法選擇已完成。下一步是固定設定的正式統計驗證：
 
 1. 以 `configs/cnn_aug_final.yaml` 執行固定 from-scratch CNN 10-fold，不再依 fold 結果調參。
-2. 時間允許時，以已鎖定的 `configs/pretrained_cnn_partial_finetune_final_test.yaml` 方法執行 EfficientAT 正式 10-fold；每 fold 只使用其非 test folds 建立 validation split。
+2. 時間允許時，以 `configs/pretrained_cnn_v2_mixup_last3.yaml` 的已鎖定方法參數建立 EfficientAT fixed-config 10-fold runner；每個 test fold 必須完全排除於選模，並只使用其餘 folds 建立 validation split。
 3. 整理 from-scratch CNN、from-scratch Transformer 與 AudioSet-pretrained CNN 的公平比較，明確區分從零訓練與 AudioSet transfer learning。
 4. 將 10-fold mean/std、per-class F1 與 confusion matrix 納入論文結果及限制分析。
 
 ## 目前完成度判斷
 
-專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA、3-seed ensemble、EfficientAT transfer-learning study 與各自鎖定後的一次性 fold 10 test 均已完成。整體目標尚未完成，因為固定設定的正式 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。
+專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA、3-seed ensemble，以及 EfficientAT v1/v2 transfer-learning studies 均已完成。V2 僅使用 development validation 並未再次查看 fold 10。整體目標尚未完成，因為固定設定的正式 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。

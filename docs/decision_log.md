@@ -336,3 +336,39 @@ EfficientAT linear probing 在 folds 1、4、7 達到 Macro F1 `0.8471 ± 0.0327
 - [x] 確認 fold 10 只評估一個鎖定設定。
 - [ ] 視時程執行固定 EfficientAT 設定的正式 10-fold cross-validation。
 - [ ] 在論文加入三模型公平比較與限制分析。
+
+---
+
+## DEC-009：鎖定 EfficientAT v2 weak Mixup 與 last-3-block fine-tuning
+
+- 日期：2026-08-17
+- 狀態：已決定
+- 相關文件：`configs/pretrained_cnn_v2_mixup_last3.yaml`、`docs/experiments/pretrained-cnn-transfer-v2.md`
+- 相關會議：無；使用者要求的 development-only 延伸實驗
+
+#### 背景
+
+EfficientAT v1 在 folds 1、4、7 的 development Macro F1 為 `0.8716 ± 0.0283`。為判斷五 epochs 是否尚未收斂，並測試 gradual unfreezing、pretrained-specific augmentation 與解凍深度，建立 v2 受控序列。所有選擇只依三-fold validation Macro F1；v1 fold 10 test 不參與，v2 不再執行 fold 10。
+
+#### 決策
+
+鎖定 8 epochs、post-frontend Mixup (`alpha=0.15`, `probability=0.5`)、解凍最後 3 個 convolution blocks、encoder/head learning rates `2e-5`/`3e-4` 的方法。唯一設定檔為 `configs/pretrained_cnn_v2_mixup_last3.yaml`。後續 EfficientAT 正式 10-fold 應使用這組固定方法參數，不再根據單一 development fold 調整。
+
+#### 理由
+
+此設定在 folds 1、4、7 達到 Macro F1 `0.8844 ± 0.0165` 與 Accuracy `0.8824 ± 0.0141`，相較 v1 提高 `0.0128` 且 fold 間標準差降低。它也比 last-2-block Mixup 高 `0.0057`，主要改善較弱的 fold 7，而 folds 1、4 沒有明顯退化。Gradual unfreezing 與輕量 time/frequency masking 均未穩健超越 8-epoch control。
+
+#### 影響
+
+- 對模型：v2 固定方法取代 v1 作為未來 EfficientAT cross-validation 的候選，但不改寫 v1 已完成的一次性 fold 10 結果。
+- 對評估：v2 尚無 test result；不得把 v1 fold 10 Macro F1 `0.9041` 標示為 v2 表現。
+- 對論文：報告三-fold mean/std、額外 AudioSet pretraining 及 validation-only 選模流程，不能把差異歸因於純架構。
+- 對程式：正式 10-fold 前需新增 fixed-config split support，確保每個 test fold 不參與 validation selection。
+
+#### 後續行動
+
+- [x] 完成 A-D 受控比較與 last 1/2/3 depth study。
+- [x] 核對六個 runs 的 Drive summaries、manifests 與 checkpoints。
+- [x] 確認所有 v2 runs 均為 `test_evaluated=false`。
+- [ ] 以鎖定方法執行正式 10-fold cross-validation。
+- [ ] 將 mean/std、per-class F1 與 aggregate confusion matrix納入論文。

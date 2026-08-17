@@ -28,12 +28,14 @@ REQUIRED_FILES = [
     "docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md",
     "docs/experiments/2026-08-13-cnn-seed-ensemble.md",
     "docs/experiments/pretrained-cnn-transfer.md",
+    "docs/experiments/pretrained-cnn-transfer-v2.md",
     "configs/cnn_aug_final.yaml",
     "configs/cnn_aug_ema.yaml",
     "configs/pretrained_cnn_linear_probe.yaml",
     "configs/pretrained_cnn_partial_finetune.yaml",
     "configs/pretrained_cnn_partial_finetune_lr2e5.yaml",
     "configs/pretrained_cnn_partial_finetune_final_test.yaml",
+    "configs/pretrained_cnn_v2_mixup_last3.yaml",
     "src/ensemble.py",
     "src/models/pretrained_efficientat.py",
     "src/train_pretrained_cnn.py",
@@ -51,7 +53,7 @@ PLACEHOLDER_MARKERS = [
 
 NEXT_ACTIONS = [
     "使用已鎖定設定執行固定 from-scratch CNN 的正式 10-fold cross-validation。",
-    "時間允許時，使用已鎖定 EfficientAT 設定執行正式 10-fold cross-validation。",
+    "使用 v2 唯一勝出方法建立 EfficientAT fixed-config 10-fold runner 並執行正式驗證。",
     "整理 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 的公平比較。",
 ]
 
@@ -59,8 +61,8 @@ STATUS_SUMMARY = (
     "setup files present; UrbanSound8K downloaded and preprocessed; "
     "CNN controlled augmentation search completed; EMA validation comparison completed; "
     "3-seed probability ensemble completed and not selected; AudioSet-pretrained EfficientAT CNN "
-    "development selection and one sealed fold-10 evaluation completed; fixed-config 10-fold "
-    "cross-validation pending"
+    "v2 development-only selection completed at Macro F1 0.8844 +/- 0.0165; v2 test not run; "
+    "fixed-config 10-fold cross-validation pending"
 )
 
 
