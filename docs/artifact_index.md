@@ -86,6 +86,7 @@
 | CNN 3-seed ensemble | `docs/experiments/2026-08-13-cnn-seed-ensemble.md` | 評估固定 seeds 42、123、2026 的 probability ensemble | 已確認 | Colab results + Drive backup | validation F1 0.7699；test F1 0.8501；未超越鎖定單一 CNN，故不採用 |
 | AudioSet-pretrained CNN transfer study | `docs/experiments/pretrained-cnn-transfer.md` | 第三模型的 protocol、設定、結果與公平比較 | 已確認 | folds 1、4、7 + one sealed test | Dev F1 `0.8716 ± 0.0283`；唯一 fold 10 test F1 `0.9041`；Drive 已備份 |
 | EfficientAT v2 development study | `docs/experiments/pretrained-cnn-transfer-v2.md` | 8 epochs、unfreezing、Mixup/masking 與解凍深度比較 | 已確認 | folds 1、4、7 validation only | 勝出 F1 `0.8844 ± 0.0165`、Accuracy `0.8824 ± 0.0141`；v2 未執行 fold 10 |
+| EfficientAT recommended study implementation | `docs/experiments/pretrained-cnn-recommended-study.md` | Waveform augmentation、TTA、固定三 seed ensemble、MN20 與正式 10-fold protocol | 程式已完成，實驗待執行 | tests + folds 1、4、7 validation only | Drive 目標為 `pretrained_cnn_recommended/`；鎖定前 fold 10 封存 |
 | 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用

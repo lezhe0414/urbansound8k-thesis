@@ -17,6 +17,14 @@ MN10_AUDIOSET_CHECKPOINT = (
     "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/"
     "mn10_as_mAP_471.pt"
 )
+MN20_AUDIOSET_CHECKPOINT = (
+    "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/"
+    "mn20_as_mAP_478.pt"
+)
+EFFICIENTAT_VARIANTS = {
+    "mn10_as": {"width_mult": 1.0, "checkpoint_url": MN10_AUDIOSET_CHECKPOINT},
+    "mn20_as": {"width_mult": 2.0, "checkpoint_url": MN20_AUDIOSET_CHECKPOINT},
+}
 
 
 def _sha256(path: Path) -> str:
@@ -43,7 +51,9 @@ class PretrainedEfficientATClassifier(nn.Module):
     def __init__(
         self,
         num_classes: int = 10,
-        checkpoint_url: str = MN10_AUDIOSET_CHECKPOINT,
+        variant: str = "mn10_as",
+        checkpoint_url: str | None = None,
+        width_mult: float | None = None,
         model_cache_dir: str | Path = ".model_cache/efficientat",
         pretrained: bool = True,
         stage: str = "linear_probe",
@@ -63,7 +73,14 @@ class PretrainedEfficientATClassifier(nn.Module):
     ) -> None:
         super().__init__()
         self.num_classes = int(num_classes)
-        self.checkpoint_url = str(checkpoint_url)
+        self.variant = str(variant)
+        if self.variant not in EFFICIENTAT_VARIANTS:
+            raise ValueError(f"Unsupported EfficientAT variant: {self.variant}")
+        variant_config = EFFICIENTAT_VARIANTS[self.variant]
+        self.checkpoint_url = str(checkpoint_url or variant_config["checkpoint_url"])
+        self.width_mult = float(
+            variant_config["width_mult"] if width_mult is None else width_mult
+        )
         self.model_cache_dir = Path(model_cache_dir)
         self.frontend_augmentation = bool(frontend_augmentation)
 
@@ -83,7 +100,7 @@ class PretrainedEfficientATClassifier(nn.Module):
         self.backbone = get_model(
             num_classes=self.num_classes,
             pretrained_name=None,
-            width_mult=1.0,
+            width_mult=self.width_mult,
             head_type="mlp",
             input_dim_f=int(n_mels),
             input_dim_t=500,

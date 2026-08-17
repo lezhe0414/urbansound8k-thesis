@@ -7,13 +7,15 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+import numpy as np
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from tqdm import tqdm
 
-from src.data import UrbanSound8KWaveformDataset
+from src.data import UrbanSound8KWaveformDataset, WaveformBatchAugmenter
 from src.models.pretrained_efficientat import PretrainedEfficientATClassifier
+from src.pretrained_cnn_inference import predict_loader, tta_offsets_samples
 from src.utils.config import load_config
 from src.utils.metrics import classification_metrics, confusion_matrix_array, write_history_csv
 from src.utils.plotting import save_confusion_matrix, save_training_history
@@ -82,6 +84,8 @@ def _run_epoch(
     scaler=None,
     mixed_precision: bool = False,
     mixup_config: dict | None = None,
+    waveform_augmentation_config: dict | None = None,
+    sample_rate: int = 32_000,
 ) -> tuple[float, dict[str, float]]:
     training = optimizer is not None
     model.train(training)
@@ -97,10 +101,19 @@ def _run_epoch(
     y_true: list[int] = []
     y_pred: list[int] = []
     mixup_applied_batches = 0
+    waveform_augmenter = WaveformBatchAugmenter(waveform_augmentation_config, sample_rate=sample_rate)
+    augmented_shifted_samples = 0
+    augmented_gain_samples = 0
+    augmented_noise_samples = 0
 
     for waveforms, targets in tqdm(loader, desc="train" if training else "validation", leave=False):
         waveforms = waveforms.to(device, non_blocking=True)
         targets = targets.to(device, non_blocking=True)
+        if training:
+            waveforms, augmentation_stats = waveform_augmenter(waveforms)
+            augmented_shifted_samples += augmentation_stats.shifted
+            augmented_gain_samples += augmentation_stats.gained
+            augmented_noise_samples += augmentation_stats.noised
         if training:
             optimizer.zero_grad(set_to_none=True)
         with torch.set_grad_enabled(training):
@@ -144,6 +157,9 @@ def _run_epoch(
 
     metrics = classification_metrics(y_true, y_pred, labels)
     metrics["mixup_applied_batches"] = float(mixup_applied_batches)
+    metrics["waveform_shifted_samples"] = float(augmented_shifted_samples)
+    metrics["waveform_gain_samples"] = float(augmented_gain_samples)
+    metrics["waveform_noise_samples"] = float(augmented_noise_samples)
     return total_loss / max(len(loader.dataset), 1), metrics
 
 
@@ -184,6 +200,7 @@ def train_validation_fold(
     val_fold: int,
     backup_root: Path | None = None,
     evaluate_test: bool = False,
+    test_fold_override: int | None = None,
 ) -> Path:
     seed = int(config.get("seed", 42))
     set_seed(seed)
@@ -193,21 +210,31 @@ def train_validation_fold(
     output_config = config.get("outputs", {})
     evaluation_config = config.get("evaluation", {})
 
-    test_fold = int(data_config.get("sealed_test_fold", 10))
+    test_fold = int(test_fold_override or data_config.get("sealed_test_fold", 10))
     development_folds = [int(value) for value in data_config.get("development_folds", [1, 4, 7])]
-    if test_fold != 10:
-        raise ValueError("This study requires fold 10 to remain the sealed test fold.")
-    if val_fold not in development_folds:
-        raise ValueError(f"val_fold={val_fold} is not one of the configured development folds {development_folds}.")
-    if evaluate_test and not bool(evaluation_config.get("locked_for_test", False)):
-        raise PermissionError("Test evaluation requires evaluation.locked_for_test=true after one final config is locked.")
+    formal_cross_validation = test_fold_override is not None
+    if formal_cross_validation:
+        if not bool(evaluation_config.get("formal_cross_validation", False)):
+            raise PermissionError("A test-fold override requires evaluation.formal_cross_validation=true.")
+        if not bool(evaluation_config.get("locked_for_test", False)):
+            raise PermissionError("Formal cross-validation requires a locked final configuration.")
+        if not 1 <= test_fold <= 10 or not 1 <= val_fold <= 10 or test_fold == val_fold:
+            raise ValueError("Formal test and validation folds must be distinct values from 1 to 10.")
+    else:
+        if test_fold != 10:
+            raise ValueError("This development study requires fold 10 to remain sealed.")
+        if val_fold not in development_folds:
+            raise ValueError(f"val_fold={val_fold} is not one of the configured development folds {development_folds}.")
+        if evaluate_test and not bool(evaluation_config.get("locked_for_test", False)):
+            raise PermissionError("Test evaluation requires evaluation.locked_for_test=true after one final config is locked.")
 
     raw_dir = Path(data_config["raw_dir"])
     waveform_cache_dir = data_config.get("waveform_cache_dir")
     labels = list(range(int(data_config.get("num_classes", 10))))
     class_names = _class_names(raw_dir)
     run_name = str(config["run_name"])
-    run_dir = Path(output_config.get("results_dir", "results")) / run_name / f"valfold{val_fold}"
+    split_name = f"testfold{test_fold}_valfold{val_fold}" if formal_cross_validation else f"valfold{val_fold}"
+    run_dir = Path(output_config.get("results_dir", "results")) / run_name / split_name
     if run_dir.exists() and any(run_dir.iterdir()):
         raise FileExistsError(f"Refusing to overwrite an existing experiment run: {run_dir}")
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -255,7 +282,9 @@ def train_validation_fold(
     initial_checkpoint = None
     initial_checkpoint_template = training_config.get("initial_checkpoint_template")
     if initial_checkpoint_template:
-        initial_checkpoint = Path(str(initial_checkpoint_template).format(val_fold=val_fold))
+        initial_checkpoint = Path(
+            str(initial_checkpoint_template).format(val_fold=val_fold, test_fold=test_fold, seed=seed)
+        )
         if not initial_checkpoint.exists():
             raise FileNotFoundError(f"Missing required linear-probe checkpoint: {initial_checkpoint}")
         try:
@@ -317,6 +346,8 @@ def train_validation_fold(
             scaler=scaler,
             mixed_precision=mixed_precision,
             mixup_config=training_config.get("mixup", {}),
+            waveform_augmentation_config=training_config.get("waveform_augmentation", {}),
+            sample_rate=dataset_kwargs["sample_rate"],
         )
         val_loss, val_metrics = _run_epoch(
             model,
@@ -337,6 +368,9 @@ def train_validation_fold(
             "training_stage": model.stage,
             "trainable_parameters": model.parameter_counts()["trainable"],
             "mixup_applied_batches": int(train_metrics["mixup_applied_batches"]),
+            "waveform_shifted_samples": int(train_metrics["waveform_shifted_samples"]),
+            "waveform_gain_samples": int(train_metrics["waveform_gain_samples"]),
+            "waveform_noise_samples": int(train_metrics["waveform_noise_samples"]),
             "encoder_learning_rate": next(
                 (group["lr"] for group in optimizer.param_groups if group.get("group_name") == "encoder"),
                 0.0,
@@ -387,7 +421,9 @@ def train_validation_fold(
     )
     manifest = {
         "run_name": run_name,
-        "model_name": "EfficientAT MN10",
+        "model_name": f"EfficientAT {model.variant.upper().replace('_AS', '')}",
+        "model_variant": model.variant,
+        "width_mult": model.width_mult,
         "pretrained_checkpoint": model.checkpoint_url,
         "checkpoint_sha256": model.checkpoint_sha256,
         "upstream_commit": "a425fdce92572e602a1d5634799bd9f1f2efa806",
@@ -407,6 +443,7 @@ def train_validation_fold(
         "parameter_counts": model.parameter_counts(),
         "development_validation_fold": val_fold,
         "sealed_test_fold": test_fold,
+        "formal_cross_validation": formal_cross_validation,
         "test_evaluated": False,
         "seed": seed,
         "epochs": epochs,
@@ -419,6 +456,7 @@ def train_validation_fold(
             "final_stage": requested_stage,
         },
         "mixup": dict(training_config.get("mixup") or {}),
+        "waveform_augmentation": dict(training_config.get("waveform_augmentation") or {}),
         "frontend_augmentation": {
             "enabled": bool(model_config.get("frontend_augmentation", False)),
             "frequency_mask_param": int(model_config.get("frequency_mask_param", 0)),
@@ -444,29 +482,31 @@ def train_validation_fold(
         test_loader = DataLoader(test_set, shuffle=False, **loader_kwargs)
         checkpoint = torch.load(best_path, map_location=device, weights_only=False)
         model.load_state_dict(checkpoint["model_state"])
-        test_loss, test_metrics = _run_epoch(
+        offsets = tta_offsets_samples(evaluation_config.get("tta"), dataset_kwargs["sample_rate"])
+        test_loss, test_metrics, test_targets, test_probabilities = predict_loader(
             model,
             test_loader,
-            criterion,
             device,
             labels,
+            criterion=criterion,
             mixed_precision=mixed_precision,
+            offsets_samples=offsets,
+            description="test",
         )
         test_metrics["test_loss"] = test_loss
+        test_metrics["tta_offsets_samples"] = offsets
         (run_dir / "test_metrics.json").write_text(
             json.dumps(test_metrics, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-        # Re-run predictions only when the uniquely locked test evaluation is explicitly requested.
-        y_true: list[int] = []
-        y_pred: list[int] = []
-        model.eval()
-        with torch.no_grad():
-            for waveforms, targets in tqdm(test_loader, desc="test", leave=False):
-                logits = model(waveforms.to(device, non_blocking=True))
-                y_true.extend(targets.tolist())
-                y_pred.extend(logits.argmax(dim=1).cpu().tolist())
-        matrix = confusion_matrix_array(y_true, y_pred, labels)
+        test_predictions = test_probabilities.argmax(axis=1)
+        np.savez_compressed(
+            run_dir / "test_predictions.npz",
+            targets=test_targets,
+            probabilities=test_probabilities,
+            predictions=test_predictions,
+        )
+        matrix = confusion_matrix_array(test_targets.tolist(), test_predictions.tolist(), labels)
         save_confusion_matrix(matrix, class_names, run_dir / "test_confusion_matrix.png", title=run_name)
         manifest["test_evaluated"] = True
         (run_dir / "experiment_manifest.json").write_text(

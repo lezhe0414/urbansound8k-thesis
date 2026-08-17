@@ -62,6 +62,39 @@ class PretrainedCNNConfigTests(unittest.TestCase):
         self.assertTrue(configs[3]["training"]["mixup"]["enabled"])
         self.assertAlmostEqual(configs[3]["training"]["mixup"]["alpha"], 0.15)
 
+    def test_recommended_candidates_preserve_development_protocol(self) -> None:
+        try:
+            import yaml
+        except ImportError as exc:
+            self.skipTest(f"PyYAML unavailable: {exc}")
+        names = [
+            "pretrained_cnn_recommended_shift_gain.yaml",
+            "pretrained_cnn_recommended_noise.yaml",
+            "pretrained_cnn_recommended_combo.yaml",
+        ]
+        configs = [yaml.safe_load((ROOT / "configs" / name).read_text(encoding="utf-8")) for name in names]
+        for config in configs:
+            self.assertEqual(config["data"]["development_folds"], [1, 4, 7])
+            self.assertEqual(config["data"]["sealed_test_fold"], 10)
+            self.assertFalse(config["evaluation"]["locked_for_test"])
+            self.assertEqual(config["training"]["epochs"], 8)
+            self.assertEqual(config["model"]["variant"], "mn10_as")
+            self.assertTrue(config["training"]["waveform_augmentation"]["enabled"])
+
+    def test_mn20_configs_use_official_audio_set_checkpoint(self) -> None:
+        try:
+            import yaml
+        except ImportError as exc:
+            self.skipTest(f"PyYAML unavailable: {exc}")
+        linear = yaml.safe_load((ROOT / "configs" / "pretrained_cnn_mn20_linear.yaml").read_text())
+        partial = yaml.safe_load((ROOT / "configs" / "pretrained_cnn_mn20_partial.yaml").read_text())
+        for config in (linear, partial):
+            self.assertEqual(config["model"]["variant"], "mn20_as")
+            self.assertIn("mn20_as_mAP_478.pt", config["model"]["checkpoint_url"])
+            self.assertFalse(config["evaluation"]["locked_for_test"])
+        self.assertEqual(linear["model"]["stage"], "linear_probe")
+        self.assertEqual(partial["model"]["stage"], "partial_finetune")
+
 
 try:
     import numpy as np
@@ -141,6 +174,11 @@ class PretrainedCNNTransferTests(unittest.TestCase):
         counts = model.parameter_counts()
         self.assertGreater(counts["trainable"], 12_810)
         self.assertGreater(counts["frozen"], 0)
+
+    def test_mn20_is_larger_than_mn10(self) -> None:
+        mn10 = PretrainedEfficientATClassifier(pretrained=False, variant="mn10_as", stage="linear_probe")
+        mn20 = PretrainedEfficientATClassifier(pretrained=False, variant="mn20_as", stage="linear_probe")
+        self.assertGreater(mn20.parameter_counts()["total"], mn10.parameter_counts()["total"])
 
     def test_frontend_and_backbone_can_be_called_separately_for_mixup(self) -> None:
         model = PretrainedEfficientATClassifier(

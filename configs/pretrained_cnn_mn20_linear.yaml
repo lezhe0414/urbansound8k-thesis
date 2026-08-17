@@ -1,0 +1,67 @@
+run_name: pretrained_cnn_mn20_linear_seed42
+seed: 42
+
+data:
+  raw_dir: data/raw/UrbanSound8K_soundata
+  waveform_cache_dir: data/processed/urbansound8k_waveforms_32k_5s
+  require_waveform_cache: true
+  sample_rate: 32000
+  clip_duration_seconds: 5.0
+  num_classes: 10
+  development_folds: [1, 4, 7]
+  sealed_test_fold: 10
+
+model:
+  name: pretrained_efficientat
+  num_classes: 10
+  variant: mn20_as
+  pretrained: true
+  checkpoint_url: https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/mn20_as_mAP_478.pt
+  model_cache_dir: .model_cache/efficientat
+  stage: linear_probe
+  partial_last_blocks: 3
+  frontend_augmentation: false
+  sample_rate: 32000
+  win_length: 800
+  hop_size: 320
+  n_fft: 1024
+  n_mels: 128
+  fmin: 0.0
+  fmax: null
+  frequency_mask_param: 0
+  time_mask_param: 0
+  fmin_aug_range: 1
+  fmax_aug_range: 1
+
+training:
+  batch_size: 64
+  epochs: 5
+  encoder_learning_rate: 0.00001
+  head_learning_rate: 0.0003
+  weight_decay: 0.0001
+  label_smoothing: 0.0
+  class_weighting:
+    enabled: true
+    power: 0.5
+  class_aware_sampling:
+    enabled: true
+    power: 0.5
+  waveform_augmentation:
+    enabled: false
+  mixup:
+    enabled: false
+    probability: 0.0
+    alpha: 0.15
+  scheduler:
+    name: none
+  mixed_precision: true
+  num_workers: 4
+  pin_memory: true
+  device: auto
+
+outputs:
+  results_dir: results
+
+evaluation:
+  locked_for_test: false
+

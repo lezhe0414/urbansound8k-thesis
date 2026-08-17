@@ -2,6 +2,16 @@
 
 這份文件定義目前最優先的程式任務：建立 sound event detection 的最小可交付 pipeline。目標是先符合 project definition 的 CNN baseline，再視時間加入 Transformer 比較。
 
+## 目前延伸任務：pretrained CNN recommended study
+
+- 分支：`codex/pretrained-cnn-recommended-study`
+- 主要指標：folds 1、4、7 的 mean validation Macro F1。
+- 研究變因：waveform augmentation、time-shift TTA、固定 seeds 42/123/2026 probability ensemble，以及 AudioSet-pretrained EfficientAT MN20。
+- 資料限制：fold 10 在 development 選模期間封存；raw audio 與既有 waveform/Mel cache 均不得覆寫。
+- 正式驗證：只在唯一方法鎖定後，以固定 cyclic validation mapping 執行一次完整 10-fold protocol。
+- 輸出：設定、history、validation metrics、checkpoint、prediction probabilities、mean/std、per-class F1 與 aggregate confusion matrix。
+- 詳細協定：`docs/experiments/pretrained-cnn-recommended-study.md`。
+
 ## 使用時機
 
 - 要建立資料處理腳本前。

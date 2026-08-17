@@ -372,3 +372,38 @@ EfficientAT v1 在 folds 1、4、7 的 development Macro F1 為 `0.8716 ± 0.028
 - [x] 確認所有 v2 runs 均為 `test_evaluated=false`。
 - [ ] 以鎖定方法執行正式 10-fold cross-validation。
 - [ ] 將 mean/std、per-class F1 與 aggregate confusion matrix納入論文。
+
+---
+
+## DEC-010：以 development-only recommended study 決定唯一正式 10-fold 方法
+
+- 日期：2026-08-17
+- 狀態：實驗進行中
+- 相關文件：`docs/experiments/pretrained-cnn-recommended-study.md`
+- 相關會議：無；使用者要求的 pretrained CNN 延伸與正式驗證
+
+#### 背景
+
+EfficientAT MN10 v2 在 folds 1、4、7 達到 Macro F1 `0.8844 ± 0.0165`，但仍未完成正式 10-fold。單純反覆調整 learning rate、dropout 或解凍深度的邊際效益已下降，因此後續集中於資料不變性、推論平均、固定 seed ensemble 與較寬的 AudioSet-pretrained CNN。
+
+#### 決策
+
+先以完全封存 fold 10 的 folds 1、4、7 比較動態 waveform augmentation、zero-fill time-shift TTA、固定 seeds 42/123/2026 probability ensemble 與 EfficientAT MN20。唯一主要選模指標為 mean validation Macro F1；Accuracy 與 fold variance只作輔助。Development 完成後只鎖定一個方法，再以預先固定的 cyclic validation mapping 執行正式 10-fold；每個 test fold 只評估一次。
+
+#### 理由
+
+這個流程把模型與推論方法的探索限制在 development folds，避免用歷史或新的 fold 10 結果回饋調參。Cyclic mapping 也保證每輪訓練的 validation fold 與 test fold 均不進入 training set，並讓十個 folds 各自只作一次 test。
+
+#### 影響
+
+- 對資料：augmentation 只在 cache 載入後動態作用，不修改 raw audio 或 cache。
+- 對模型：MN20 與 MN10 使用相同官方 frontend，差異主要是 pretrained backbone 容量。
+- 對算力：若三 seed ensemble 勝出，正式 10-fold 必須完整訓練三個固定 seeds，不能事後挑 seed。
+- 對論文：必須分開報告 development selection 與 formal 10-fold results，並揭露 AudioSet pretraining。
+
+#### 後續行動
+
+- [ ] 完成三組 waveform augmentation development runs。
+- [ ] 完成 TTA、三 seed ensemble 與 MN20 development 比較。
+- [ ] 只依 mean validation Macro F1 鎖定唯一方法。
+- [ ] 執行一次固定 formal 10-fold 並備份 artifacts。
