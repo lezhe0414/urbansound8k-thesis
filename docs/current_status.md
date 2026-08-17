@@ -1,6 +1,6 @@
 # 專案目前狀態
 
-更新日期：2026-08-13
+更新日期：2026-08-17
 
 ## 專案目的
 
@@ -37,6 +37,7 @@
 7. EMA validation-only 比較已完成：EMA Macro F1 只比同次 online 權重高約 `0.00089`，不足以支持採用，正式設定關閉 EMA。
 8. 固定 3-seed probability ensemble 已完成：validation Macro F1 `0.7699`，低於鎖定單一 CNN 的 `0.7924`；因此完成但不採用。
 9. 鎖定後唯一一次 ensemble fold 10 test Accuracy 為 `0.8411`、Macro F1 為 `0.8501`，亦略低於單一 CNN，但此 test 只作確認，不作選模依據。
+10. 已在 `codex/pretrained-cnn-transfer` 實作 EfficientAT `mn10_as` 的官方 32 kHz waveform pipeline、linear probing、partial fine-tuning 與 folds 1、4、7 runner；正式 development 實驗待在 Colab A100 執行，fold 10 尚未接觸。
 
 ## 已建立內容
 
@@ -117,13 +118,13 @@
 
 ## 下一步
 
-EMA 與 ensemble 延伸實驗均已完成。最有效的下一步是直接進入固定設定的最終統計驗證：
+目前先完成第三模型的 validation-only transfer-learning 判斷，再進入固定設定的最終統計驗證：
 
-1. 在 Colab 使用 `configs/cnn_aug_final.yaml`、EMA 關閉的單一 CNN 執行固定設定 10-fold cross-validation。
-2. 報告 Macro F1、Accuracy 的 mean、standard deviation 與每類表現。
-3. 不再依 fold 10 test、ensemble test 或任何 10-fold 結果改動超參數。
-4. 在論文中將 EMA 與 3-seed ensemble 說明為未帶來改善的延伸實驗。
-5. 整理 CNN、Transformer 與 pretrained AST 的比較範圍和限制。
+1. 在 Colab A100 執行 `configs/pretrained_cnn_linear_probe.yaml` 的 folds 1、4、7。
+2. 只依三-fold validation Macro F1 mean/std 判斷是否進入 partial fine-tuning。
+3. 不得建立或評估任何 fold 10 candidate；唯一 transfer 設定鎖定前 test 保持封存。
+4. 完成第三模型判斷後，以 `configs/cnn_aug_final.yaml` 執行固定單一 CNN 10-fold。
+5. 整理 from-scratch CNN、from-scratch Transformer 與 AudioSet-pretrained CNN 的公平比較。
 
 ## 目前完成度判斷
 

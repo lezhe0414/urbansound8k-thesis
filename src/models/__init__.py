@@ -2,6 +2,7 @@
 
 from src.models.cnn import SpectrogramCNN, SpectrogramResNetCNN
 from src.models.pretrained_ast import PretrainedASTClassifier
+from src.models.pretrained_efficientat import PretrainedEfficientATClassifier
 from src.models.spectrogram_transformer import SpectrogramTransformer
 
 
@@ -15,6 +16,8 @@ def build_model(config: dict):
         return SpectrogramResNetCNN(**model_config)
     if name == "pretrained_ast":
         return PretrainedASTClassifier(**model_config)
+    if name == "pretrained_efficientat":
+        return PretrainedEfficientATClassifier(**model_config)
     if name == "spectrogram_transformer":
         return SpectrogramTransformer(**model_config)
 
@@ -23,6 +26,7 @@ def build_model(config: dict):
 
 __all__ = [
     "PretrainedASTClassifier",
+    "PretrainedEfficientATClassifier",
     "SpectrogramCNN",
     "SpectrogramResNetCNN",
     "SpectrogramTransformer",

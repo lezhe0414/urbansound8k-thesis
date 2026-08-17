@@ -267,3 +267,37 @@ Ensemble validation Macro F1 為 0.7699，低於鎖定單一 CNN 的 0.7924，�
 - [x] 完成 validation probability ensemble 比較。
 - [x] 鎖定後執行唯一一次 ensemble fold 10 test。
 - [ ] 使用固定單一 CNN 設定執行正式 10-fold cross-validation。
+
+---
+
+## DEC-007：以 EfficientAT MN10 建立第三個 transfer-learning 比較模型
+
+- 日期：2026-08-17
+- 狀態：已決定
+- 相關文件：`docs/experiments/pretrained-cnn-transfer.md`、`configs/pretrained_cnn_linear_probe.yaml`
+- 相關會議：2026-08-07 supervisor meeting 後續研究規劃
+
+#### 背景
+
+From-scratch CNN 已是主要基準，從零訓練 Spectrogram Transformer 則受限於 UrbanSound8K 的資料量。需要加入一個 AudioSet-pretrained CNN，評估 transfer learning 是否能在不改變主要 CNN 研究主線的情況下提供較穩健的 Macro F1。
+
+#### 決策
+
+採用 MIT-licensed EfficientAT `mn10_as` 作為第三個模型。先在 folds 1、4、7 做五 epochs linear probing；只在平均 validation Macro F1 接近 control `0.7818` 或有清楚上升趨勢時，才從最佳 linear-probe checkpoint 接續 partial fine-tuning。Fold 10 保持封存。
+
+#### 理由
+
+`mn10_as` 是 AudioSet-pretrained MobileNetV3-style CNN，官方規模約 4.88M parameters、0.54 GMACs，較大型 PANNs CNN14 或 AST 更符合目前時間及 Colab 運算限制。官方 frontend 接收 32 kHz waveform，可避免把本專案既有、逐 clip 標準化的 Mel cache 錯誤重用於不同預訓練分布。
+
+#### 影響
+
+- 對論文：新增 transfer-learning 比較，但 CNN 仍是主要模型。
+- 對程式：新增 raw-waveform dataset、獨立 cache、EfficientAT wrapper 及 development runner。
+- 對資料：不覆寫 raw audio 或既有 Mel cache；新 cache 使用獨立路徑。
+- 對評估：唯一選模指標為三-fold validation Macro F1 mean/std，fold 10 不參與。
+
+#### 後續行動
+
+- [ ] 在 Colab A100 完成 folds 1、4、7 linear probing。
+- [ ] 依預先定義門檻決定是否執行 partial fine-tuning。
+- [ ] 若鎖定唯一設定，才執行一次 fold 10 test evaluation。

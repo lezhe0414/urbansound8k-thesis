@@ -27,9 +27,14 @@ REQUIRED_FILES = [
     "docs/professor_update_template.md",
     "docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md",
     "docs/experiments/2026-08-13-cnn-seed-ensemble.md",
+    "docs/experiments/pretrained-cnn-transfer.md",
     "configs/cnn_aug_final.yaml",
     "configs/cnn_aug_ema.yaml",
+    "configs/pretrained_cnn_linear_probe.yaml",
+    "configs/pretrained_cnn_partial_finetune.yaml",
     "src/ensemble.py",
+    "src/models/pretrained_efficientat.py",
+    "src/train_pretrained_cnn.py",
     "references/literature_notes.md",
     "src/README.md",
     "src/utils/ema.py",
@@ -43,15 +48,16 @@ PLACEHOLDER_MARKERS = [
 ]
 
 NEXT_ACTIONS = [
-    "使用 configs/cnn_aug_final.yaml、EMA 關閉的單一 CNN 執行正式 10-fold cross-validation。",
-    "整理 10-fold Macro F1、Accuracy mean/std、per-class F1 與 aggregate confusion matrix。",
-    "在論文中記錄 EMA 與 3-seed ensemble 未超越鎖定單一 CNN 的負結果。",
+    "在 folds 1、4、7 執行 pretrained EfficientAT CNN linear probing，fold 10 保持封存。",
+    "只依三-fold validation Macro F1 mean/std 判斷是否進入 partial fine-tuning。",
+    "完成第三模型判斷後，再執行固定 from-scratch CNN 的正式 10-fold cross-validation。",
 ]
 
 STATUS_SUMMARY = (
     "setup files present; UrbanSound8K downloaded and preprocessed; "
     "CNN controlled augmentation search completed; EMA validation comparison completed; "
-    "3-seed probability ensemble completed and not selected; fixed-config 10-fold cross-validation pending"
+    "3-seed probability ensemble completed and not selected; AudioSet-pretrained EfficientAT CNN "
+    "development validation pending; fixed-config 10-fold cross-validation pending"
 )
 
 

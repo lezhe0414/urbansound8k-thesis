@@ -1,0 +1,53 @@
+run_name: pretrained_cnn_smoke
+seed: 42
+
+data:
+  raw_dir: data/raw/UrbanSound8K_synthetic
+  waveform_cache_dir: null
+  require_waveform_cache: false
+  sample_rate: 32000
+  clip_duration_seconds: 0.5
+  num_classes: 10
+  development_folds: [1, 4, 7]
+  sealed_test_fold: 10
+  max_train_samples: 4
+  max_val_samples: 2
+
+model:
+  name: pretrained_efficientat
+  num_classes: 10
+  pretrained: false
+  stage: linear_probe
+  partial_last_blocks: 2
+  frontend_augmentation: false
+  sample_rate: 32000
+  win_length: 800
+  hop_size: 320
+  n_fft: 1024
+  n_mels: 128
+  fmin_aug_range: 1
+  fmax_aug_range: 1
+
+training:
+  batch_size: 2
+  epochs: 1
+  encoder_learning_rate: 0.00001
+  head_learning_rate: 0.0003
+  weight_decay: 0.0001
+  label_smoothing: 0.0
+  class_weighting:
+    enabled: false
+  class_aware_sampling:
+    enabled: false
+  scheduler:
+    name: none
+  mixed_precision: false
+  num_workers: 0
+  pin_memory: false
+  device: cpu
+
+outputs:
+  results_dir: results
+
+evaluation:
+  locked_for_test: false

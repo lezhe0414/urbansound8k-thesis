@@ -1,6 +1,6 @@
 # 專案儀表板
 
-更新日期：2026-08-13
+更新日期：2026-08-17
 
 ## 目前階段
 
@@ -12,9 +12,9 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 
 ## 立即執行方向
 
-1. 使用 `configs/cnn_aug_final.yaml`、EMA 關閉的固定單一 CNN，在 Colab 執行正式 10-fold cross-validation 並輸出 mean/std 與 per-class 指標。
-2. 不得再依 fold 10、ensemble test 或 10-fold 結果調整超參數。
-3. CNN 作為主要模型；從零訓練 Transformer 作為架構比較；pretrained AST 作為 transfer-learning 延伸。
+1. 在獨立分支執行 EfficientAT `mn10_as` 的 folds 1、4、7 validation-only linear probing，fold 10 保持封存。
+2. 只在 pretrained CNN 有競爭力時執行最後兩個 blocks 的 partial fine-tuning；選模只看三-fold validation Macro F1 mean/std。
+3. CNN 作為主要模型；從零訓練 Transformer 作為架構比較；AudioSet-pretrained CNN 作為 transfer-learning 比較。
 4. EMA 與 3-seed ensemble 作為已完成但沒有改善的延伸實驗，保留重現程式與誠實結果。
 5. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
 
@@ -35,10 +35,10 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 
 下一步 AI Agent 應依序執行：
 
-1. 跑固定單一 CNN 設定的 10-fold cross-validation。
-2. 整理 mean/std、每類 F1 與 aggregate confusion matrix。
-3. 將單一 CNN、EMA、3-seed ensemble、Transformer 與 AST 的結果整理成公平比較。
-4. 更新論文 Results、Discussion 與 limitations，避免把單一 fold 改善描述成確定結論。
+1. 完成 `docs/experiments/pretrained-cnn-transfer.md` 定義的三-fold linear probing。
+2. 依 validation Macro F1 判斷是否進入 partial fine-tuning，禁止使用 fold 10 作決策。
+3. 鎖定第三個模型後，再跑固定單一 CNN 的正式 10-fold cross-validation。
+4. 將 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 整理成公平比較。
 
 文獻與寫作同步更新：
 

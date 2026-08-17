@@ -25,6 +25,7 @@ results/*
 figures/*
 reports/*
 experiment_artifacts/*
+.model_cache/
 
 # Keep folder placeholders
 !data/raw/.gitkeep
