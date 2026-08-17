@@ -87,7 +87,7 @@
 | AudioSet-pretrained CNN transfer study | `docs/experiments/pretrained-cnn-transfer.md` | 第三模型的 protocol、設定、結果與公平比較 | 已確認 | folds 1、4、7 + one sealed test | Dev F1 `0.8716 ± 0.0283`；唯一 fold 10 test F1 `0.9041`；Drive 已備份 |
 | EfficientAT v2 development study | `docs/experiments/pretrained-cnn-transfer-v2.md` | 8 epochs、unfreezing、Mixup/masking 與解凍深度比較 | 已確認 | folds 1、4、7 validation only | 勝出 F1 `0.8844 ± 0.0165`、Accuracy `0.8824 ± 0.0141`；v2 未執行 fold 10 |
 | EfficientAT recommended study | `docs/experiments/pretrained-cnn-recommended-study.md`、`configs/pretrained_cnn_mn20_locked_last2.yaml` | Waveform augmentation、TTA、固定三 seed ensemble、MN20 與正式 10-fold protocol | 已完成 | 41 tests + development folds 1/4/7 + locked formal 10-fold | Dev F1 `0.89069 ± 0.01165`；formal F1 `0.87686 ± 0.04048`；Drive `pretrained_cnn_recommended/` |
-| EfficientAT post-formal exploration | `docs/experiments/pretrained-cnn-postformal-exploration.md` | MN20 三 seed、checkpoint averaging 與 focal-loss development-only 比較 | 執行中 | folds 1/4/7 validation only | 禁止重新評估 test；artifacts 將備份至 Drive `pretrained_cnn_postformal/` |
+| EfficientAT post-formal exploration | `docs/experiments/pretrained-cnn-postformal-exploration.md` | MN20 三 seed、checkpoint averaging 與 focal-loss development-only 比較 | 已完成 | 27 manifests + folds 1/4/7 validation only | Focal + ensemble F1 `0.89395 ± 0.00932`；checkpoint averaging 無效；Drive `pretrained_cnn_postformal/`；未評估 test |
 | 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用

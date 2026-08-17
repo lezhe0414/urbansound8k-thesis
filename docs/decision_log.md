@@ -415,7 +415,7 @@ EfficientAT MN10 v2 在 folds 1、4、7 達到 Macro F1 `0.8844 ± 0.0165`，但
 ## DEC-011：正式 10-fold 後的 MN20 延伸僅作 development-only 探索
 
 - 日期：2026-08-17
-- 狀態：執行中
+- 狀態：已決定
 - 相關文件：`docs/experiments/pretrained-cnn-postformal-exploration.md`
 - 相關會議：無；使用者要求延伸三 seed ensemble、checkpoint averaging 與 loss study
 
@@ -431,6 +431,8 @@ MN20 的固定正式 10-fold 已完成，其 test-fold 結果已被觀察，因�
 
 這三項方法分別處理 seed variance、訓練軌跡 variance 與困難樣本權重，而且不需要改變 waveform cache、官方 frontend、backbone 容量或資料切分。共用初始化及固定其餘參數可將差異歸因於單一方法。
 
+實驗完成後，focal loss + 三 seed probability ensemble 以 Macro F1 `0.89395 ± 0.00932` 勝出，比鎖定 development control `0.89069 ± 0.01165` 高 `0.00327`，且標準差略降。Weighted-CE ensemble 為 `0.89267 ± 0.01052`。Checkpoint averaging 在 CE 與 focal 下均降低 mean F1，因此不保留。這些數字只來自 folds 1、4、7 validation。
+
 #### 影響
 
 - 對結果：新數字必須標示為 post-formal exploratory validation，不得取代 `0.87686 ± 0.04048` 的正式 10-fold 結果。
@@ -440,7 +442,7 @@ MN20 的固定正式 10-fold 已完成，其 test-fold 結果已被觀察，因�
 
 #### 後續行動
 
-- [ ] 在 Colab 完成全部 development-only runs。
-- [ ] 依 mean validation Macro F1 整理各方法效果與 variance。
-- [ ] 確認所有 manifests 的 `test_evaluated=false`。
-- [ ] 將結果及限制寫回實驗紀錄。
+- [x] 在 Colab 完成全部 27 個 development-only runs。
+- [x] 依 mean validation Macro F1 整理各方法效果與 variance。
+- [x] 確認所有 27 份 manifests 的 `test_evaluated=false`。
+- [x] 將結果、限制與 Drive 備份寫回實驗紀錄。
