@@ -123,6 +123,31 @@ class PretrainedCNNConfigTests(unittest.TestCase):
         reference["model"]["partial_last_blocks"] = 2
         self.assertEqual(reference, neighbor)
 
+    def test_locked_mn20_config_matches_selected_development_method(self) -> None:
+        try:
+            import yaml
+        except ImportError as exc:
+            self.skipTest(f"PyYAML unavailable: {exc}")
+        selected = yaml.safe_load(
+            (ROOT / "configs" / "pretrained_cnn_mn20_partial_last2.yaml").read_text()
+        )
+        locked = yaml.safe_load(
+            (ROOT / "configs" / "pretrained_cnn_mn20_locked_last2.yaml").read_text()
+        )
+        self.assertEqual(locked["model"]["variant"], "mn20_as")
+        self.assertEqual(locked["model"]["partial_last_blocks"], 2)
+        self.assertEqual(locked["seed"], 42)
+        self.assertTrue(locked["evaluation"]["locked_for_test"])
+        self.assertEqual(
+            locked["evaluation"]["tta"],
+            {"enabled": False, "offsets_seconds": [0.0]},
+        )
+        self.assertFalse(locked["training"]["waveform_augmentation"]["enabled"])
+
+        selected["run_name"] = locked["run_name"]
+        selected["evaluation"] = locked["evaluation"]
+        self.assertEqual(selected, locked)
+
 
 try:
     import numpy as np

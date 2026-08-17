@@ -378,8 +378,8 @@ EfficientAT v1 在 folds 1、4、7 的 development Macro F1 為 `0.8716 ± 0.028
 ## DEC-010：以 development-only recommended study 決定唯一正式 10-fold 方法
 
 - 日期：2026-08-17
-- 狀態：實驗進行中
-- 相關文件：`docs/experiments/pretrained-cnn-recommended-study.md`
+- 狀態：已鎖定唯一方法，formal 10-fold 待執行
+- 相關文件：`docs/experiments/pretrained-cnn-recommended-study.md`、`configs/pretrained_cnn_mn20_locked_last2.yaml`
 - 相關會議：無；使用者要求的 pretrained CNN 延伸與正式驗證
 
 #### 背景
@@ -388,11 +388,11 @@ EfficientAT MN10 v2 在 folds 1、4、7 達到 Macro F1 `0.8844 ± 0.0165`，但
 
 #### 決策
 
-先以完全封存 fold 10 的 folds 1、4、7 比較動態 waveform augmentation、zero-fill time-shift TTA、固定 seeds 42/123/2026 probability ensemble 與 EfficientAT MN20。唯一主要選模指標為 mean validation Macro F1；Accuracy 與 fold variance只作輔助。Development 完成後只鎖定一個方法，再以預先固定的 cyclic validation mapping 執行正式 10-fold；每個 test fold 只評估一次。
+已在完全封存 fold 10 的 folds 1、4、7 比較動態 waveform augmentation、zero-fill time-shift TTA、固定 seeds 42/123/2026 probability ensemble 與 EfficientAT MN20。只依 mean validation Macro F1 鎖定 `configs/pretrained_cnn_mn20_locked_last2.yaml`：MN20、seed 42、解凍最後 2 blocks、無 waveform augmentation、無 TTA。正式 10-fold 使用預先固定 cyclic validation mapping，每個 test fold 只評估一次。
 
 #### 理由
 
-這個流程把模型與推論方法的探索限制在 development folds，避免用歷史或新的 fold 10 結果回饋調參。Cyclic mapping 也保證每輪訓練的 validation fold 與 test fold 均不進入 training set，並讓十個 folds 各自只作一次 test。
+勝出設定達 validation Macro F1 `0.89069 ± 0.01165`，高於 MN10 v2 control `0.88437 ± 0.01650`，mean 增加 `0.00631` 且 fold variance 降低。MN10 三 seed ensemble 只增加 `0.00026` 且 variance 惡化；三種 waveform augmentation 與 TTA 均降低 mean Macro F1。這個選擇完全限制在 development folds，沒有使用歷史或新的 fold 10 結果回饋調參。
 
 #### 影響
 
@@ -403,7 +403,7 @@ EfficientAT MN10 v2 在 folds 1、4、7 達到 Macro F1 `0.8844 ± 0.0165`，但
 
 #### 後續行動
 
-- [ ] 完成三組 waveform augmentation development runs。
-- [ ] 完成 TTA、三 seed ensemble 與 MN20 development 比較。
-- [ ] 只依 mean validation Macro F1 鎖定唯一方法。
+- [x] 完成三組 waveform augmentation development runs。
+- [x] 完成 TTA、三 seed ensemble 與 MN20 development 比較。
+- [x] 只依 mean validation Macro F1 鎖定唯一方法。
 - [ ] 執行一次固定 formal 10-fold 並備份 artifacts。
