@@ -205,6 +205,27 @@ class PretrainedCNNConfigTests(unittest.TestCase):
         control["model"]["freeze_encoder_batchnorm"] = True
         self.assertEqual(control, bnfreeze)
 
+    def test_bold_multiseed_cross_scale_runner_seals_test_and_fixes_six_members(self) -> None:
+        path = ROOT / "scripts" / "run_pretrained_cnn_bold_multiseed_cross_scale.py"
+        source = path.read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        self.assertIn('"test_evaluated": False', source)
+        self.assertIn('"formal_test_results_used_for_selection": False', source)
+        self.assertIn('"checkpoint_count_per_fold": 6', source)
+        self.assertNotIn('split="test"', source)
+        self.assertNotIn("test_fold_override", source)
+        argument_names = {
+            argument.args[0].value
+            for argument in ast.walk(tree)
+            if isinstance(argument, ast.Call)
+            and isinstance(argument.func, ast.Attribute)
+            and argument.func.attr == "add_argument"
+            and argument.args
+            and isinstance(argument.args[0], ast.Constant)
+        }
+        self.assertNotIn("--folds", argument_names)
+        self.assertNotIn("--test-fold", argument_names)
+
 
 try:
     import numpy as np

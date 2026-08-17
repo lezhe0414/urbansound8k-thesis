@@ -1,7 +1,7 @@
 # Pretrained CNN bold breakthrough study
 
 更新日期：2026-08-17  
-狀態：已完成 Colab development-only 執行；不升級為正式方法
+狀態：第一階段已完成；第二階段 cross-scale 多 seed 穩健性測試已預註冊、待執行
 
 ## 目的與邊界
 
@@ -106,3 +106,18 @@ MN40 單模型達門檻後，依預註冊規則補跑 seeds 42、123、2026，�
 ## 結論
 
 本研究找到 Macro F1 超過 `0.90` 的探索性 development 候選，但三 seed 檢查沒有支持穩健突破。論文可報告「跨尺度 MN20 + MN40 在固定 development screen 達 `0.90128`，但 MN40 三 seed ensemble 只達 `0.89440`，故未改變正式模型」，並將完整 cross-scale 多 seed 驗證列為 future work。正式結論仍使用鎖定的 MN20 10-fold 結果 `0.87686 ± 0.04048`。
+
+## 第二階段預註冊：完整 cross-scale 多 seed 集成
+
+為直接檢查 seed-42 MN20 + MN40 的改善能否跨 seeds 保留，第二階段固定使用 MN20 與 MN40、seeds 42/123/2026、development folds 1/4/7。每個 validation fold 對六個模型的 softmax probabilities 做等權平均；不搜尋權重、不刪除較弱 seed，也不依單一 fold 選成員。除補訓缺少的 MN20 seeds 123/2026 外，其餘 checkpoints 全部重用第一階段 artifacts。
+
+主要結果在執行前固定為六模型集成的 mean validation Macro F1。若高於歷史 MN20 focal 三 seed ensemble `0.893950613`，視為 cross-scale 多樣性得到 multi-seed 支持；若同時至少達 seed-42 screen `0.901280552`，才稱為重現固定-seed 的探索性突破。三個 same-seed MN20 + MN40 pair 只作穩健性診斷，不用於挑選最佳 seed。Fold 10 繼續封存，無論結果如何都不由本 runner 執行 test evaluation。
+
+執行命令：
+
+```text
+python3 scripts/run_pretrained_cnn_bold_multiseed_cross_scale.py \
+  --base-output-name pretrained_cnn_bold_breakthrough_b6848c1_20260817_130915 \
+  --output-name <unique-run-name> \
+  --backup-root <new-google-drive-artifact-directory>
+```
