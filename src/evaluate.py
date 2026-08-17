@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+import numpy as np
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
@@ -49,6 +50,7 @@ def evaluate_run(run_dir: Path, checkpoint_name: str = "best_model.pt") -> dict[
     total_loss = 0.0
     y_true: list[int] = []
     y_pred: list[int] = []
+    probability_batches: list[np.ndarray] = []
     with torch.no_grad():
         for inputs, targets in test_loader:
             inputs = inputs.to(device)
@@ -58,10 +60,19 @@ def evaluate_run(run_dir: Path, checkpoint_name: str = "best_model.pt") -> dict[
             total_loss += float(loss.item()) * inputs.size(0)
             y_true.extend(targets.cpu().tolist())
             y_pred.extend(logits.argmax(dim=1).cpu().tolist())
+            probability_batches.append(torch.softmax(logits, dim=1).cpu().numpy())
 
     metrics = classification_metrics(y_true, y_pred, labels)
     metrics["test_loss"] = total_loss / max(len(test_set), 1)
+    metrics["num_examples"] = len(y_true)
     (run_dir / "evaluation_metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    probabilities = np.concatenate(probability_batches, axis=0)
+    np.savez_compressed(
+        run_dir / "evaluation_predictions.npz",
+        targets=np.asarray(y_true, dtype=np.int64),
+        predictions=np.asarray(y_pred, dtype=np.int64),
+        probabilities=probabilities,
+    )
 
     matrix = confusion_matrix_array(y_true, y_pred, labels)
     figures_dir = Path(config.get("outputs", {}).get("figures_dir", "figures"))

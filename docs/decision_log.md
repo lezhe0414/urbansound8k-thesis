@@ -267,3 +267,43 @@ Ensemble validation Macro F1 為 0.7699，低於鎖定單一 CNN 的 0.7924，�
 - [x] 完成 validation probability ensemble 比較。
 - [x] 鎖定後執行唯一一次 ensemble fold 10 test。
 - [ ] 使用固定單一 CNN 設定執行正式 10-fold cross-validation。
+
+---
+
+## DEC-007：以鎖定單一 CNN 執行正式 UrbanSound8K 10-fold
+
+- 日期：2026-08-17
+- 狀態：已預註冊；待執行
+- 相關文件：`configs/cnn_aug_final.yaml`、`docs/experiments/2026-08-17-cnn-formal-10fold.md`
+- 相關會議：延續 2026-08-07 supervisor meeting 與受控搜尋決策
+
+#### 背景
+
+CNN controlled search、EMA、固定三 seed ensemble 與高風險 breakthrough study 均已
+完成。沒有延伸方法在 folds 1、4、7 顯示足以取代鎖定設定的穩健改善，因此繼續搜尋
+會增加 development overfitting 風險。
+
+#### 決策
+
+使用 `configs/cnn_aug_final.yaml` 的固定 hash、seed 42、EMA off 與單一模型，依
+UrbanSound8K 十個官方 folds 執行正式 cross-validation。每個 test fold 對應固定的下一
+fold 作 validation；checkpoint 只依 validation Macro F1 選擇，test fold 各評估一次。
+
+#### 理由
+
+正式 10-fold mean/std 比單一 fold 高分更能回答方法是否跨錄音條件泛化，也能量化
+fold variability。固定設定可避免在已觀察結果後改變方法，保留研究可信度。
+
+#### 影響
+
+- 對論文：此結果將成為 from-scratch CNN 的主要正式數據。
+- 對程式：新增可恢復但禁止重複 test 的 runner、predictions 與 aggregate summary。
+- 對資料：raw audio 與既有 Mel cache 唯讀，不重新 preprocessing。
+- 對時程：完成後停止 from-scratch CNN 調參，轉入三模型比較與論文定稿。
+
+#### 後續行動
+
+- [ ] 在固定 commit 完成十個 folds。
+- [ ] 核對每 fold completion manifest 與 Drive backup。
+- [ ] 整理 mean/std、per-class F1 及 aggregate confusion matrix。
+- [ ] 更新 Results、Discussion、limitations 與 PDF。

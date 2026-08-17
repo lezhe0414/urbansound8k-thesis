@@ -2,6 +2,19 @@
 
 這份文件定義目前最優先的程式任務：建立 sound event detection 的最小可交付 pipeline。目標是先符合 project definition 的 CNN baseline，再視時間加入 Transformer 比較。
 
+## 目前正式任務：鎖定 CNN 10-fold cross-validation
+
+- 分支：`codex/cnn-formal-10fold`
+- 狀態：runner 實作與 protocol 預註冊；待 Colab 正式執行。
+- 唯一設定：`configs/cnn_aug_final.yaml`，SHA-256
+  `6831eedade7a0cb6e7d2e2b98d32bd067bcc1c7fe62568a2059ead4fe68b82e4`。
+- 固定 seed 42、EMA off、無 ensemble；禁止 CLI 覆寫 folds、seed 或超參數。
+- 每個官方 fold 作 test 一次，validation fold 使用固定 cyclic mapping。
+- 只依 validation Macro F1 選各 fold checkpoint；test 不用於選模。
+- 輸出 mean/std、per-class F1、predictions、aggregate confusion matrix、integrity manifests
+  與逐 fold Drive backup。
+- 詳細協定：`docs/experiments/2026-08-17-cnn-formal-10fold.md`。
+
 ## 使用時機
 
 - 要建立資料處理腳本前。

@@ -81,6 +81,7 @@
 | CNN controlled augmentation search | `docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md` | 記錄四組初始比較、九輪單一變因迭代與唯一一次 test | 已確認 | Colab results + Drive backup | 最佳 validation Macro F1 0.7924；fold 10 test Macro F1 0.8536 |
 | CNN EMA validation comparison | Google Drive EMA backup | 比較同次訓練的 online 與 EMA 權重 | 已確認 | `validation_metrics.json` | EMA F1 0.76515、online F1 0.76426；不採用 EMA |
 | CNN 3-seed ensemble | `docs/experiments/2026-08-13-cnn-seed-ensemble.md` | 評估固定 seeds 42、123、2026 的 probability ensemble | 已確認 | Colab results + Drive backup | validation F1 0.7699；test F1 0.8501；未超越鎖定單一 CNN，故不採用 |
+| Locked CNN formal 10-fold | `docs/experiments/2026-08-17-cnn-formal-10fold.md`、`scripts/run_cnn_formal_cross_validation.py` | 固定 from-scratch CNN 的正式跨 fold 泛化評估 | 已預註冊；待執行 | Config SHA-256 + integrity manifests + tests | 將輸出 mean/std、per-class F1、predictions、aggregate confusion matrix 與 Drive backup |
 | 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用
