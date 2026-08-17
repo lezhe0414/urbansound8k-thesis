@@ -8,7 +8,7 @@
 
 Project definition 已確認方向為「Sound Event Detection Using Machine Learning Techniques」。核心技術路線是將音訊轉成 Mel-spectrogram 等頻譜圖，再以 CNN 進行聲音事件分類。可用公開資料集包含 UrbanSound8K 或 ESC-50，工具以 Python、PyTorch、Librosa、NumPy、Matplotlib 為主。
 
-端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。AudioSet-pretrained EfficientAT recommended study 亦已完成：MN20 last-2-block partial fine-tuning 在 folds 1、4、7 達 development Macro F1 `0.89069 ± 0.01165`，正式 Macro F1 為 `0.87686 ± 0.04048`、Accuracy 為 `0.86883 ± 0.04263`。Post-formal bold study 的 MN20 + MN40 固定 seed 跨尺度 ensemble 達 `0.90128 ± 0.00982`，但 MN40 三 seed ensemble 只有 `0.89440 ± 0.00651`；因此前者只作探索性上限，不覆寫正式結果。
+端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。AudioSet-pretrained EfficientAT recommended study 亦已完成：MN20 last-2-block partial fine-tuning 在 folds 1、4、7 達 development Macro F1 `0.89069 ± 0.01165`，正式 Macro F1 為 `0.87686 ± 0.04048`、Accuracy 為 `0.86883 ± 0.04263`。Post-formal bold study 的 MN20 + MN40 固定 seed 跨尺度 ensemble 達 `0.90128 ± 0.00982`；完整六模型 multi-seed ensemble 為 `0.90104 ± 0.00920`，支持跨尺度多樣性，但只作探索性證據，不覆寫正式結果。
 
 ## 立即執行方向
 
@@ -18,7 +18,7 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 4. EMA 與 3-seed ensemble 作為已完成但沒有改善的延伸實驗，保留重現程式與誠實結果。
 5. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
 6. MN20 post-formal study 已完成：保留 focal + 3-seed ensemble 作探索性改善，拒絕 checkpoint averaging；不得重新查看正式 test folds。
-7. `codex/pretrained-cnn-bold-breakthrough` 已完成；MN20 + MN40 固定 seed screen 超過 `0.90`，但多 seed 穩健性不足，不追加 fold 10。
+7. `codex/pretrained-cnn-bold-breakthrough` 已完成；MN20 + MN40 六模型 multi-seed ensemble 達 `0.90104 ± 0.00920`，不追加 fold 10。
 
 ## 最高風險
 
@@ -41,7 +41,7 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 2. 將 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 整理成公平比較。
 3. 在論文中清楚說明 pretrained 模型使用額外 AudioSet 資訊，不能把差異歸因於 CNN 架構 alone。
 4. 將 MN20 10-fold mean/std、per-class F1 與 fold variability 納入結果與限制分析。
-5. 將已完成的 post-formal focal 與 bold studies 標示為探索性補充；區分固定 seed `0.90128` 上限與三 seed `0.89440` 穩健性檢查，不改寫正式結果。
+5. 將已完成的 post-formal focal 與 bold studies 標示為探索性補充；區分固定 seed `0.90128` screen、六模型 `0.90104 ± 0.00920` multi-seed 結果與正式 10-fold，不改寫正式結果。
 
 文獻與寫作同步更新：
 

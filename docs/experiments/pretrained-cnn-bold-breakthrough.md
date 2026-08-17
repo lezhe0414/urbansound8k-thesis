@@ -1,7 +1,7 @@
 # Pretrained CNN bold breakthrough study
 
 更新日期：2026-08-17  
-狀態：第一階段已完成；第二階段 cross-scale 多 seed 穩健性測試已預註冊、待執行
+狀態：第一、第二階段均已完成；正式 10-fold 結論維持不變
 
 ## 目的與邊界
 
@@ -121,3 +121,37 @@ python3 scripts/run_pretrained_cnn_bold_multiseed_cross_scale.py \
   --output-name <unique-run-name> \
   --backup-root <new-google-drive-artifact-directory>
 ```
+
+## 第二階段結果：完整 cross-scale 多 seed 集成
+
+2026-08-17 在 Colab A100 執行 run
+`pretrained_cnn_bold_multiseed_cross_scale_6237825_20260817_141117`。補訓 MN20
+seeds 123/2026 後，先以三個固定 same-seed pair 診斷跨尺度互補性，再依預註冊規則
+將 MN20 與 MN40 各三 seeds 的六組 softmax probabilities 等權平均。所有數字仍只來自
+folds 1、4、7 validation；fold 10 未執行。
+
+| 方法 | Macro F1 | Accuracy | 用途 |
+| --- | ---: | ---: | --- |
+| MN20 + MN40, seed 42 | `0.90128 ± 0.00982` | `0.89725 ± 0.01625` | 診斷 |
+| MN20 + MN40, seed 123 | `0.89995 ± 0.00586` | `0.89682 ± 0.01142` | 診斷 |
+| MN20 + MN40, seed 2026 | `0.90099 ± 0.01359` | `0.89674 ± 0.01517` | 診斷 |
+| MN20 + MN40, three seeds each (six models) | **`0.90104 ± 0.00920`** | **`0.89732 ± 0.01416`** | 唯一主要結果 |
+
+六模型結果比歷史 MN20 focal 三 seed ensemble `0.893950613` 高 `0.007087`，因此符合
+「cross-scale 多樣性得到 multi-seed 支持」的預註冊判準。三個 same-seed pair 也都接近或
+超過 `0.90`，顯示 seed-42 的改善不是完全孤立的偶然值。不過六模型結果比固定-seed
+screen `0.901280552` 低 `0.000243`，未達「重現固定-seed 探索性突破」的較嚴格判準。
+因此最準確的結論是：跨尺度集成帶來可重複但幅度有限的 development 改善；它支持
+探索性方法，仍不足以回頭更改已完成的正式 MN20 10-fold 結論。
+
+完整性核對如下：
+
+- 新補訓的 MN20 linear-probe 與 partial-fine-tuning 共 12 份 manifests；Drive 備份亦為 12 份。
+- 本地與 Drive 均找到第二階段 `summary.json`。
+- 第二階段 artifacts 中 `test_evaluated=true` 數量為 0，fold-10 路徑數量為 0。
+- Drive：`/content/drive/MyDrive/urbansound8k_data/experiment_artifacts/pretrained_cnn_bold_multiseed_cross_scale_6237825_20260817_141117/`。
+- Dataset、waveform cache、checkpoints、results 與 figures 均未提交 GitHub。
+
+論文中可將此結果寫為 post-formal exploratory analysis，並明確報告預註冊門檻、固定
+development folds、六模型計算成本及沒有重新評估 test。不可把 `0.90104` 與正式
+10-fold Macro F1 `0.87686 ± 0.04048` 當成同一 protocol 下可互換的最終成績。

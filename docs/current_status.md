@@ -43,7 +43,7 @@
 13. EfficientAT recommended development study 已完成。Waveform augmentation 與 time-shift TTA 均退步；MN10 固定 3-seed ensemble 只提高 `0.00026` 且 variance 變差。MN20 解凍最後 2 blocks 達 Macro F1 `0.89069 ± 0.01165`、Accuracy `0.88742 ± 0.01062`，依 folds 1、4、7 結果鎖定為唯一正式方法。鎖定時未讀取任何新 test 結果。
 14. 已用鎖定 commit `78a3245` 完成 MN20 正式 10-fold：Macro F1 `0.87686 ± 0.04048`、Accuracy `0.86883 ± 0.04263`、Macro Precision `0.88162 ± 0.04115`、Macro Recall `0.88069 ± 0.03948`。十個 test folds 各只評估一次，結果與 checkpoints 已備份至 Drive。最弱類別為 air conditioner (`0.72376`) 與 jackhammer (`0.79392`)；fold 6 F1 `0.78472` 顯示 fold variability 仍是主要風險。
 15. MN20 post-formal development-only 探索已完成。Class-balanced focal loss (`gamma=1.5`) 搭配固定三 seed probability ensemble 達 Macro F1 `0.89395 ± 0.00932`、Accuracy `0.89004 ± 0.01062`，比鎖定 development control 高 `0.00327` 且 variance 略降。Checkpoint averaging 使 F1 降至約 `0.8831`--`0.8862`，不採用。27 份 manifests 均為 `test_evaluated=false`，此探索結果不得取代正式 10-fold 結論。
-16. `codex/pretrained-cnn-bold-breakthrough` 的 development-only 更大尺度探索已完成。Seed-42 MN20 + MN40 跨尺度 ensemble 達 Macro F1 `0.90128 ± 0.00982`、Accuracy `0.89725 ± 0.01626`，但 MN40 固定三 seed ensemble 只有 `0.89440 ± 0.00651`，僅比歷史 focal 三 seed ensemble 高 `0.00045`。因此把 `0.90128` 視為探索性上限，不升級正式方法、不執行 fold 10。33 份本地與 Drive manifests 均為 `test_evaluated=false`。
+16. `codex/pretrained-cnn-bold-breakthrough` 的 development-only 更大尺度探索已完成。Seed-42 MN20 + MN40 跨尺度 ensemble 達 Macro F1 `0.90128 ± 0.00982`；完整 MN20/MN40 各三 seeds 的六模型 ensemble 達 `0.90104 ± 0.00920`、Accuracy `0.89732 ± 0.01416`。六模型結果比歷史 MN20 focal 三 seed ensemble 高 `0.00709`，支持跨尺度多樣性可跨 seeds 保留，但比固定-seed screen 低 `0.00024`，未形成更高的新峰值。此結果只作 post-formal exploratory evidence，不升級正式方法、不執行 fold 10；第二階段 12 份 Drive manifests 均為 `test_evaluated=false`。
 
 ## 已建立內容
 
@@ -131,7 +131,7 @@ AudioSet-pretrained 第三模型的 development 選擇與正式 10-fold 均已�
 3. 整理 from-scratch CNN、from-scratch Transformer 與 AudioSet-pretrained CNN 的公平比較，明確區分從零訓練與 AudioSet transfer learning。
 4. 將 10-fold mean/std、per-class F1 與 aggregate confusion matrix 納入論文結果及限制分析。
 5. Post-formal MN20 延伸已完成；只可將 focal + 3-seed ensemble 的小幅 development 改善列為探索性結果，不得覆寫已鎖定的正式 10-fold 結論。
-6. Bold breakthrough study 已完成：保留 MN20 + MN40 的 `0.90128` 作探索性證據，但三 seed 檢查未支持穩健突破，不再追加 fold 10 或用它改寫正式結果。
+6. Bold breakthrough study 已完成：六模型 cross-scale multi-seed ensemble 達 `0.90104 ± 0.00920`，支持幅度有限但可重複的 development 改善；不再追加 fold 10，也不以 post-formal 結果改寫正式 10-fold。
 
 ## 目前完成度判斷
 

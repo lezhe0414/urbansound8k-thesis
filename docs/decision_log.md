@@ -491,7 +491,7 @@ MN20 focal 三 seed ensemble 的 development Macro F1 已達 `0.89395 ± 0.00932
 ## DEC-013：以六模型固定集成檢查 MN20 + MN40 跨 seed 穩健性
 
 - 日期：2026-08-17
-- 狀態：已預註冊；待 development-only 執行
+- 狀態：已完成；支持跨尺度穩健性，但未重現較高固定-seed screen
 - 相關文件：`docs/experiments/pretrained-cnn-bold-breakthrough.md`
 - 相關會議：無；使用者同意進一步大膽嘗試，但維持 fold 10 封存
 
@@ -509,7 +509,16 @@ MN20 + MN40 在固定 seed 42 達 Macro F1 `0.90128`，但只擴展 MN40 的三 
 
 #### 後續行動
 
-- [ ] 補訓 MN20 seeds 123/2026 的 folds 1/4/7。
-- [ ] 評估三個 same-seed pair 與唯一六模型集成。
-- [ ] 核對本地與 Drive manifests 均為 `test_evaluated=false`。
-- [ ] 依預註冊判準記錄結論，不追加 fold 10。
+- [x] 補訓 MN20 seeds 123/2026 的 folds 1/4/7。
+- [x] 評估三個 same-seed pair 與唯一六模型集成。
+- [x] 核對本地與 Drive manifests 均為 `test_evaluated=false`。
+- [x] 依預註冊判準記錄結論，不追加 fold 10。
+
+#### 結果與判讀
+
+六模型 ensemble 的 development Macro F1 為 `0.90104 ± 0.00920`，Accuracy 為
+`0.89732 ± 0.01416`。相較歷史 MN20 focal 三 seed 提高 `0.00709`，因此第一項成功
+判準成立；相較固定-seed screen 則低 `0.00024`，第二項較嚴格判準不成立。三個
+same-seed pair 的 Macro F1 分別為 `0.90128`、`0.89995`、`0.90099`，支持跨尺度互補
+不是 seed 42 的單點異常。結論限於 post-formal development evidence；正式 10-fold
+方法及結果不變。
