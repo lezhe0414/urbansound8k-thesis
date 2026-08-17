@@ -1,7 +1,7 @@
 # Pretrained CNN bold breakthrough study
 
 更新日期：2026-08-17  
-狀態：已預註冊，等待 Colab development-only 執行
+狀態：已完成 Colab development-only 執行；不升級為正式方法
 
 ## 目的與邊界
 
@@ -61,4 +61,48 @@ python3 scripts/run_pretrained_cnn_bold_study.py \
 
 ## 結果
 
-待 Colab 執行後回填。任何勝出結果都只能稱為 post-formal development-only exploratory evidence，不得取代正式 10-fold 結果。
+2026-08-17 在 Colab A100 執行 run `pretrained_cnn_bold_breakthrough_b6848c1_20260817_130915`，約 30 分鐘完成。所有數字均為 folds 1、4、7 的 validation mean/std；fold 10 沒有執行。
+
+### Seed-42 單模型初篩
+
+| 模型 | Macro F1 | Accuracy | 判讀 |
+| --- | ---: | ---: | --- |
+| MN20 control | `0.89128 ± 0.00880` | `0.88697 ± 0.01207` | 同次實驗參考 |
+| MN20 + BN freeze | `0.88738 ± 0.01302` | `0.88344 ± 0.00470` | mean 下降，不保留 |
+| MN30 | `0.87767 ± 0.01029` | `0.87786 ± 0.01523` | 明顯下降，不保留 |
+| MN40 | `0.89543 ± 0.00687` | `0.89101 ± 0.00999` | 達預註冊門檻，進入三 seed 擴展 |
+
+增加寬度並非單調改善：MN30 比 MN20 差，而 MN40 在 seed 42 提高約 `0.00415`。固定 BatchNorm running statistics 也沒有改善 MN20，顯示小 batch 的 running-statistics drift 不是此設定的主要限制。
+
+### 跨尺度 probability ensemble
+
+| 成員 | Macro F1 | Accuracy |
+| --- | ---: | ---: |
+| MN20 + MN30 | `0.89362 ± 0.01065` | `0.89172 ± 0.01300` |
+| MN20 + MN40 | **`0.90128 ± 0.00982`** | **`0.89725 ± 0.01626`** |
+| MN30 + MN40 | `0.89199 ± 0.00627` | `0.88873 ± 0.01097` |
+| MN20 + MN30 + MN40 | `0.90062 ± 0.01320` | `0.89636 ± 0.01648` |
+
+MN20 + MN40 是本研究的 seed-42 screen winner。其 Macro F1 比同次 MN20 control 高 `0.01000`，也比歷史 focal 三 seed ensemble `0.89395` 高 `0.00733`。這證明跨尺度模型存在互補錯誤，但它仍只是一組固定 seed 的 post-formal development result，不能直接視為穩健的新最佳方法。
+
+### 三 seed 穩健性檢查
+
+MN40 單模型達門檻後，依預註冊規則補跑 seeds 42、123、2026，並平均三模型 softmax probabilities：
+
+| 方法 | Macro F1 | Accuracy |
+| --- | ---: | ---: |
+| MN40 3-seed ensemble | `0.89440 ± 0.00651` | `0.89060 ± 0.01188` |
+
+此結果只比歷史 MN20 focal 三 seed ensemble `0.89395 ± 0.00932` 高約 `0.00045`。雖然 fold 間標準差較低，但改善量小到不足以排除實驗噪音；較寬 backbone 的 seed-42 優勢沒有在三 seed 集成後保留。因此不把 MN40 或 MN20 + MN40 升級為正式方法，也不重新執行 fold 10。
+
+## 完整性與備份
+
+- Git commit：`b6848c1`。
+- 本地 Colab 輸出與 Drive 各有 33 份 `experiment_manifest.json`。
+- 所有 manifests 均維持 `test_evaluated=false`。
+- Drive：`/content/drive/MyDrive/urbansound8k_data/experiment_artifacts/pretrained_cnn_bold_breakthrough_b6848c1_20260817_130915/`。
+- Dataset、waveform cache、checkpoints、results 與 figures 均未提交 GitHub。
+
+## 結論
+
+本研究找到 Macro F1 超過 `0.90` 的探索性 development 候選，但三 seed 檢查沒有支持穩健突破。論文可報告「跨尺度 MN20 + MN40 在固定 development screen 達 `0.90128`，但 MN40 三 seed ensemble 只達 `0.89440`，故未改變正式模型」，並將完整 cross-scale 多 seed 驗證列為 future work。正式結論仍使用鎖定的 MN20 10-fold 結果 `0.87686 ± 0.04048`。

@@ -452,7 +452,7 @@ MN20 的固定正式 10-fold 已完成，其 test-fold 結果已被觀察，因�
 ## DEC-012：以獨立分支進行更寬 EfficientAT 與跨尺度集成探索
 
 - 日期：2026-08-17
-- 狀態：已預註冊，待執行
+- 狀態：已完成；不升級正式方法
 - 相關文件：`docs/experiments/pretrained-cnn-bold-breakthrough.md`
 - 相關會議：無；使用者要求在不改寫正式結果的前提下大膽嘗試突破
 
@@ -468,16 +468,20 @@ MN20 focal 三 seed ensemble 的 development Macro F1 已達 `0.89395 ± 0.00932
 
 這三類方法分別測試 representation capacity、小 batch fine-tuning 的統計穩定性與模型多樣性，研究假設明確，且比繼續微調 learning rate 或 dropout 更可能產生可解釋的變化。預註冊門檻可避免看到 validation 結果後任意追加昂貴實驗。
 
+執行結果顯示 MN40 seed-42 單模型達 `0.89543 ± 0.00687`，因此依規則補跑三 seeds。固定 seed 的 MN20 + MN40 跨尺度 ensemble 達 `0.90128 ± 0.00982`，但 MN40 三 seed probability ensemble 只有 `0.89440 ± 0.00651`，相較歷史 focal 三 seed `0.89395 ± 0.00932` 只高 `0.00045`。固定 seed 的跨尺度改善沒有得到相同等級的 multi-seed 支持，故不升級為正式方法。
+
 #### 影響
 
 - 對評估：只使用 folds 1、4、7 mean validation Macro F1；fold 10 runner 不提供執行入口。
 - 對論文：任何提升只能標示為探索性 validation evidence，不能取代正式 10-fold。
 - 對資料：沿用既有 waveform cache 與官方 frontend，不重新 preprocessing、不修改 raw/cache。
 - 對 Git：程式碼、設定、測試與文件留在獨立分支；大型 artifacts 只進 Drive。
+- 對結論：`0.90128` 只能稱為探索性 development screen winner；正式 10-fold 結論維持不變。
 
 #### 後續行動
 
-- [ ] 完成 seed-42 MN20/MN30/MN40 與 BatchNorm freeze 初篩。
-- [ ] 完成七組 cross-scale probability ensemble validation。
-- [ ] 只有達預註冊門檻時才執行固定三 seed 擴展。
-- [ ] 核對所有 manifests 的 `test_evaluated=false` 並寫回結果。
+- [x] 完成 seed-42 MN20/MN30/MN40 與 BatchNorm freeze 初篩。
+- [x] 完成七組 cross-scale probability ensemble validation。
+- [x] MN40 達門檻後執行固定 seeds 42/123/2026 擴展。
+- [x] 核對本地與 Drive 各 33 份 manifests 均為 `test_evaluated=false`。
+- [x] 因 multi-seed 改善不足，不執行 fold 10、不改寫正式方法。
