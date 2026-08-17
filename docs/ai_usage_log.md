@@ -24,6 +24,7 @@
 | 2026-08-13 | 實作 CNN EMA 權重追蹤、online/EMA validation 同次比較、checkpoint metadata 與測試，並記錄延後的 3-seed ensemble | `src/utils/ema.py`、`src/train.py`、`configs/cnn_aug_ema.yaml`、`tests/test_ema.py`、狀態與決策文件 | 待使用者在 Colab 執行 validation-only EMA 實驗 | 不改動既有 final config；不再次執行 fold 10 test |
 | 2026-08-13 | 操作 Colab 完成 EMA validation 比較與固定 3-seed probability ensemble，核對鎖定協定、整理 validation/test 指標並備份 artifacts 至 Google Drive | `src/ensemble.py`、`configs/cnn_aug_final.yaml`、`docs/experiments/2026-08-13-cnn-seed-ensemble.md`；Drive ensemble artifacts | 使用者需確認是否直接進入固定單一 CNN 的正式 10-fold | EMA 與 ensemble 均未超越鎖定單一 CNN；大型結果不提交 GitHub |
 | 2026-08-17 | 預註冊並實作鎖定 from-scratch CNN 正式 10-fold runner，加入 config hash、不可重複 test marker、resume integrity、逐 fold predictions/Drive backup、mean/std、per-class F1 與 aggregate confusion matrix | `src/evaluate.py`、`src/formal_cross_validation.py`、`scripts/run_cnn_formal_cross_validation.py`、`tests/test_cnn_formal_cross_validation.py`、`docs/experiments/2026-08-17-cnn-formal-10fold.md` | 待 Colab 正式十 folds 完成後核對結果 | 不修改鎖定設定，不重新 preprocessing，不使用 test metrics 調參 |
+| 2026-08-17 | 操作 Colab A100 完成鎖定 from-scratch CNN 正式 10-fold，核對十組不可重複 test manifests、aggregate predictions/confusion matrix 與 Google Drive backup，並撰寫公平模型比較與 Results/Discussion 草稿 | `docs/experiments/2026-08-17-cnn-formal-10fold.md`、`docs/experiments/2026-08-17-formal-model-comparison.md`、`docs/chapters/05_results_and_discussion.md` | 待將表格與圖整合至英文 8 頁 PDF | 正式 Macro F1 `0.79041 ± 0.04755`；未依正式 test 結果調參 |
 
 ## 可記錄的協助類型
 

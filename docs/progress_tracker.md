@@ -1,14 +1,14 @@
 # MVP 進度追蹤
 
-更新日期：2026-08-13
+更新日期：2026-08-17
 
 這份文件用來集中追蹤 UrbanSound8K 聲音分類 MVP 的已完成、未完成與下一步。之後每次程式、資料、實驗、圖表或論文草稿有重要更新時，都要同步更新本文件。
 
 ## 目前結論
 
-MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋，唯一最佳設定的 fold 10 test Accuracy 為 0.8471、Macro F1 為 0.8536。EMA validation 比較與固定 3-seed probability ensemble 亦已完成，但都沒有超越已鎖定的單一 CNN，因此正式設定維持 EMA 關閉且不採用 ensemble。
+MVP 已完成，可展示端到端流程：UrbanSound8K 音訊已下載驗證，已轉成 Mel-spectrogram，CNN baseline 與 Spectrogram Transformer 都能訓練、評估並輸出 metrics 與 confusion matrix。CNN 已完成 validation-only 受控資料增強搜尋；在不再更動設定後，已鎖定 EMA 關閉、seed 42 的單一 CNN 並完成正式 10-fold cross-validation。其 fold-level Macro F1 為 `0.7904 +/- 0.0476`，Accuracy 為 `0.7742 +/- 0.0543`。EMA validation 比較與固定 3-seed probability ensemble 都沒有超越已鎖定的單一 CNN，因此不採用。
 
-整個論文專案尚未完成，因為固定 CNN 設定的正式 10-fold cross-validation、結果解讀與最終 8 頁論文仍待完成。
+AudioSet-pretrained EfficientAT MN20 在相同正式 10-fold protocol 下取得 Macro F1 `0.8769 +/- 0.0405`，比 from-scratch CNN 高 `0.0864`，因此是目前最強的正式單模型結果。MN20+MN40 六模型 cross-scale ensemble 的 `0.9010 +/- 0.0092` 僅來自 folds 1、4、7 的 post-formal development study，不能取代正式 10-fold 結果。整個論文專案仍需完成圖表整合、引用核對與最終 PDF 排版。
 
 ## 實作流程圖
 
@@ -109,7 +109,7 @@ CNN 已在 Colab GPU 完成正式 fold 10 長訓練、受控 augmentation 搜尋
 | 驗證 UrbanSound8K | 完成 | `soundata.validate()` | 已確認資料集完整 |
 | 音訊轉 Mel-spectrogram | 完成 | `data/processed/urbansound8k_mels/` | 8732 筆處理後資料，不提交到 git |
 | 資料集 loader | 完成 | `src/data/urbansound8k.py` | 支援 fold split、preload、smoke sample limit |
-| CNN baseline 模型 | 完成 | `src/models/cnn.py` | 架構可訓練，正式長訓練待補 |
+| CNN baseline 模型 | 完成 | `src/models/cnn.py`、`configs/cnn_aug_final.yaml` | 已完成鎖定設定的正式 10-fold cross-validation |
 | Spectrogram Transformer 模型 | 完成 | `src/models/spectrogram_transformer.py` | 作為現代比較模型 |
 | Preprocessing script | 完成 | `src/preprocess.py` | 可重複產生 Mel-spectrogram |
 | Training script | 完成 | `src/train.py` | 可輸出 checkpoint、history、metrics、confusion matrix |
@@ -122,6 +122,8 @@ CNN 已在 Colab GPU 完成正式 fold 10 長訓練、受控 augmentation 搜尋
 | Transformer smoke run | 完成 | `results/transformer_baseline_smoke_fold10/` | 只驗證流程，非正式結果 |
 | Transformer fold 10 正式訓練 | 完成 | `results/transformer_baseline_fold10/` | 10 epochs，完整 train/val/test split |
 | Transformer confusion matrix | 完成 | `figures/transformer_baseline_fold10_confusion_matrix.png` | 可用於初步討論 |
+| From-scratch CNN 正式 10-fold | 完成 | `docs/experiments/2026-08-17-cnn-formal-10fold.md` | Macro F1 `0.7904 +/- 0.0476`，Accuracy `0.7742 +/- 0.0543` |
+| 正式模型比較 | 完成 | `docs/experiments/2026-08-17-formal-model-comparison.md` | 相同 10-fold protocol 下比較 from-scratch CNN 與 EfficientAT MN20 |
 | 單元測試 | 完成 | `tests/` | `python -m unittest discover -s tests` 通過 |
 | 專案狀態檢查 | 完成 | `scripts/check_project_status.py` | 可快速檢查文件與下一步 |
 | Git commit | 完成 | `acda41d`、`7325b43` | 程式與狀態文件已提交 |
@@ -140,7 +142,29 @@ CNN 已在 Colab GPU 完成正式 fold 10 長訓練、受控 augmentation 搜尋
 | Fold 10 test Macro F1 | 0.8536 |
 | 相較歷史 test Macro F1 0.8413 | +0.0123 |
 
-所有設定選擇只使用 validation Macro F1。Fold 10 test 在唯一設定鎖定後僅執行一次，不能再用於調參。下一步是用固定設定執行 10-fold cross-validation。
+所有設定選擇只使用 validation Macro F1。Fold 10 test 在唯一設定鎖定後僅執行一次，不能再用於調參。後續正式 10-fold 使用同一鎖定設定，未再根據任何 test fold 修改參數。
+
+### From-scratch CNN 正式 10-fold 結果
+
+完整紀錄：`docs/experiments/2026-08-17-cnn-formal-10fold.md`
+
+| 指標 | Fold mean | Population std | Aggregate prediction metric |
+| --- | ---: | ---: | ---: |
+| Accuracy | 0.7742 | 0.0543 | 0.7728 |
+| Macro precision | 0.7956 | 0.0477 | 0.7898 |
+| Macro recall | 0.7963 | 0.0489 | 0.7933 |
+| Macro F1 | 0.7904 | 0.0476 | 0.7909 |
+
+較弱的 aggregate per-class F1 為 air conditioner `0.6101`、jackhammer `0.6481` 與 engine idling `0.6876`。主要錯誤集中在機械噪聲類別互相混淆，例如 air conditioner 與 engine idling，以及 jackhammer 與 drilling。這表示剩餘限制不只是整體容量不足，而與類別間相似的穩態或衝擊聲學特徵及跨 fold domain shift 有關。
+
+### 相同正式 protocol 的模型比較
+
+| 模型 | 預訓練 | Macro F1 mean +/- std | Accuracy mean +/- std | 證據層級 |
+| --- | --- | ---: | ---: | --- |
+| From-scratch CNN | 無 | 0.7904 +/- 0.0476 | 0.7742 +/- 0.0543 | 正式 10-fold |
+| EfficientAT MN20 | AudioSet | 0.8769 +/- 0.0405 | 0.8688 +/- 0.0426 | 正式 10-fold |
+
+EfficientAT MN20 的 Macro F1 絕對提升為 `+0.0864`，且 fold 間標準差較低。從零訓練 Transformer 目前只有 fold 10 結果，不能放入上述 matched 10-fold 主表；MN20+MN40 cross-scale ensemble 也只能標示為 development-only exploratory result。
 
 ### EMA 與 3-seed ensemble 結果
 
@@ -185,24 +209,24 @@ Smoke run 只用少量資料與 1 epoch 檢查 pipeline 是否能完整執行。
 
 | 項目 | 狀態 | 原因 / 風險 | 下一步 |
 | --- | --- | --- | --- |
-| 10-fold cross validation | 未完成 | MVP 先跑 fold 10 | 後續可跑 `--fold all` 或多 fold 平均 |
+| From-scratch CNN 10-fold cross-validation | 完成 | 鎖定設定、seed 42、EMA 關閉 | 將表格與 aggregate confusion matrix 納入論文 |
 | EMA validation comparison | 完成 | 改善僅約 0.00089 | 正式設定關閉 EMA |
 | 3-seed ensemble | 完成 | validation Macro F1 0.7699，未超越單一 CNN | 保留負結果與重現程式，不採用於正式 10-fold |
-| CNN vs Transformer 正式比較表 | 進行中 | 單一 fold 結果已具備，缺 10-fold CNN 統計 | 完成 10-fold 後整理最終表格 |
-| 結果圖表解讀 | 未完成 | 目前只有 confusion matrix 與 metrics | 寫出哪些類別容易混淆、可能原因 |
+| CNN vs Transformer 正式比較表 | 進行中 | CNN 已有 10-fold；Transformer 仍只有 fold 10，protocol 不匹配 | 主表比較兩個正式 10-fold CNN，Transformer 另列架構性比較 |
+| 結果圖表解讀 | 進行中 | 已完成 per-class 與主要混淆分析 | 將 aggregate confusion matrix 與文字整合進 PDF |
 | 文獻整理 | 未完成 | 還沒整理核心 citation | 補 UrbanSound8K、CNN spectrogram、Transformer/AST 相關文獻 |
 | 方法章草稿 | 未完成 | 需要把 pipeline 寫成論文語言 | 先寫 Mel-spectrogram + model comparison 方法 |
-| 結果與討論草稿 | 未完成 | CNN 正式結果缺失 | 先寫 Transformer 初步結果，CNN 後補 |
+| 結果與討論草稿 | 進行中 | 正式 CNN 結果已補入 | 核對引用、圖表編號與篇幅 |
 | 8 頁 PDF | 未完成 | 需要正文、圖表、引用與排版 | 在結果與方法穩定後生成 |
 | 教授確認 Transformer 策略 | 未完成 | 需確認是否接受偏離原 CNN-only definition | 週五會議時說明 CNN baseline + Transformer comparison |
 
 ## 下一步優先順序
 
-1. 以 `configs/cnn_aug_final.yaml`、EMA 關閉的固定單一 CNN 執行正式 10-fold cross-validation。
-2. 整理 mean/std、per-class F1 與 aggregate confusion matrix。
-3. 將單一 CNN、3-seed ensemble、從零訓練 Transformer 與 pretrained AST 的角色公平寫入 Results 與 Discussion。
-4. 不再依 fold 10 test 改動 seed、ensemble 權重或超參數。
-5. 整理 confusion matrix 與 metrics 成論文可用圖表與表格。
+1. 將 from-scratch CNN 與 EfficientAT MN20 的正式 10-fold 結果整合進論文主表。
+2. 加入 aggregate confusion matrix，並聚焦分析機械噪聲類別的主要混淆。
+3. 將 Transformer 標示為 fold-10 架構比較，cross-scale ensemble 標示為 development-only post-formal study。
+4. 不再依任何 test fold 改動 seed、ensemble 權重或超參數。
+5. 完成 Harvard 引用核對、圖表 caption、AI disclosure 與最終 PDF 排版。
 
 ## 常用命令
 
@@ -236,20 +260,15 @@ python3 -m src.train --config configs/transformer_baseline.yaml --fold 10
 python3 -m src.evaluate --run-dir results/transformer_baseline_fold10
 ```
 
-正式 10-fold cross validation：
+正式 from-scratch CNN 10-fold cross-validation（已完成；命令保留供重現，不應無故重跑）：
 
 ```bash
-python3 -m src.train --config configs/cnn_baseline.yaml --fold all
-python3 -m src.train --config configs/transformer_baseline.yaml --fold all
+python3 scripts/run_cnn_formal_cross_validation.py \
+  --config configs/cnn_aug_final.yaml \
+  --output-dir results/<unique_run_name>
 ```
 
-CNN 論文主結果應改用已鎖定且 EMA 關閉的設定：
-
-```bash
-python3 -m src.train --config configs/cnn_aug_final.yaml --fold all
-```
-
-說明：`--fold all` 會依序跑 fold 1 到 fold 10，並輸出 `results/<run_name>_10fold_summary.json` 與 `results/<run_name>_10fold_summary.csv`，包含 accuracy、macro precision、macro recall、macro F1、test loss 的平均與標準差。
+說明：正式 runner 會驗證鎖定 config hash、固定 seed 與 cyclic validation mapping，並輸出 fold summary、aggregate metrics、per-class metrics、predictions、confusion matrix 及完整 manifest。正式結果已備份至 Google Drive，不應覆寫或以重跑結果取代。
 
 正式 CNN fold 10：
 
@@ -303,7 +322,7 @@ CNN spectrogram augmentation fold 10 ablation：
 python3 scripts/run_cnn_augmentation_ablation.py --fold 10 --skip-existing
 ```
 
-此流程依序執行 control、light、balanced、strong 四組設定，排名只使用 validation Macro F1，預設不執行 test。`scripts/run_cnn_controlled_search.py` 會在初始比較後，只以勝出設定逐輪調整單一類別的變因；每輪即時寫入 CSV/Markdown 並備份。只有唯一設定鎖定後，才可明確要求一次 fold 10 test evaluation。資料增強在線上套用於 cached Mel-spectrogram，不需要重新 preprocessing。正式結果尚待 Colab 執行。
+此流程依序執行 control、light、balanced、strong 四組設定，排名只使用 validation Macro F1，預設不執行 test。`scripts/run_cnn_controlled_search.py` 會在初始比較後，只以勝出設定逐輪調整單一類別的變因；每輪即時寫入 CSV/Markdown 並備份。資料增強在線上套用於 cached Mel-spectrogram，不需要重新 preprocessing。此搜尋已結束，設定已鎖定，不應再用 test 結果重新開啟調參。
 
 ## 維護規則
 

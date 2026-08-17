@@ -1,6 +1,6 @@
 # 專案目前狀態
 
-更新日期：2026-08-13
+更新日期：2026-08-17
 
 ## 專案目的
 
@@ -24,7 +24,7 @@
 
 ## 目前判斷
 
-目前不是完成狀態。UrbanSound8K 的端到端 pipeline、CNN、從零訓練 Spectrogram Transformer、即時 spectrogram augmentation 與受控搜尋流程均已完成。CNN 受控搜尋只依 validation Macro F1 選模，鎖定唯一設定後才執行一次 fold 10 test。
+目前不是完成狀態。UrbanSound8K 的端到端 pipeline、CNN、從零訓練 Spectrogram Transformer、即時 spectrogram augmentation、受控搜尋與鎖定 from-scratch CNN 正式 10-fold 均已完成。CNN 受控搜尋只依 validation Macro F1 選模；正式十 folds 僅估計泛化表現，不再用於調參。
 
 目前最重要的實驗進度如下：
 
@@ -32,11 +32,13 @@
 2. 已執行 Mel-spectrogram preprocessing，輸出到 `data/processed/urbansound8k_mels/`。
 3. CNN 受控 augmentation 搜尋完成：最佳 validation Macro F1 `0.7924`、validation Accuracy `0.7709`。
 4. 唯一最佳設定的單次 fold 10 test：Accuracy `0.8471`、Macro F1 `0.8536`。
-5. 歷史 CNN fold 10 Macro F1 約 `0.8413`；本次差異約 `+0.0123`，尚需 10-fold 統計驗證。
+5. 鎖定 from-scratch CNN 正式 10-fold 已完成：Macro F1 `0.79041 ± 0.04755`、Accuracy `0.77423 ± 0.05431`。
 6. 從零訓練 Spectrogram Transformer 表現低於 CNN，因此保留為比較模型，不再用 fold 10 反覆調參。
 7. EMA validation-only 比較已完成：EMA Macro F1 只比同次 online 權重高約 `0.00089`，不足以支持採用，正式設定關閉 EMA。
 8. 固定 3-seed probability ensemble 已完成：validation Macro F1 `0.7699`，低於鎖定單一 CNN 的 `0.7924`；因此完成但不採用。
 9. 鎖定後唯一一次 ensemble fold 10 test Accuracy 為 `0.8411`、Macro F1 為 `0.8501`，亦略低於單一 CNN，但此 test 只作確認，不作選模依據。
+10. AudioSet-pretrained EfficientAT MN20 正式 10-fold Macro F1 為 `0.87686 ± 0.04048`、Accuracy 為 `0.86883 ± 0.04263`，相較 from-scratch CNN 分別提高 `0.08645` 與 `0.09460`。
+11. Post-formal MN20+MN40 六模型 cross-scale ensemble 在 folds 1、4、7 development validation 達 `0.90104 ± 0.00920`；未執行新 test，不能取代正式 MN20 結果。
 
 ## 已建立內容
 
@@ -117,14 +119,14 @@
 
 ## 下一步
 
-EMA 與 ensemble 延伸實驗均已完成。最有效的下一步是直接進入固定設定的最終統計驗證：
+固定 CNN 的正式統計驗證已完成。下一步集中在公平比較與論文定稿：
 
-1. 在 Colab 使用 `configs/cnn_aug_final.yaml`、EMA 關閉的單一 CNN 執行固定設定 10-fold cross-validation。
-2. 報告 Macro F1、Accuracy 的 mean、standard deviation 與每類表現。
-3. 不再依 fold 10 test、ensemble test 或任何 10-fold 結果改動超參數。
-4. 在論文中將 EMA 與 3-seed ensemble 說明為未帶來改善的延伸實驗。
-5. 整理 CNN、Transformer 與 pretrained AST 的比較範圍和限制。
+1. 將 from-scratch CNN 與 pretrained MN20 的 formal 10-fold mean/std 寫入 Results。
+2. 將 Transformer `0.6644` 明確標示為 fold-10-only，避免與 10-fold mean 直接比較。
+3. 不再依任何正式 10-fold 結果改動超參數。
+4. 將 EMA、3-seed ensemble 說明為未改善的延伸實驗，將 cross-scale `0.90104` 標示為 post-formal development-only。
+5. 加入 aggregate confusion matrix、limitations、Harvard references，完成英文 8 頁 PDF。
 
 ## 目前完成度判斷
 
-專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA 比較、3-seed ensemble 與鎖定後的 fold 10 test 均已完成。整體目標尚未完成，因為固定單一 CNN 的 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。
+專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA、3-seed ensemble、from-scratch CNN 正式 10-fold 與 pretrained MN20 正式 10-fold 均已完成。整體目標尚未完成，因為最終圖表、引用核對與英文 8 頁論文仍需定稿。

@@ -27,6 +27,8 @@ REQUIRED_FILES = [
     "docs/professor_update_template.md",
     "docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md",
     "docs/experiments/2026-08-13-cnn-seed-ensemble.md",
+    "docs/experiments/2026-08-17-cnn-formal-10fold.md",
+    "docs/experiments/2026-08-17-formal-model-comparison.md",
     "configs/cnn_aug_final.yaml",
     "configs/cnn_aug_ema.yaml",
     "src/ensemble.py",
@@ -43,15 +45,16 @@ PLACEHOLDER_MARKERS = [
 ]
 
 NEXT_ACTIONS = [
-    "使用 configs/cnn_aug_final.yaml、EMA 關閉的單一 CNN 執行正式 10-fold cross-validation。",
-    "整理 10-fold Macro F1、Accuracy mean/std、per-class F1 與 aggregate confusion matrix。",
-    "在論文中記錄 EMA 與 3-seed ensemble 未超越鎖定單一 CNN 的負結果。",
+    "將 from-scratch CNN 與 pretrained MN20 的正式 10-fold mean/std 納入論文主表。",
+    "將 aggregate confusion matrix 與 machinery-class error analysis 納入 Results。",
+    "完成 Harvard references、AI disclosure、figure captions 與英文 8 頁 PDF。",
 ]
 
 STATUS_SUMMARY = (
     "setup files present; UrbanSound8K downloaded and preprocessed; "
     "CNN controlled augmentation search completed; EMA validation comparison completed; "
-    "3-seed probability ensemble completed and not selected; fixed-config 10-fold cross-validation pending"
+    "3-seed probability ensemble completed and not selected; locked from-scratch CNN formal 10-fold completed; "
+    "pretrained MN20 formal 10-fold completed; dissertation integration pending"
 )
 
 

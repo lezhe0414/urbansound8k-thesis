@@ -31,7 +31,7 @@
 | 文獻探討 | `docs/chapters/02_literature_review.md` | 第二章 | 待補 | 文獻筆記 | 需核心文獻 |
 | 研究方法 | `docs/chapters/03_methodology.md` | 第三章 | 待補 | 程式與資料流程 | 需方法與資料 |
 | 系統或實驗設計 | `docs/chapters/04_system_or_experiment_design.md` | 第四章 | 待補 | 程式與實驗設定 | 需確認論文類型 |
-| 結果與討論 | `docs/chapters/05_results_and_discussion.md` | 第五章 | 待補 | `results/`、`figures/` | 需實驗結果 |
+| 結果與討論 | `docs/chapters/05_results_and_discussion.md` | 第五章 | 進行中 | formal experiment logs | 已加入正式 10-fold 比較、class errors、overfitting 與 limitations；待整合 PDF |
 | 結論 | `docs/chapters/06_conclusion.md` | 第六章 | 待補 | 最終結果與討論 | 建議最後撰寫 |
 
 ## 程式碼
@@ -81,7 +81,8 @@
 | CNN controlled augmentation search | `docs/experiments/2026-08-13-cnn-controlled-augmentation-search.md` | 記錄四組初始比較、九輪單一變因迭代與唯一一次 test | 已確認 | Colab results + Drive backup | 最佳 validation Macro F1 0.7924；fold 10 test Macro F1 0.8536 |
 | CNN EMA validation comparison | Google Drive EMA backup | 比較同次訓練的 online 與 EMA 權重 | 已確認 | `validation_metrics.json` | EMA F1 0.76515、online F1 0.76426；不採用 EMA |
 | CNN 3-seed ensemble | `docs/experiments/2026-08-13-cnn-seed-ensemble.md` | 評估固定 seeds 42、123、2026 的 probability ensemble | 已確認 | Colab results + Drive backup | validation F1 0.7699；test F1 0.8501；未超越鎖定單一 CNN，故不採用 |
-| Locked CNN formal 10-fold | `docs/experiments/2026-08-17-cnn-formal-10fold.md`、`scripts/run_cnn_formal_cross_validation.py` | 固定 from-scratch CNN 的正式跨 fold 泛化評估 | 已預註冊；待執行 | Config SHA-256 + integrity manifests + tests | 將輸出 mean/std、per-class F1、predictions、aggregate confusion matrix 與 Drive backup |
+| Locked CNN formal 10-fold | `docs/experiments/2026-08-17-cnn-formal-10fold.md`、`scripts/run_cnn_formal_cross_validation.py` | 固定 from-scratch CNN 的正式跨 fold 泛化評估 | 已確認 | 10 completion manifests + matching Drive summary | Macro F1 `0.79041 ± 0.04755`；Accuracy `0.77423 ± 0.05431` |
+| Formal model comparison draft | `docs/experiments/2026-08-17-formal-model-comparison.md` | 公平區分 formal 10-fold、fold-10-only 與 development-only 證據 | 已確認 | locked experiment documents | Pretrained MN20 比 from-scratch CNN 高 `0.08645` Macro F1 |
 | 圖表目錄 | `figures/` | 儲存論文圖表 | 進行中 | 程式產生 | 已有 smoke confusion matrix，正式圖表待補 |
 
 ## 文獻與引用

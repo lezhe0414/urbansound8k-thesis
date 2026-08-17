@@ -266,14 +266,14 @@ Ensemble validation Macro F1 為 0.7699，低於鎖定單一 CNN 的 0.7924，�
 - [x] 完成三個固定 seeds 的 validation-only training。
 - [x] 完成 validation probability ensemble 比較。
 - [x] 鎖定後執行唯一一次 ensemble fold 10 test。
-- [ ] 使用固定單一 CNN 設定執行正式 10-fold cross-validation。
+- [x] 使用固定單一 CNN 設定執行正式 10-fold cross-validation。
 
 ---
 
 ## DEC-007：以鎖定單一 CNN 執行正式 UrbanSound8K 10-fold
 
 - 日期：2026-08-17
-- 狀態：已預註冊；待執行
+- 狀態：已完成；設定維持鎖定
 - 相關文件：`configs/cnn_aug_final.yaml`、`docs/experiments/2026-08-17-cnn-formal-10fold.md`
 - 相關會議：延續 2026-08-07 supervisor meeting 與受控搜尋決策
 
@@ -303,7 +303,16 @@ fold variability。固定設定可避免在已觀察結果後改變方法，保�
 
 #### 後續行動
 
-- [ ] 在固定 commit 完成十個 folds。
-- [ ] 核對每 fold completion manifest 與 Drive backup。
-- [ ] 整理 mean/std、per-class F1 及 aggregate confusion matrix。
-- [ ] 更新 Results、Discussion、limitations 與 PDF。
+- [x] 在固定 commit 完成十個 folds。
+- [x] 核對每 fold completion manifest 與 Drive backup。
+- [x] 整理 mean/std、per-class F1 及 aggregate confusion matrix。
+- [x] 更新 Results、Discussion 與 limitations 草稿。
+- [ ] 將最終表格與圖整合至英文 8 頁 PDF。
+
+#### 執行結果
+
+固定 commit `aef4a4f`、config hash `6831eeda...68b82e4` 的正式執行完成。
+Macro F1 為 `0.79041 ± 0.04755`，Accuracy 為 `0.77423 ± 0.05431`。
+十個 test folds 各有一組 started/completed manifests，Drive 與 Colab summary 相符，
+且 `model_selection_used_test_metrics=false`。Fold 10 F1 `0.85835` 位於十折結果上緣，
+因此先前單一 fold 高分不可取代正式平均。依原決策，不使用這些結果重新調參。
