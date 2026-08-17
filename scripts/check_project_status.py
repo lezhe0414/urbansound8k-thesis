@@ -55,16 +55,16 @@ PLACEHOLDER_MARKERS = [
 
 NEXT_ACTIONS = [
     "使用已鎖定設定執行固定 from-scratch CNN 的正式 10-fold cross-validation。",
-    "使用已鎖定 MN20 last-2 方法執行 EfficientAT fixed-config 10-fold 正式驗證。",
     "整理 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 的公平比較。",
+    "將 MN20 formal mean/std、per-class F1 與 fold variability 納入論文。",
 ]
 
 STATUS_SUMMARY = (
     "setup files present; UrbanSound8K downloaded and preprocessed; "
     "CNN controlled augmentation search completed; EMA validation comparison completed; "
     "3-seed probability ensemble completed and not selected; AudioSet-pretrained EfficientAT "
-    "MN20 last-2 development method locked at Macro F1 0.89069 +/- 0.01165; recommended-study "
-    "test not run; fixed-config 10-fold cross-validation pending"
+    "MN20 last-2 development method locked at Macro F1 0.89069 +/- 0.01165; locked formal "
+    "10-fold completed at Macro F1 0.87686 +/- 0.04048; from-scratch fixed-config 10-fold pending"
 )
 
 

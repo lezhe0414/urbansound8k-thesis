@@ -378,7 +378,7 @@ EfficientAT v1 在 folds 1、4、7 的 development Macro F1 為 `0.8716 ± 0.028
 ## DEC-010：以 development-only recommended study 決定唯一正式 10-fold 方法
 
 - 日期：2026-08-17
-- 狀態：已鎖定唯一方法，formal 10-fold 待執行
+- 狀態：已完成
 - 相關文件：`docs/experiments/pretrained-cnn-recommended-study.md`、`configs/pretrained_cnn_mn20_locked_last2.yaml`
 - 相關會議：無；使用者要求的 pretrained CNN 延伸與正式驗證
 
@@ -400,10 +400,12 @@ EfficientAT MN10 v2 在 folds 1、4、7 達到 Macro F1 `0.8844 ± 0.0165`，但
 - 對模型：MN20 與 MN10 使用相同官方 frontend，差異主要是 pretrained backbone 容量。
 - 對算力：若三 seed ensemble 勝出，正式 10-fold 必須完整訓練三個固定 seeds，不能事後挑 seed。
 - 對論文：必須分開報告 development selection 與 formal 10-fold results，並揭露 AudioSet pretraining。
+- 對結果：唯一 MN20 方法的正式 Macro F1 為 `0.87686 ± 0.04048`、Accuracy 為 `0.86883 ± 0.04263`；不得再根據十個 test folds 改設定。
 
 #### 後續行動
 
 - [x] 完成三組 waveform augmentation development runs。
 - [x] 完成 TTA、三 seed ensemble 與 MN20 development 比較。
 - [x] 只依 mean validation Macro F1 鎖定唯一方法。
-- [ ] 執行一次固定 formal 10-fold 並備份 artifacts。
+- [x] 執行一次固定 formal 10-fold 並備份 artifacts。
+- [x] 核對十個 test predictions、十個 checkpoints、aggregate summary 與 Drive backup。

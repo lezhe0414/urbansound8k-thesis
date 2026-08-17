@@ -8,12 +8,12 @@
 
 Project definition 已確認方向為「Sound Event Detection Using Machine Learning Techniques」。核心技術路線是將音訊轉成 Mel-spectrogram 等頻譜圖，再以 CNN 進行聲音事件分類。可用公開資料集包含 UrbanSound8K 或 ESC-50，工具以 Python、PyTorch、Librosa、NumPy、Matplotlib 為主。
 
-端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。AudioSet-pretrained EfficientAT recommended study 亦已完成：waveform augmentation、TTA 與 MN10 三 seed ensemble 未提供穩健提升；MN20 last-2-block partial fine-tuning 在 folds 1、4、7 達 development Macro F1 `0.89069 ± 0.01165`、Accuracy `0.88742 ± 0.01062`，且 variance 低於 MN10 v2。唯一 MN20 方法已鎖定，但 recommended study 尚未執行 test。仍需固定設定的正式 10-fold mean/std 才能判斷泛化是否穩定。
+端到端 pipeline 與 CNN 受控資料增強搜尋已完成。搜尋只依 validation Macro F1 選模，最佳值為 `0.7924`；鎖定唯一設定後的一次 fold 10 test Accuracy 為 `0.8471`、Macro F1 為 `0.8536`。AudioSet-pretrained EfficientAT recommended study 亦已完成：waveform augmentation、TTA 與 MN10 三 seed ensemble 未提供穩健提升；MN20 last-2-block partial fine-tuning 在 folds 1、4、7 達 development Macro F1 `0.89069 ± 0.01165`，因此先鎖定再執行正式 10-fold。正式 Macro F1 為 `0.87686 ± 0.04048`、Accuracy 為 `0.86883 ± 0.04263`；fold 6 與 air-conditioner/jackhammer 類別顯示明顯較高難度。
 
 ## 立即執行方向
 
 1. 以鎖定的 `configs/cnn_aug_final.yaml` 執行 from-scratch CNN 正式 10-fold，不再調參。
-2. 以 `configs/pretrained_cnn_mn20_locked_last2.yaml` 執行唯一 EfficientAT fixed-config 10-fold；固定 seed 42、無 TTA，不得再依 test fold 調參。
+2. EfficientAT MN20 formal 10-fold 已完成；不得再依其 test folds 調參。
 3. CNN 作為主要基準；從零訓練 Transformer 作為架構比較；AudioSet-pretrained CNN 作為 transfer-learning 比較。
 4. EMA 與 3-seed ensemble 作為已完成但沒有改善的延伸實驗，保留重現程式與誠實結果。
 5. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
@@ -36,9 +36,9 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 下一步 AI Agent 應依序執行：
 
 1. 執行固定單一 from-scratch CNN 的正式 10-fold cross-validation。
-2. 執行已鎖定 MN20 last-2-block EfficientAT 方法的正式 10-fold cross-validation。
-3. 將 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 整理成公平比較。
-4. 在論文中清楚說明 pretrained 模型使用額外 AudioSet 資訊，不能把差異歸因於 CNN 架構 alone。
+2. 將 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 整理成公平比較。
+3. 在論文中清楚說明 pretrained 模型使用額外 AudioSet 資訊，不能把差異歸因於 CNN 架構 alone。
+4. 將 MN20 10-fold mean/std、per-class F1 與 fold variability 納入結果與限制分析。
 
 文獻與寫作同步更新：
 
@@ -95,6 +95,6 @@ b1f8459 Add thesis risk register
 - 風險與交付管理：已建立。
 - 正式論文內容：方向已確認，正文尚未開始。
 - 實際程式碼：MVP 已完成。
-- 實驗結果：CNN fold 10、受控 augmentation、EMA、3-seed ensemble、Transformer fold 10 與 EfficientAT recommended development study 均已完成；MN20 唯一設定的正式 10-fold 待補。
+- 實驗結果：CNN fold 10、受控 augmentation、EMA、3-seed ensemble、Transformer fold 10，以及 EfficientAT recommended development 與正式 10-fold 均已完成；from-scratch CNN fixed-config 10-fold 待補。
 
 目前不可將整體目標標記為完成，因為仍需完成正式實驗、圖表解讀與 8 頁論文。

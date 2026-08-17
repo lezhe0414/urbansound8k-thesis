@@ -1,7 +1,7 @@
 # EfficientAT recommended development and formal validation study
 
 更新日期：2026-08-17  
-狀態：development 已完成，唯一方法已鎖定；formal 10-fold 尚未啟動
+狀態：已完成；唯一方法鎖定後已執行一次 formal 10-fold
 
 ## 目的
 
@@ -82,8 +82,39 @@ TTA 不重新訓練模型。對勝出 checkpoint 產生 `-0.5`、`0`、`+0.5` �
 
 正式 10-fold 使用固定 cyclic mapping：test fold 1 對應 validation fold 2，依此類推，test fold 10 對應 validation fold 1。每個 test fold 從訓練與 checkpoint selection 完全排除，且只評估一次。因勝出方法是單一 seed MN20，正式執行固定 seed 42、無 TTA，不再比較候選。正式輸出包含 mean/std、per-class F1、每 fold 與 aggregate confusion matrix。
 
+## Formal 10-fold results
+
+正式執行使用 commit `78a3245` 的已鎖定設定。十組 linear probe 與 partial fine-tuning 共 20 個 runs，A100 manifest 累計訓練時間為 782.6 秒（13.0 分鐘）。
+
+| Metric | Mean ± population std |
+| --- | --- |
+| Macro F1 | **`0.87686 ± 0.04048`** |
+| Accuracy | `0.86883 ± 0.04263` |
+| Macro Precision | `0.88162 ± 0.04115` |
+| Macro Recall | `0.88069 ± 0.03948` |
+
+| Test fold | Validation fold | Macro F1 | Accuracy |
+| --- | --- | --- | --- |
+| 1 | 2 | `0.89392` | `0.87514` |
+| 2 | 3 | `0.86151` | `0.84234` |
+| 3 | 4 | `0.85169` | `0.83568` |
+| 4 | 5 | `0.88623` | `0.88990` |
+| 5 | 6 | `0.95242` | `0.95085` |
+| 6 | 7 | `0.78472` | `0.77764` |
+| 7 | 8 | `0.86877` | `0.87351` |
+| 8 | 9 | `0.87413` | `0.86600` |
+| 9 | 10 | `0.89547` | `0.88480` |
+| 10 | 1 | `0.89977` | `0.89247` |
+
+Aggregate per-class F1 was: air conditioner `0.72376`, car horn `0.91309`, children playing `0.92602`, dog bark `0.93587`, drilling `0.86849`, engine idling `0.82412`, gun shot `0.98143`, jackhammer `0.79392`, siren `0.93311`, and street music `0.89415`. Air conditioner and jackhammer remain the main error sources; gun shot is the strongest class.
+
+The formal mean is `0.01382` below the three-fold development selection result. Across the ten formal training runs, selected best epochs ranged from 1 to 8 (mean 4.3), confirming the value of validation-selected checkpoints. Training Macro F1 at the selected epoch averaged `0.7394`, but this number is intentionally depressed by Mixup and class-aware resampling and is not directly comparable with clean validation/test metrics. The modest validation-to-test mean decrease does not indicate severe global overfitting; the larger concern is fold variability, especially test fold 6. Consequently, the result should be reported as `0.8769 ± 0.0405`, not as evidence of 90% general performance based on the earlier single fold 10 result.
+
+This locked MN20 method is suitable for the dissertation's AudioSet-transfer comparison. It should not be tuned further using these ten test results. A statistically fair comparison still requires the fixed from-scratch CNN and Transformer protocols to be reported under compatible multi-fold evaluation, and the contribution of AudioSet pretraining must be disclosed.
+
 ## Artifact locations
 
 - Local/Colab outputs：`results/`
 - Drive backup：`/content/drive/MyDrive/urbansound8k_data/experiment_artifacts/pretrained_cnn_recommended/`
+- Formal summary：`pretrained_cnn_mn20_locked_last2_formal_10fold_1seed/formal_10fold_summary/`
 - GitHub：只提交 source、configs、tests 與 documentation，不提交 dataset、cache、checkpoints、results 或 figures。

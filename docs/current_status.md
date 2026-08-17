@@ -41,6 +41,7 @@
 11. 唯一設定鎖定後只執行一次 fold 10 test，Accuracy `0.8949`、Macro F1 `0.9041`；test 不參與選模或後續調參。
 12. EfficientAT v2 development-only study 已完成：8 epochs、weak Mixup (`alpha=0.15`, `p=0.5`) 與解凍最後 3 個 blocks 的唯一勝出設定達 Macro F1 `0.8844 ± 0.0165`、Accuracy `0.8824 ± 0.0141`。V2 沒有再次執行 fold 10；上述 v1 test 分數不能當作 v2 test result。
 13. EfficientAT recommended development study 已完成。Waveform augmentation 與 time-shift TTA 均退步；MN10 固定 3-seed ensemble 只提高 `0.00026` 且 variance 變差。MN20 解凍最後 2 blocks 達 Macro F1 `0.89069 ± 0.01165`、Accuracy `0.88742 ± 0.01062`，依 folds 1、4、7 結果鎖定為唯一正式方法。鎖定時未讀取任何新 test 結果。
+14. 已用鎖定 commit `78a3245` 完成 MN20 正式 10-fold：Macro F1 `0.87686 ± 0.04048`、Accuracy `0.86883 ± 0.04263`、Macro Precision `0.88162 ± 0.04115`、Macro Recall `0.88069 ± 0.03948`。十個 test folds 各只評估一次，結果與 checkpoints 已備份至 Drive。最弱類別為 air conditioner (`0.72376`) 與 jackhammer (`0.79392`)；fold 6 F1 `0.78472` 顯示 fold variability 仍是主要風險。
 
 ## 已建立內容
 
@@ -121,13 +122,13 @@
 
 ## 下一步
 
-第三模型的 recommended development-only 方法選擇已完成。下一步是固定設定的正式統計驗證：
+AudioSet-pretrained 第三模型的 development 選擇與正式 10-fold 均已完成。下一步是完成主模型及論文比較：
 
 1. 以 `configs/cnn_aug_final.yaml` 執行固定 from-scratch CNN 10-fold，不再依 fold 結果調參。
-2. 立即以 `configs/pretrained_cnn_mn20_locked_last2.yaml` 執行唯一 EfficientAT fixed-config 10-fold；固定 seed 42、無 TTA，不再依任何 test fold 調參。
+2. 不再使用 MN20 formal test folds 調參；將鎖定結果整理成第三模型的 transfer-learning comparison。
 3. 整理 from-scratch CNN、from-scratch Transformer 與 AudioSet-pretrained CNN 的公平比較，明確區分從零訓練與 AudioSet transfer learning。
-4. 將 10-fold mean/std、per-class F1 與 confusion matrix 納入論文結果及限制分析。
+4. 將 10-fold mean/std、per-class F1 與 aggregate confusion matrix 納入論文結果及限制分析。
 
 ## 目前完成度判斷
 
-專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA、3-seed ensemble，以及 EfficientAT v1/v2/recommended transfer-learning studies 均已完成。Recommended study 只使用 development validation，唯一 MN20 方法已鎖定。整體目標尚未完成，因為固定設定的正式 10-fold 統計、最終圖表解讀與 8 頁論文仍需完成。
+專案基礎設施、資料處理、模型 pipeline、CNN 受控 augmentation 搜尋、EMA、3-seed ensemble，以及 EfficientAT v1/v2/recommended transfer-learning studies 均已完成。唯一 MN20 方法已依 development folds 鎖定，且正式 10-fold 已完成。整體目標尚未完成，因為 from-scratch 主模型的固定 10-fold、公平三模型比較、最終圖表解讀與 8 頁論文仍需完成。
