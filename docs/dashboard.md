@@ -17,6 +17,7 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 3. CNN 作為主要基準；從零訓練 Transformer 作為架構比較；AudioSet-pretrained CNN 作為 transfer-learning 比較。
 4. EMA 與 3-seed ensemble 作為已完成但沒有改善的延伸實驗，保留重現程式與誠實結果。
 5. 實驗 artifacts 備份至 Google Drive，GitHub 只提交程式碼、設定與文件。
+6. MN20 post-formal ensemble/checkpoint-averaging/focal-loss study 僅限 folds 1、4、7 validation；不得重新查看正式 test folds。
 
 ## 最高風險
 
@@ -39,6 +40,7 @@ Project definition 已確認方向為「Sound Event Detection Using Machine Lear
 2. 將 from-scratch CNN、Transformer 與 AudioSet-pretrained CNN 整理成公平比較。
 3. 在論文中清楚說明 pretrained 模型使用額外 AudioSet 資訊，不能把差異歸因於 CNN 架構 alone。
 4. 將 MN20 10-fold mean/std、per-class F1 與 fold variability 納入結果與限制分析。
+5. 完成獨立 post-formal development study，將其標示為探索性補充，不改寫正式結果。
 
 文獻與寫作同步更新：
 

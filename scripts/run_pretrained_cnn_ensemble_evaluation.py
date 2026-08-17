@@ -22,13 +22,14 @@ def run_development_evaluation(
     output_dir: Path,
     tta_offsets_seconds: list[float],
     backup_root: Path | None = None,
+    checkpoint_name: str = "best_model.pt",
 ) -> dict:
     if output_dir.exists():
         raise FileExistsError(f"Refusing to overwrite development evaluation: {output_dir}")
     output_dir.mkdir(parents=True)
     rows: list[dict] = []
     for fold in folds:
-        checkpoints = [root / f"valfold{fold}" / "best_model.pt" for root in run_roots]
+        checkpoints = [root / f"valfold{fold}" / checkpoint_name for root in run_roots]
         missing = [path for path in checkpoints if not path.exists()]
         if missing:
             raise FileNotFoundError(f"Missing checkpoint(s) for fold {fold}: {missing}")
@@ -57,6 +58,7 @@ def run_development_evaluation(
         "checkpoint_count_per_fold": len(run_roots),
         "development_folds": folds,
         "tta_offsets_seconds": tta_offsets_seconds,
+        "checkpoint_name": checkpoint_name,
         "folds": rows,
         "test_evaluated": False,
     }
@@ -88,6 +90,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--tta-offsets-seconds", nargs="+", type=float, default=[0.0])
     parser.add_argument("--backup-root", type=Path)
+    parser.add_argument("--checkpoint-name", default="best_model.pt")
     return parser.parse_args()
 
 
@@ -99,6 +102,7 @@ def main() -> int:
         output_dir=args.output_dir,
         tta_offsets_seconds=[float(value) for value in args.tta_offsets_seconds],
         backup_root=args.backup_root,
+        checkpoint_name=args.checkpoint_name,
     )
     return 0
 

@@ -409,3 +409,38 @@ EfficientAT MN10 v2 在 folds 1、4、7 達到 Macro F1 `0.8844 ± 0.0165`，但
 - [x] 只依 mean validation Macro F1 鎖定唯一方法。
 - [x] 執行一次固定 formal 10-fold 並備份 artifacts。
 - [x] 核對十個 test predictions、十個 checkpoints、aggregate summary 與 Drive backup。
+
+---
+
+## DEC-011：正式 10-fold 後的 MN20 延伸僅作 development-only 探索
+
+- 日期：2026-08-17
+- 狀態：執行中
+- 相關文件：`docs/experiments/pretrained-cnn-postformal-exploration.md`
+- 相關會議：無；使用者要求延伸三 seed ensemble、checkpoint averaging 與 loss study
+
+#### 背景
+
+MN20 的固定正式 10-fold 已完成，其 test-fold 結果已被觀察，因此後續調整不能再被描述為原正式 protocol 的一部分，也不能依正式 fold 或類別表現作選擇。
+
+#### 決策
+
+建立獨立 branch，僅使用既有 development folds 1、4、7 的 mean validation Macro F1 比較：固定 seeds 42/123/2026 probability ensemble、epochs 5--8 的 validation top-3 checkpoint weight average，以及唯一 loss 變因 class-balanced focal loss (`gamma=1.5`)。Cross-entropy 與 focal loss 共用完全相同的 linear-probe checkpoints；所有 runner 禁止 test evaluation。
+
+#### 理由
+
+這三項方法分別處理 seed variance、訓練軌跡 variance 與困難樣本權重，而且不需要改變 waveform cache、官方 frontend、backbone 容量或資料切分。共用初始化及固定其餘參數可將差異歸因於單一方法。
+
+#### 影響
+
+- 對結果：新數字必須標示為 post-formal exploratory validation，不得取代 `0.87686 ± 0.04048` 的正式 10-fold 結果。
+- 對資料：不重新 preprocess，不修改 raw audio 或 waveform/Mel cache。
+- 對論文：可作為延伸實驗與 future work 證據，但不能宣稱是獨立 test-set 改善。
+- 對 Git：程式、設定與文件提交到獨立分支；checkpoints/results 只備份到 Drive。
+
+#### 後續行動
+
+- [ ] 在 Colab 完成全部 development-only runs。
+- [ ] 依 mean validation Macro F1 整理各方法效果與 variance。
+- [ ] 確認所有 manifests 的 `test_evaluated=false`。
+- [ ] 將結果及限制寫回實驗紀錄。

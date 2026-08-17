@@ -14,6 +14,8 @@ from torch.utils.data import DataLoader, WeightedRandomSampler
 from tqdm import tqdm
 
 from src.data import UrbanSound8KWaveformDataset, WaveformBatchAugmenter
+from src.checkpoint_averaging import average_state_dicts, clone_state_dict_to_cpu
+from src.losses import build_classification_loss
 from src.models.pretrained_efficientat import PretrainedEfficientATClassifier
 from src.pretrained_cnn_inference import predict_loader, tta_offsets_samples
 from src.utils.config import load_config
@@ -306,10 +308,7 @@ def train_validation_fold(
         model.set_training_stage("linear_probe", partial_last_blocks=model.partial_last_blocks)
     initial_parameter_counts = model.parameter_counts()
     class_weights = _class_weights(train_set, labels, device, training_config.get("class_weighting", {}))
-    criterion = nn.CrossEntropyLoss(
-        weight=class_weights,
-        label_smoothing=float(training_config.get("label_smoothing", 0.0)),
-    )
+    criterion = build_classification_loss(training_config, class_weights)
     encoder_lr = float(training_config.get("encoder_learning_rate", 1e-5))
     head_lr = float(training_config.get("head_learning_rate", 3e-4))
     optimizer = torch.optim.AdamW(
@@ -332,6 +331,18 @@ def train_validation_fold(
     history: list[dict] = []
     best_f1 = -1.0
     best_path = run_dir / "best_model.pt"
+    averaging_config = dict(training_config.get("checkpoint_averaging") or {})
+    averaging_enabled = bool(averaging_config.get("enabled", False))
+    averaging_start_epoch = int(averaging_config.get("start_epoch", 1))
+    averaging_top_k = int(averaging_config.get("top_k", 3))
+    if averaging_enabled:
+        if not 1 <= averaging_start_epoch <= epochs:
+            raise ValueError("checkpoint_averaging.start_epoch must be within the training epochs.")
+        if averaging_top_k < 2:
+            raise ValueError("checkpoint_averaging.top_k must be at least 2.")
+        if averaging_top_k > epochs - averaging_start_epoch + 1:
+            raise ValueError("checkpoint_averaging.top_k exceeds the eligible epoch count.")
+    averaging_candidates: list[dict] = []
     for epoch in range(1, epochs + 1):
         if gradual_enabled and epoch == head_only_epochs + 1:
             model.set_training_stage("partial_finetune", partial_last_blocks=model.partial_last_blocks)
@@ -381,22 +392,30 @@ def train_validation_fold(
         }
         history.append(row)
         print(json.dumps(row, sort_keys=True))
+        checkpoint_payload = {
+            "model_state": model.state_dict(),
+            "config": config,
+            "val_fold": val_fold,
+            "sealed_test_fold": test_fold,
+            "best_epoch": epoch,
+            "selected_by": "validation_macro_f1",
+            "checkpoint_sha256": model.checkpoint_sha256,
+            "training_stage": model.stage,
+            "partial_last_blocks": model.partial_last_blocks,
+        }
         if val_metrics["f1_macro"] > best_f1:
             best_f1 = val_metrics["f1_macro"]
-            torch.save(
+            torch.save(checkpoint_payload, best_path)
+        if averaging_enabled and epoch >= averaging_start_epoch:
+            averaging_candidates.append(
                 {
-                    "model_state": model.state_dict(),
-                    "config": config,
-                    "val_fold": val_fold,
-                    "sealed_test_fold": test_fold,
-                    "best_epoch": epoch,
-                    "selected_by": "validation_macro_f1",
-                    "checkpoint_sha256": model.checkpoint_sha256,
-                    "training_stage": model.stage,
-                    "partial_last_blocks": model.partial_last_blocks,
-                },
-                best_path,
+                    "epoch": epoch,
+                    "val_f1_macro": float(val_metrics["f1_macro"]),
+                    "model_state": clone_state_dict_to_cpu(model.state_dict()),
+                }
             )
+            averaging_candidates.sort(key=lambda item: float(item["val_f1_macro"]), reverse=True)
+            del averaging_candidates[averaging_top_k:]
         if scheduler is not None:
             scheduler.step()
 
@@ -419,6 +438,57 @@ def train_validation_fold(
         json.dumps(validation_metrics, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    checkpoint_averaging_metrics = None
+    if averaging_enabled:
+        averaged_path = run_dir / "averaged_model.pt"
+        selected_candidates = sorted(
+            averaging_candidates,
+            key=lambda item: int(item["epoch"]),
+        )
+        averaged_state = average_state_dicts(
+            [candidate["model_state"] for candidate in selected_candidates]
+        )
+        torch.save(
+            {
+                "model_state": averaged_state,
+                "config": config,
+                "val_fold": val_fold,
+                "sealed_test_fold": test_fold,
+                "selected_epochs": [int(candidate["epoch"]) for candidate in selected_candidates],
+                "source_validation_f1": [
+                    float(candidate["val_f1_macro"]) for candidate in selected_candidates
+                ],
+                "selected_by": "top_k_validation_macro_f1_checkpoint_weight_average",
+                "checkpoint_sha256": model.checkpoint_sha256,
+                "training_stage": model.stage,
+                "partial_last_blocks": model.partial_last_blocks,
+            },
+            averaged_path,
+        )
+        model.load_state_dict(averaged_state)
+        averaged_val_loss, averaged_val_metrics = _run_epoch(
+            model,
+            val_loader,
+            criterion,
+            device,
+            labels,
+            mixed_precision=mixed_precision,
+        )
+        checkpoint_averaging_metrics = {
+            "selected_epochs": [int(candidate["epoch"]) for candidate in selected_candidates],
+            "source_validation_f1": [
+                float(candidate["val_f1_macro"]) for candidate in selected_candidates
+            ],
+            "val_accuracy": float(averaged_val_metrics["accuracy"]),
+            "val_f1_macro": float(averaged_val_metrics["f1_macro"]),
+            "val_loss": float(averaged_val_loss),
+            "selection_metric": "validation_macro_f1",
+            "test_evaluated": False,
+        }
+        (run_dir / "checkpoint_averaging_metrics.json").write_text(
+            json.dumps(checkpoint_averaging_metrics, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
     manifest = {
         "run_name": run_name,
         "model_name": f"EfficientAT {model.variant.upper().replace('_AS', '')}",
@@ -456,6 +526,13 @@ def train_validation_fold(
             "final_stage": requested_stage,
         },
         "mixup": dict(training_config.get("mixup") or {}),
+        "loss": dict(training_config.get("loss") or {"name": "cross_entropy"}),
+        "checkpoint_averaging": {
+            "enabled": averaging_enabled,
+            "start_epoch": averaging_start_epoch,
+            "top_k": averaging_top_k,
+            "metrics": checkpoint_averaging_metrics,
+        },
         "waveform_augmentation": dict(training_config.get("waveform_augmentation") or {}),
         "frontend_augmentation": {
             "enabled": bool(model_config.get("frontend_augmentation", False)),

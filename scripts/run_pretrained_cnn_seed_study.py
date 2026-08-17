@@ -14,6 +14,29 @@ from src.train_pretrained_cnn import train_validation_fold
 from src.utils.config import load_config
 
 
+def train_linear_seed_runs(
+    linear_config: dict,
+    seeds: list[int],
+    output_name: str,
+    backup_root: Path | None = None,
+) -> dict[int, dict[int, Path]]:
+    folds = [int(value) for value in linear_config["data"].get("development_folds", [1, 4, 7])]
+    linear_dirs_by_seed: dict[int, dict[int, Path]] = {}
+    for seed in seeds:
+        linear = copy.deepcopy(linear_config)
+        linear["seed"] = int(seed)
+        linear["run_name"] = f"{output_name}_linear_seed{seed}"
+        linear_dirs_by_seed[int(seed)] = {}
+        for fold in folds:
+            linear_dirs_by_seed[int(seed)][fold] = train_validation_fold(
+                linear,
+                val_fold=fold,
+                backup_root=backup_root,
+                evaluate_test=False,
+            )
+    return linear_dirs_by_seed
+
+
 def run_seed_study(
     linear_config: dict,
     finetune_config: dict,
@@ -21,23 +44,26 @@ def run_seed_study(
     output_name: str,
     tta_offsets_seconds: list[float],
     backup_root: Path | None = None,
+    linear_dirs_by_seed: dict[int, dict[int, Path]] | None = None,
 ) -> dict:
     folds = [int(value) for value in finetune_config["data"].get("development_folds", [1, 4, 7])]
     results_dir = Path(finetune_config.get("outputs", {}).get("results_dir", "results"))
     run_roots: list[Path] = []
-    for seed in seeds:
-        linear = copy.deepcopy(linear_config)
-        linear["seed"] = int(seed)
-        linear["run_name"] = f"{output_name}_linear_seed{seed}"
-        linear_dirs: dict[int, Path] = {}
-        for fold in folds:
-            linear_dirs[fold] = train_validation_fold(
-                linear,
-                val_fold=fold,
-                backup_root=backup_root,
-                evaluate_test=False,
-            )
+    if linear_dirs_by_seed is None:
+        linear_dirs_by_seed = train_linear_seed_runs(
+            linear_config,
+            seeds=seeds,
+            output_name=output_name,
+            backup_root=backup_root,
+        )
 
+    for seed in seeds:
+        linear_dirs = linear_dirs_by_seed.get(int(seed), {})
+        missing_folds = [fold for fold in folds if fold not in linear_dirs]
+        if missing_folds:
+            raise FileNotFoundError(
+                f"Shared linear checkpoints for seed {seed} are missing folds {missing_folds}."
+            )
         finetune = copy.deepcopy(finetune_config)
         finetune["seed"] = int(seed)
         finetune["run_name"] = f"{output_name}_seed{seed}"

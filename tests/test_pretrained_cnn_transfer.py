@@ -148,6 +148,30 @@ class PretrainedCNNConfigTests(unittest.TestCase):
         selected["evaluation"] = locked["evaluation"]
         self.assertEqual(selected, locked)
 
+    def test_postformal_loss_configs_change_only_loss_and_run_name(self) -> None:
+        try:
+            import yaml
+        except ImportError as exc:
+            self.skipTest(f"PyYAML unavailable: {exc}")
+        ce = yaml.safe_load(
+            (ROOT / "configs" / "pretrained_cnn_mn20_postformal_ce.yaml").read_text()
+        )
+        focal = yaml.safe_load(
+            (ROOT / "configs" / "pretrained_cnn_mn20_postformal_focal.yaml").read_text()
+        )
+        for config in (ce, focal):
+            self.assertEqual(config["data"]["development_folds"], [1, 4, 7])
+            self.assertEqual(config["data"]["sealed_test_fold"], 10)
+            self.assertFalse(config["evaluation"]["locked_for_test"])
+            self.assertNotIn("formal_cross_validation", config["evaluation"])
+            self.assertTrue(config["training"]["checkpoint_averaging"]["enabled"])
+            self.assertEqual(config["training"]["checkpoint_averaging"]["start_epoch"], 5)
+            self.assertEqual(config["training"]["checkpoint_averaging"]["top_k"], 3)
+
+        ce["run_name"] = focal["run_name"]
+        ce["training"]["loss"] = focal["training"]["loss"]
+        self.assertEqual(ce, focal)
+
 
 try:
     import numpy as np
@@ -155,6 +179,8 @@ try:
     import torch
 
     from src.data import UrbanSound8KWaveformDataset
+    from src.checkpoint_averaging import average_state_dicts
+    from src.losses import FocalCrossEntropyLoss
     from src.models.pretrained_efficientat import PretrainedEfficientATClassifier
     from src.train_pretrained_cnn import _add_unfrozen_encoder_group
 except Exception as exc:  # pragma: no cover - dependency availability controls skip
@@ -262,6 +288,23 @@ class PretrainedCNNTransferTests(unittest.TestCase):
         model.set_training_stage("partial_finetune", partial_last_blocks=2)
         _add_unfrozen_encoder_group(model, optimizer, encoder_lr=2e-5, head_lr=3e-4)
         self.assertEqual([group["group_name"] for group in optimizer.param_groups], ["head", "encoder"])
+
+    def test_focal_gamma_zero_matches_weighted_cross_entropy(self) -> None:
+        logits = torch.tensor([[2.0, -0.5], [-1.0, 1.5], [0.1, 0.2]])
+        targets = torch.tensor([0, 1, 0])
+        weights = torch.tensor([0.7, 1.3])
+        focal = FocalCrossEntropyLoss(gamma=0.0, weight=weights)(logits, targets)
+        cross_entropy = torch.nn.functional.cross_entropy(logits, targets, weight=weights)
+        self.assertTrue(torch.allclose(focal, cross_entropy, atol=1e-7))
+
+    def test_checkpoint_average_averages_float_and_keeps_integer_buffer(self) -> None:
+        states = [
+            {"weight": torch.tensor([1.0, 3.0]), "count": torch.tensor(4)},
+            {"weight": torch.tensor([3.0, 5.0]), "count": torch.tensor(8)},
+        ]
+        averaged = average_state_dicts(states)
+        self.assertTrue(torch.equal(averaged["weight"], torch.tensor([2.0, 4.0])))
+        self.assertEqual(int(averaged["count"]), 4)
 
 
 if __name__ == "__main__":
